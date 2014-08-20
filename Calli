@@ -1,7 +1,0 @@
--- Calli script for Cuiloa
-
-target "tests/tests"
-  type "c++"
-  files "tests/main.cc"
-  cxxflags "-Wall -Wextra -Iinclude -DCUILOA_DEBUG"
-  pkgconfig "cppunit"

@@ -2,3 +2,8 @@
 *.swp
 doc/html
 tests/tests
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+cuiloa-cppunit-test
+Makefile

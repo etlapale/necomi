@@ -1,24 +1,4 @@
-/*
- * cuiloa - A scientific multi-dimensional array library.
- * Copyright (C) 2007  Émilien Tlapale
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-#ifndef __CUILOA_ARRAY_H
-#define __CUILOA_ARRAY_H
-
+#pragma once
 
 #include <string.h>
 
@@ -26,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+#include <stdarg.h>
 
 namespace cuiloa
 {
@@ -455,14 +436,3 @@ namespace cuiloa
 #define cuiloa_for_path4(a, path, i, j, k, l)				\
   cuiloa_for_path2(a, path, i, j) cuiloa_for_path2(a, path, k, l)
 }
-
-#endif
-
-
-
-/*
- * Local Variables:
- * mode: c++
- * coding: utf-8
- * End:
- */
