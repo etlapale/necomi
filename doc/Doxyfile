@@ -1,0 +1,19 @@
+# Doxyfile 1.5.2
+
+PROJECT_NAME           = cuiloa
+PROJECT_NUMBER         = 0.0.0
+OUTPUT_DIRECTORY       = doc
+OUTPUT_LANGUAGE        = English
+
+JAVADOC_AUTOBRIEF      = YES
+DETAILS_AT_TOP         = YES
+EXTRACT_ALL            = YES
+
+INPUT                  = include
+RECURSIVE              = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+SHOW_DIRECTORIES       = NO
+OPTIMIZE_OUTPUT_FOR_C  = NO
+
