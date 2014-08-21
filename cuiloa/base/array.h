@@ -91,13 +91,6 @@ namespace cuiloa
       /**
        * Return a reference to a single element in the array.
        */
-      T& operator()(unsigned int* path);
-      
-      T operator()(unsigned int* path) const;
-
-      /**
-       * Return a reference to a single element in the array.
-       */
       T& operator()(unsigned int index_0, ...);
 
       T operator()(unsigned int index_0, ...) const;
@@ -289,19 +282,14 @@ namespace cuiloa
       return ((T &) (*this)) = src;
     }
   
+#if 0
   template <typename T, unsigned int n>
     T&
     Array<T,n>::operator()(unsigned int* path)
     {
       return m_data[this->index(path)];
     }
-  
-  template <typename T, unsigned int n>
-    T
-    Array<T,n>::operator()(unsigned int* path) const
-    {
-      return m_data[this->index(path)];
-    }
+#endif
   
   template <typename T, unsigned int n>
     T&
