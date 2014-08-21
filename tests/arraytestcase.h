@@ -111,25 +111,29 @@ public:
     CPPUNIT_ASSERT(a2(1,2) == 6
         && a2(2,3) == a2.index(2,3));
   }
+
+  void test_slices()
+  {
+    Array<double,1> a1(127);
+    for (unsigned int i = 0; i < a1.size(); i++)
+      a1(i) = i;
+    auto a1s = a1[45];
+    CPPUNIT_ASSERT(a1s.dimensions().empty()
+        && a1s() == 45);
+
+    Array<double,2> a2(3,4);
+    for (unsigned int i = 0; i < a2.size(); i++)
+      a2.data()[i] = i;
+    auto a2s = a2[2];
+    CPPUNIT_ASSERT(a2s.dimensions().size() == 1
+        && a2s.size() == 4
+        && a2s.dimensions()[0] == 4);
+    CPPUNIT_ASSERT(a2s.strides().size() == 1
+        && a2s.strides()[0] == 1);
+    CPPUNIT_ASSERT(a2s(2) == 10);
+    CPPUNIT_ASSERT(a2s(3) == 11);
+  }
 #if 0
-  void test_indexing()
-  {
-    unsigned int dims[] = {3, 4};
-    Array<double,2> a(dims);
-
-    a(1,1) = 124;
-
-    CPPUNIT_ASSERT(true);
-  }
-
-  void
-  testStrides()
-  {
-    unsigned int dims[] = {4, 5, 6};
-    cuiloa::Array<double,3> a(dims);
-    CPPUNIT_ASSERT(a.strides()[0] == 30);
-  }
-
   void
   testViews()
   {
@@ -184,6 +188,8 @@ public:
 	       ("test_indices", &ArrayTestCase::test_indices));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_data", &ArrayTestCase::test_data));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_slices", &ArrayTestCase::test_slices));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_indexing", &ArrayTestCase::test_indexing));
