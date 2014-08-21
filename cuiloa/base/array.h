@@ -76,8 +76,6 @@ namespace cuiloa
        */
       unsigned int size() const;
 
-      bool is_empty() const;
-      
       /**
        * Return a shared view of the array.
        * The view will be of the given size starting at the desired
@@ -378,13 +376,6 @@ namespace cuiloa
     Array<T,n>::data() const
     {
       return m_data;
-    }
-  
-  template <typename T, unsigned int n>
-    bool
-    Array<T,n>::is_empty() const
-    {
-      return this->size() == 0;
     }
   
   template <typename T, unsigned int n>
