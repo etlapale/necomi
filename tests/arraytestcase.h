@@ -2,27 +2,85 @@
 #define __CUILOA_ARRAY_TEST_CASE
 
 #include <iostream>
+using namespace std;
 
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestCase.h>
 #include <cppunit/TestFixture.h>
 
-#include <cuiloa.h>
-
-
-using namespace std;
-
+#include <cuiloa/cuiloa.h>
+using namespace cuiloa;
 
 class ArrayTestCase : public CppUnit::TestCase
 {
 public:
   void
-  testCreation()
+  test_creation()
   {
-    unsigned int dims[] = {100, 100, 25};
-    cuiloa::Array<double,3> a(dims);
-    CPPUNIT_ASSERT(a.size() == 100*100*25);
+    Array<double,0> a0;
+    CPPUNIT_ASSERT(a0.size() == 1);
+
+    Array<double,1> a1(127);
+    CPPUNIT_ASSERT(a1.size() == 127);
+
+    Array<double,2> a2(3,4);
+    CPPUNIT_ASSERT(a2.size() == 3*4);
+
+    Array<double,5> a5(8,1,7,2,9);
+    CPPUNIT_ASSERT(a5.size() == 8*1*7*2*9);
+  }
+
+  void
+  test_dimensions()
+  {
+    Array<double,0> a0;
+    CPPUNIT_ASSERT(a0.dimensions().empty());
+
+    Array<double,1> a1(127);
+    CPPUNIT_ASSERT(a1.dimensions().size() == 1
+        && a1.dimensions()[0] == 127);
+
+    Array<double,2> a2(3,4);
+    CPPUNIT_ASSERT(a2.dimensions().size() == 2
+        && a2.dimensions()[0] == 3
+        && a2.dimensions()[1] == 4);
+
+    Array<double,5> a5(8,1,7,2,9);
+    CPPUNIT_ASSERT(a5.dimensions().size() == 5
+        && a5.dimensions()[1] == 1
+        && a5.dimensions()[4] == 9);
+  }
+
+  void
+  test_strides()
+  {
+    Array<double,0> a0;
+    CPPUNIT_ASSERT(a0.strides().empty());
+
+    Array<double,1> a1(127);
+    CPPUNIT_ASSERT(a1.strides().size() == 1
+        && a1.strides()[0] == 1);
+
+    Array<double,2> a2(3,4);
+    CPPUNIT_ASSERT(a2.strides().size() == 2
+        && a2.strides()[0] == 4
+        && a2.strides()[1] == 1);
+
+    Array<double,5> a5(8,1,7,2,9);
+    CPPUNIT_ASSERT(a5.strides().size() == 5
+        && a5.strides()[1] == 1*7*2*9
+        && a5.strides()[4] == 1);
+  }
+#if 0
+  void test_indexing()
+  {
+    unsigned int dims[] = {3, 4};
+    Array<double,2> a(dims);
+
+    a(1,1) = 124;
+
+    CPPUNIT_ASSERT(true);
   }
 
   void
@@ -47,6 +105,7 @@ public:
     
     unsigned int shape[] = {3, 1, 2};
     unsigned int offset[] = {0, 1, 1};
+#if 0
     auto b = a.view(shape, offset);
     CPPUNIT_ASSERT(b.dimensions()[0] == 3);
     CPPUNIT_ASSERT(b.dimensions()[2] == 2);
@@ -54,7 +113,9 @@ public:
     CPPUNIT_ASSERT(b(0,0,0) == 5);
     CPPUNIT_ASSERT(b(1,0,0) == 13);
     CPPUNIT_ASSERT(b(2,0,1) == 22);
+#endif
   }
+#endif
 
 #if 0
   void
@@ -75,13 +136,21 @@ public:
   {
     CppUnit::TestSuite* s = new CppUnit::TestSuite("ArrayTestSuite");
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
-	       ("testCreation", &ArrayTestCase::testCreation));
+	       ("test_creation", &ArrayTestCase::test_creation));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_dimensions", &ArrayTestCase::test_dimensions));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_strides", &ArrayTestCase::test_strides));
+#if 0
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_indexing", &ArrayTestCase::test_indexing));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testStrides", &ArrayTestCase::testStrides));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));
     /*s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testInrCodec", &ArrayTestCase::testInrCodec));*/
+#endif
     return s;
   }
 };

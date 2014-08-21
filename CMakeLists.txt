@@ -5,7 +5,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 
-include_directories ("${PROJECT_SOURCE_DIR}/cuiloa")
+include_directories ("${PROJECT_SOURCE_DIR}")
 
 find_package (HDF5 COMPONENTS "C;CXX")
 if (HDF5_FOUND)

@@ -2,11 +2,13 @@
 #pragma once
 
 #include "base/array.h"
+#if 0
 #include "filters/deriche.h"
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
 #include "codecs/inr.h"
+#endif
 
 
 /**
