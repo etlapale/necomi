@@ -135,14 +135,6 @@ public:
   Array<T,N> operator[](unsigned int index) const;
 
   /**
-   * Return a reference to a single element in the array.
-   */
-  template <typename... I>
-  T& operator()(I... indices);
-
-  T operator()(unsigned int index_0, ...) const;
-  
-  /**
    * Convert a singleton to its value.
    */
   operator T&();
@@ -169,7 +161,31 @@ public:
   }
 
   /**
+   * Return a reference to a single element.
+   */
+  template <typename ...Indices>
+  T& operator()(Indices... indices)
+  {
+    return m_data.get()[index(indices...)];
+  }
+
+  /**
+   * Return the value of a single element.
+   */
+  template <typename ...Indices>
+  T operator()(Indices... indices) const
+  {
+    return m_data.get()[index(indices...)];
+  }
+
+  /**
    * Return the data associated with the array.
+   */
+  T* data()
+  { return m_data.get(); }
+
+  /**
+   * Return the immutable data associated with the array.
    */
   const T* data() const
   { return m_data.get(); }
@@ -255,92 +271,10 @@ template <typename T, unsigned int n>
   }
 
 template <typename T, unsigned int n>
-  Array<T,n>::operator T&()
-  {
-#ifdef CUILOA_DEBUG
-    if (this->size() != 1)
-      throw ArrayIndexException("Cannot index-cast a non-singleton");
-#endif /* CUILOA_DEBUG */
-    
-    return m_data[0];
-  }
-
-template <typename T, unsigned int n>
   T
   Array<T,n>::operator=(const T & src)
   {
     return ((T &) (*this)) = src;
-  }
-
-#if 0
-template <typename T, unsigned int n>
-  T&
-  Array<T,n>::operator()(unsigned int* path)
-  {
-    return m_data[this->index(path)];
-  }
-#endif
-
-template <typename T, unsigned int n>
-  template <typename... I>
-T& Array<T,n>::operator()(I... indices)
-{
-  static_assert(sizeof...(I) == n, "improper indices arity");
-#if 0
-    va_list ap;
-    auto index = index_0 * m_strides[0];
-#ifdef CUILOA_DEBUG
-    if (index_0 >= m_dims[0])
-      throw ArrayIndexException("Invalid index");
-#endif /* CUILOA_DEBUG */
-
-    va_start(ap, index_0);
-    
-    for (unsigned int i = 1; i < n; i++)
-#ifdef CUILOA_DEBUG
-      {
-        unsigned int index_i = va_arg(ap, unsigned int);
-        if (index_i >= m_dims[i])
-          throw ArrayIndexException("Invalid index");
-        index += index_i * m_strides[i];
-      }
-#else
-    index += va_arg(ap, unsigned int) * m_strides[i];
-#endif /* CUILOA_DEBUG */
-    
-    va_end (ap);
-    return m_data[index];
-#endif
-    return m_data[0];
-}
-
-template <typename T, unsigned int n>
-  T
-  Array<T,n>::operator()(unsigned int index_0, ...) const
-  {
-    va_list ap;
-    auto index = index_0 * m_strides[0];
-#ifdef CUILOA_DEBUG
-    if (index_0 >= m_dims[0])
-      throw ArrayIndexException("Invalid index");
-#endif /* CUILOA_DEBUG */
-
-    va_start(ap, index_0);
-    
-    for (auto i = 1; i < n; i++)
-#ifdef CUILOA_DEBUG
-      {
-        unsigned int index_i = va_arg(ap, unsigned int);
-        if (index_i >= m_dims[i])
-          throw ArrayIndexException("Invalid index");
-        index += index_i * m_strides[i];
-      }
-#else
-    index += va_arg(ap, unsigned int) * m_strides[i];
-#endif /* CUILOA_DEBUG */
-    
-    va_end (ap);
-    return m_data[index];
   }
 
 template <typename T, unsigned int n>

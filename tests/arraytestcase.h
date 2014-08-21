@@ -88,6 +88,29 @@ public:
         && a2.index(1,3) == 7
         && a2.index(2,1) == 9);
   }
+
+  void
+  test_data()
+  {
+    Array<double,0> a0;
+    a0() = 123.456;
+    CPPUNIT_ASSERT(a0() == 123.456
+        && a0.data()[0] == 123.456);
+
+    Array<double,1> a1(127);
+    a1(32) = 123.456;
+    a1(69) = 456.123;
+    CPPUNIT_ASSERT(a1(32) == 123.456
+        && a1(69) == 456.123
+        && a1.data()[32] == 123.456
+        && a1.data()[69] == 456.123);
+
+    Array<double,2> a2(3,4);
+    for (unsigned int i = 0; i < a2.size(); i++)
+      a2.data()[i] = i;
+    CPPUNIT_ASSERT(a2(1,2) == 6
+        && a2(2,3) == a2.index(2,3));
+  }
 #if 0
   void test_indexing()
   {
@@ -159,6 +182,8 @@ public:
 	       ("test_strides", &ArrayTestCase::test_strides));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_indices", &ArrayTestCase::test_indices));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_data", &ArrayTestCase::test_data));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_indexing", &ArrayTestCase::test_indexing));
