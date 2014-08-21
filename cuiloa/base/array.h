@@ -133,7 +133,7 @@ public:
    * Return a dimensionality reduced view of the array.
    */
   Array<T,N> operator[](unsigned int index) const;
-  
+
   /**
    * Return a reference to a single element in the array.
    */
@@ -152,32 +152,35 @@ public:
    */
   T operator=(const T & src);
 
+#endif
   /**
    * Convert a multi-dimensional position into an offset from
    * the beginning of the data (m_data).
    */
-  template <typename ...Index>
-  unsigned int index(Index... indices)
+  template <typename ...Indices>
+  ArrayIndex index(Indices... indices)
   {
-    static_assert(sizeof...(Index) == N, "improper indices arity");
-    unsigned int inds[] = {indices ...};
+    static_assert(sizeof...(Indices) == N, "improper indices arity");
+    static_assert(all_indices<Indices...>(), "invalid indices type");
 
-    // TODO finish that
-
-    return 0;
+    std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
+    return std::inner_product(idx.cbegin(), idx.cend(),
+                              m_strides.cbegin(), 0);
   }
 
   /**
    * Return the data associated with the array.
    */
-  T* data() const;
+  const T* data() const
+  { return m_data.get(); }
 
+#if 0
   /**
    * Fill an entire array with a single value.
    */
   void fill(T val);
-        
 #endif
+
 protected:
   std::array<ArrayIndex,N> m_dims;
   std::array<ArrayIndex,N> m_strides;
@@ -338,24 +341,6 @@ template <typename T, unsigned int n>
     
     va_end (ap);
     return m_data[index];
-  }
-
-/*
-template <typename T, unsigned int n>
-  unsigned int
-  Array<T,n>::index(unsigned int* pos) const
-  {
-    auto ans = 0;
-    for (unsigned int i = 0; i < n; i++)
-      ans += pos[i] * m_strides[i];
-    return ans;
-  }*/
-
-template <typename T, unsigned int n>
-  T*
-  Array<T,n>::data() const
-  {
-    return m_data;
   }
 
 template <typename T, unsigned int n>

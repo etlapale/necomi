@@ -72,6 +72,22 @@ public:
         && a5.strides()[1] == 1*7*2*9
         && a5.strides()[4] == 1);
   }
+
+  void
+  test_indices()
+  {
+    Array<double,0> a0;
+    CPPUNIT_ASSERT(a0.index() == 0);
+
+    Array<double,1> a1(127);
+    CPPUNIT_ASSERT(a1.index(4) == 4
+        && a1.index(86) == 86);
+
+    Array<double,2> a2(3,4);
+    CPPUNIT_ASSERT(a2.index(0,2) == 2
+        && a2.index(1,3) == 7
+        && a2.index(2,1) == 9);
+  }
 #if 0
   void test_indexing()
   {
@@ -141,6 +157,8 @@ public:
 	       ("test_dimensions", &ArrayTestCase::test_dimensions));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_strides", &ArrayTestCase::test_strides));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_indices", &ArrayTestCase::test_indices));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_indexing", &ArrayTestCase::test_indexing));
