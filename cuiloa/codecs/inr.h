@@ -44,7 +44,7 @@ namespace cuiloa
    * \ingroup Codecs
    */
   template <typename T>
-    Array<T> inr_load(const char* path)
+    Array<T,4> inr_load(const char* path)
     {
       int fp;
       struct stat stbuf;
@@ -114,7 +114,7 @@ namespace cuiloa
       //int dimz[4] = (int[4]) {depth, channels, height, width};
       int dimz[4];
       dimz[0] = depth; dimz[1] = channels; dimz[2] = height; dimz[3] = width;
-      Array<T> a(4, dimz);
+      Array<T,4> a(dimz);
       for (int t = 0; t < depth; t++)
 	for (int v = 0; v < channels; v++)
 	  for (int y = 0; y < height; y++)
@@ -242,11 +242,11 @@ namespace cuiloa
    * \param path Path to the output INR file.
    * \ingroup Codecs
    */
-  template <typename T>
+  template <typename T,unsigned int n>
     void
-    inr_save(const cuiloa::Array<T>& a, const char* path)
+    inr_save(const cuiloa::Array<T,n>& a, const char* path)
     {
-      if (a.dimensions_count() != 3 && a.dimensions_count() != 4)
+      if (n < 3 || 4 < n)
 	throw std::runtime_error("Only arrays with dimensions count equal to"
 				 " 3 or 4 can be saved as INR");
 
@@ -257,7 +257,7 @@ namespace cuiloa
 		       a.dimensions(), a.dimensions_count(), of);
       
       int* pos = new int[a.dimensions_count()];
-      switch (a.dimensions_count())
+      switch (n)
 	{
 	case 3:
 	  cuiloa_for_path3(a, pos, 1, 2, 0)
@@ -296,13 +296,13 @@ namespace cuiloa
        * Append an image to the INR stream.
        */
       INRWriter<T>&
-      append(const cuiloa::Array<T>& frame);
+      append(const cuiloa::Array<T,3>& frame);
       
       /**
        * Append an image to the INR stream.
        */
       INRWriter<T>&
-      operator<<(const cuiloa::Array<T>& frame);
+      operator<<(const cuiloa::Array<T,3>& frame);
       
       /**
        * Update the INR sequence header.
@@ -320,13 +320,8 @@ namespace cuiloa
 
   template <typename T>
     INRWriter<T>&
-    INRWriter<T>::append(const cuiloa::Array<T>& frame)
+    INRWriter<T>::append(const cuiloa::Array<T,3>& frame)
     {
-      /*if (m_fp == NULL)
-	throw std::runtime_error("Could not append to a closed stream");*/
-      if (frame.dimensions_count() > 3)
-	throw std::runtime_error("Too many dimensions for the frame");
-
       const int* dims = frame.dimensions();
         
       // Check if it is the first frame
@@ -362,7 +357,7 @@ namespace cuiloa
 
   template <typename T>
     INRWriter<T>&
-    INRWriter<T>::operator<<(const cuiloa::Array<T>& frame)
+    INRWriter<T>::operator<<(const cuiloa::Array<T,3>& frame)
     {
       return this->append(frame);
     }

@@ -20,34 +20,34 @@ public:
   void
   testCreation()
   {
-    int dims[] = {100, 100, 25};
-    cuiloa::Array<double> a(3, dims);
+    unsigned int dims[] = {100, 100, 25};
+    cuiloa::Array<double,3> a(dims);
     CPPUNIT_ASSERT(a.size() == 100*100*25);
   }
 
   void
   testStrides()
   {
-    int dims[] = {4, 5, 6};
-    cuiloa::Array<double> a(3, dims);
+    unsigned int dims[] = {4, 5, 6};
+    cuiloa::Array<double,3> a(dims);
     CPPUNIT_ASSERT(a.strides()[0] == 30);
   }
 
   void
   testViews()
   {
-    int dims[] = {3, 2, 4};
-    cuiloa::Array<int> a(3, dims);
+    unsigned int dims[] = {3, 2, 4};
+    cuiloa::Array<int,3> a(dims);
     int i = 0;
     
-    for (size_t z = 0; z < 3; z++)
-      for (size_t y = 0; y < 2; y++)
-	for (size_t x = 0; x < 4; x++)
+    for (auto z = 0; z < 3; z++)
+      for (auto y = 0; y < 2; y++)
+	for (auto x = 0; x < 4; x++)
 	  a(z,y,x) = i++;
     
-    int shape[] = {3, 1, 2};
-    int offset[] = {0, 1, 1};
-    cuiloa::Array<int> b = a.view(shape, offset);
+    unsigned int shape[] = {3, 1, 2};
+    unsigned int offset[] = {0, 1, 1};
+    auto b = a.view(shape, offset);
     CPPUNIT_ASSERT(b.dimensions()[0] == 3);
     CPPUNIT_ASSERT(b.dimensions()[2] == 2);
     

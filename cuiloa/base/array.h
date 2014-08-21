@@ -35,46 +35,46 @@ namespace cuiloa
    * target data, ...). Unmodifiable data should be marked as such in
    * the template parameter.
    */
-  template <typename T>
+  template <typename T, unsigned int n>
     class Array
     {
     public:
-      Array();
+      //Array();
 
       /**
        * Create a new multi-dimensional array.
        * If data is passed as argument then it will be destroyed by
        * delete[] by the constructor. The data should also be contiguous.
        */
-      Array(int ndim, const int* dims, T* data = NULL);
+      Array(const unsigned int* dims, T* data = NULL);
 
       /**
        * Create another view on the given array.
        */
-      Array(const Array<T>& src);
+      Array(const Array<T,n>& src);
       
       ~Array();
 
       /** Construct a copy of an array. */
-      Array<T> copy() const;
+      Array<T,n> copy() const;
 
       /** Make the array a view on another one. */
-      Array<T>& operator=(const Array<T>& src);
+      Array<T,n>& operator=(const Array<T,n>& src);
       
       /** Return the number of dimensions in the array. */
-      int dimensions_count() const;
+      //unsigned int dimensions_count() const;
 
       /** Return all the dimensions of the array. */
-      inline const int* dimensions() const;
+      inline const unsigned int* dimensions() const;
       
-      const int* strides() const;
+      const unsigned int* strides() const;
       
       /**
        * Return the total number of elements in the array.
        * This is equivalement to
        * dimensions()[0] * ... * dimensions()[dimensions_count() - 1]
        */
-      int size() const;
+      unsigned int size() const;
 
       bool is_empty() const;
       
@@ -83,26 +83,26 @@ namespace cuiloa
        * The view will be of the given size starting at the desired
        * position.
        */
-      Array<T> view(int* dims, int* offset) const;
+      Array<T,n> view(unsigned int* dims, unsigned int* offset) const;
 
       /**
        * Return a dimensionality reduced view of the array.
        */
-      Array<T> operator[](int index) const;
+      Array<T,n> operator[](unsigned int index) const;
       
       /**
        * Return a reference to a single element in the array.
        */
-      T& operator()(int* path);
+      T& operator()(unsigned int* path);
       
-      T operator()(int* path) const;
+      T operator()(unsigned int* path) const;
 
       /**
        * Return a reference to a single element in the array.
        */
-      T& operator()(int index_0, ...);
+      T& operator()(unsigned int index_0, ...);
 
-      T operator()(int index_0, ...) const;
+      T operator()(unsigned int index_0, ...) const;
       
       /**
        * Convert a singleton to its value.
@@ -118,7 +118,7 @@ namespace cuiloa
        * Convert a multi-dimensional position into an offset from
        * the beginning of the data (m_data).
        */
-      int index(int* pos) const;
+      unsigned int index(unsigned int* pos) const;
 
       /**
        * Return the data associated with the array.
@@ -137,9 +137,8 @@ namespace cuiloa
 	T* m_data;
       };
 
-      int m_ndim;
-      int* m_dims;
-      int* m_strides;
+      unsigned int* m_dims;
+      unsigned int* m_strides;
       bool m_contiguous;
       InnerData *m_inner;
       T* m_data;
@@ -147,13 +146,14 @@ namespace cuiloa
   
   /** Duplicate the given array using new. */
   template <typename T>
-    T* memdup(const T* src, int count)
+    T* memdup(const T* src, unsigned int count)
     {
       T* dst = new T[count];
       memcpy(dst, src, count * sizeof(T));
       return dst;
     }
 
+  /*
   template <typename T>
     Array<T>::Array()
       : m_contiguous(true)
@@ -163,34 +163,33 @@ namespace cuiloa
       m_inner = NULL;
       m_strides = NULL;
       m_data = NULL;
-    }
+    }*/
   
-  template <typename T>
-    Array<T>::Array(int ndim, const int* dims, T* data)
+  template <typename T, unsigned int n>
+    Array<T,n>::Array(const unsigned int* dims, T* data)
       : m_contiguous(true)
     {
-      m_ndim = ndim;
-      m_dims = memdup<int>(dims, ndim);
+      m_dims = memdup<unsigned int>(dims, n);
       m_inner = new InnerData();
       m_inner->m_refcount = 1;
       m_data = m_inner->m_data = data == NULL ? new T[this->size()] : data;
 
       // Build the strides
-      m_strides = new int[ndim];
-      int prev = m_strides[m_ndim - 1] = 1;
-      for (int i = m_ndim - 2; i >= 0; i--)
+      m_strides = new unsigned int[n];
+      auto prev = m_strides[n - 1] = 1;
+      for (int i = n - 2; i >= 0; i--)
 	prev = m_strides[i] = m_dims[i + 1] * prev;
     }
   
-  template <typename T>
-  Array<T>::Array(const Array<T>& src)
+  template <typename T, unsigned int n>
+  Array<T,n>::Array(const Array<T,n>& src)
     : m_dims(NULL), m_strides(NULL), m_inner(NULL)
     {
       this->operator=(src);
     }
   
-  template <typename T>
-    Array<T>::~Array()
+  template <typename T, unsigned int n>
+    Array<T,n>::~Array()
     {
       if (m_inner && --m_inner->m_refcount == 0)
 	delete m_inner;
@@ -200,24 +199,23 @@ namespace cuiloa
 	delete [] m_dims;
     }
 
-  template <typename T>
-    Array<T>
-    Array<T>::copy() const
+  template <typename T, unsigned int n>
+    Array<T,n>
+    Array<T,n>::copy() const
     {
-      Array<T> a(m_ndim, m_dims);
-      for (int i = 0; i < this->size(); i++)
+      Array<T,n> a(m_dims);
+      for (auto i = 0; i < this->size(); i++)
 	a.m_data[i] = m_data[i];
       return a;
     }
 
-  template <typename T>
-    Array<T>&
-    Array<T>::operator=(const Array<T>& src)
+  template <typename T, unsigned int n>
+    Array<T,n>&
+    Array<T,n>::operator=(const Array<T,n>& src)
     {
       this->~Array();
-      m_ndim = src.m_ndim;
-      m_dims = memdup<int>(src.m_dims, m_ndim);
-      m_strides = memdup<int>(src.m_strides, m_ndim);
+      m_dims = memdup<unsigned int>(src.m_dims, n);
+      m_strides = memdup<unsigned int>(src.m_strides, n);
       m_contiguous = src.m_contiguous;
       m_inner = src.m_inner;
       m_inner->m_refcount++;
@@ -225,65 +223,58 @@ namespace cuiloa
       return *this;
     }
 
-  template <typename T>
-    int
-    Array<T>::dimensions_count() const
-    {
-      return m_ndim;
-    }
-
-  template <typename T>
-    inline const int*
-    Array<T>::dimensions() const
+  template <typename T, unsigned int n>
+    inline const unsigned int*
+    Array<T,n>::dimensions() const
     {
       return m_dims;
     }
 
-  template <typename T>
-    const int*
-    Array<T>::strides() const
+  template <typename T, unsigned int n>
+    const unsigned int*
+    Array<T,n>::strides() const
     {
       return m_strides;
     }
 
-  template <typename T>
-    int
-    Array<T>::size() const
+  template <typename T, unsigned int n>
+    unsigned int
+    Array<T,n>::size() const
     {
-      int ans = 1;
-      for (int i = 0; i < m_ndim; i++)
+      auto ans = 1;
+      for (unsigned int i = 0; i < n; i++)
 	ans *= m_dims[i];
       return ans;
     }
 
-  template <typename T>
-    Array<T>
-    Array<T>::view(int* dims, int* offset) const
+  template <typename T, unsigned int n>
+    Array<T,n>
+    Array<T,n>::view(unsigned int* dims, unsigned int* offset) const
     {
-      Array<T> a(*this);
+      Array<T,n> a(*this);
 
-      memcpy (a.m_dims, dims, m_ndim * sizeof(int));
+      memcpy (a.m_dims, dims, n * sizeof(unsigned int));
       a.m_data = &(m_data[this->index(offset)]);
 
       return a;
     }
   
-  template <typename T>
-    Array<T>
-    Array<T>::operator[](int index) const
+  template <typename T, unsigned int n>
+    Array<T,n>
+    Array<T,n>::operator[](unsigned int index) const
     {
-      Array<T> a(*this);
+      Array<T,n> a(*this);
       
       a.m_data = &(m_data[index * m_strides[0]]);
       a.m_ndim--;
-      memmove(a.m_dims, a.m_dims + 1, a.m_ndim * sizeof(int));
-      memmove(a.m_strides, a.m_strides + 1, a.m_ndim * sizeof(int));
+      memmove(a.m_dims, a.m_dims + 1, n * sizeof(unsigned int));
+      memmove(a.m_strides, a.m_strides + 1, a * sizeof(unsigned int));
       
       return a;
     }
 
-  template <typename T>
-    Array<T>::operator T&()
+  template <typename T, unsigned int n>
+    Array<T,n>::operator T&()
     {
 #ifdef CUILOA_DEBUG
       if (this->size() != 1)
@@ -293,33 +284,33 @@ namespace cuiloa
       return m_data[0];
     }
 
-  template <typename T>
+  template <typename T, unsigned int n>
     T
-    Array<T>::operator=(const T & src)
+    Array<T,n>::operator=(const T & src)
     {
       return ((T &) (*this)) = src;
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     T&
-    Array<T>::operator()(int* path)
+    Array<T,n>::operator()(unsigned int* path)
     {
       return m_data[this->index(path)];
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     T
-    Array<T>::operator()(int* path) const
+    Array<T,n>::operator()(unsigned int* path) const
     {
       return m_data[this->index(path)];
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     T&
-    Array<T>::operator()(int index_0, ...)
+    Array<T,n>::operator()(unsigned int index_0, ...)
     {
       va_list ap;
-      int index = index_0 * m_strides[0];
+      auto index = index_0 * m_strides[0];
 #ifdef CUILOA_DEBUG
       if (index_0 >= m_dims[0])
 	throw ArrayIndexException("Invalid index");
@@ -327,28 +318,28 @@ namespace cuiloa
 
       va_start(ap, index_0);
       
-      for (int i = 1; i < m_ndim; i++)
+      for (unsigned int i = 1; i < n; i++)
 #ifdef CUILOA_DEBUG
 	{
-	  int index_i = va_arg(ap, int);
+	  unsigned int index_i = va_arg(ap, unsigned int);
 	  if (index_i >= m_dims[i])
 	    throw ArrayIndexException("Invalid index");
 	  index += index_i * m_strides[i];
 	}
 #else
-      index += va_arg(ap, int) * m_strides[i];
+      index += va_arg(ap, unsigned int) * m_strides[i];
 #endif /* CUILOA_DEBUG */
       
       va_end (ap);
       return m_data[index];
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     T
-    Array<T>::operator()(int index_0, ...) const
+    Array<T,n>::operator()(unsigned int index_0, ...) const
     {
       va_list ap;
-      int index = index_0 * m_strides[0];
+      auto index = index_0 * m_strides[0];
 #ifdef CUILOA_DEBUG
       if (index_0 >= m_dims[0])
 	throw ArrayIndexException("Invalid index");
@@ -356,61 +347,61 @@ namespace cuiloa
 
       va_start(ap, index_0);
       
-      for (int i = 1; i < m_ndim; i++)
+      for (auto i = 1; i < n; i++)
 #ifdef CUILOA_DEBUG
 	{
-	  int index_i = va_arg(ap, int);
+	  unsigned int index_i = va_arg(ap, unsigned int);
 	  if (index_i >= m_dims[i])
 	    throw ArrayIndexException("Invalid index");
 	  index += index_i * m_strides[i];
 	}
 #else
-      index += va_arg(ap, int) * m_strides[i];
+      index += va_arg(ap, unsigned int) * m_strides[i];
 #endif /* CUILOA_DEBUG */
       
       va_end (ap);
       return m_data[index];
     }
   
-  template <typename T>
-    int
-    Array<T>::index(int* pos) const
+  template <typename T, unsigned int n>
+    unsigned int
+    Array<T,n>::index(unsigned int* pos) const
     {
-      int ans = 0;
-      for (int i = 0; i < m_ndim; i++)
+      auto ans = 0;
+      for (unsigned int i = 0; i < n; i++)
 	ans += pos[i] * m_strides[i];
       return ans;
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     T*
-    Array<T>::data() const
+    Array<T,n>::data() const
     {
       return m_data;
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     bool
-    Array<T>::is_empty() const
+    Array<T,n>::is_empty() const
     {
       return this->size() == 0;
     }
   
-  template <typename T>
+  template <typename T, unsigned int n>
     void
-    Array<T>::fill(T val)
+    Array<T,n>::fill(T val)
     {
-      int sz = this->size();
-      for (int i = 0; i < sz; i++)
+      auto sz = this->size();
+      for (auto i = 0; i < sz; i++)
 	m_data[i] = val;
     }
 
 #define cuiloa_for(array, var, dim) \
-  for (int var = 0; var < (array).dimensions()[dim]; var++)
+  for (unsigned int var = 0; var < (array).dimensions()[dim]; var++)
 
 #if 0
   /*#define cuiloa_for(a, i)					\
-  for (int (i) = 0; (i) < (a).dimensions()[(i)]; (i)++)
+  for (unsigned int (i) = 0; (i) < (a).dimensions()[(i)]; (i)++)
 
 #define cuiloa_for2(a, i, j)			\
   cuiloa_for(a, i) cuiloa_for(a, j)

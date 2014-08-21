@@ -21,14 +21,13 @@ namespace cuiloa
    * Apply a Canny-Deriche recursive filter on an array.
    * \ingroup Filters
    */
-  template <typename T>
-    Array<T> &
-    deriche_filter(Array<T> & a, double sigma,
+  template <typename T, unsigned int n>
+    Array<T,n> &
+    deriche_filter(Array<T,n> & a, double sigma,
 		   DericheFilteringType type,
 		   int dim,
 		   bool cond = true)
     {
-      int ndim = a.dimensions_count();
       const int* dims = a.dimensions();
 
       if (a.is_empty() || sigma == 0.0 || dims[dim] <= 1)
@@ -111,8 +110,8 @@ namespace cuiloa
       
       double* y = new double[dims[dim]];
       int stride = a.strides()[dim];
-      int* path = new int[ndim];
-      deriche_filter_inner_loop(0, path, dims, ndim,
+      int* path = new int[n];
+      deriche_filter_inner_loop(0, path, dims,
 				dim, a, y, stride,
 				parity, b1, b2,
 				a0, a1, a2, a3,
@@ -126,23 +125,23 @@ namespace cuiloa
    * deriche_filter(Array<T>&,double,DericheFilteringType,int,bool)
    * and should not be called by normal code.
    */
-  template <typename T>
+  template <typename T, unsigned int n>
     void
-    deriche_filter_inner_loop(int level, int* path,
-			      const int* dims, int ndim,
-			      int dim, cuiloa::Array<T>& array,
+    deriche_filter_inner_loop(unsigned int level, int* path,
+			      const int* dims,
+			      unsigned int dim, cuiloa::Array<T,n>& array,
 			      double* y, int stride,
 			      int parity, double b1, double b2,
 			      double a0, double a1, double a2, double a3,
 			      double g0, double sumg0, double sumg1)
     {
-      if (level < ndim)
+      if (level < n)
 	{
 	  if (level == dim)
 	    {
 	      path[level] = 0;
 	      deriche_filter_inner_loop(level + 1, path,
-					dims, ndim, dim, array, y, stride,
+					dims, dim, array, y, stride,
 					parity, b1, b2, a0, a1, a2, a3, g0, sumg0, sumg1);
 	    }
 	  else
@@ -151,7 +150,7 @@ namespace cuiloa
 		{
 		  path[level] = i;
 		  deriche_filter_inner_loop(level + 1, path,
-					    dims, ndim,
+					    dims,
 					    dim, array, y, stride,
 					    parity, b1, b2, a0, a1, a2, a3, g0, sumg0, sumg1);
 		}
@@ -201,9 +200,9 @@ namespace cuiloa
    * \return A reference to the blurred array.
    * \ingroup Filters
    */
-  template <typename T>
-    Array<T>&
-    deriche_blur(Array<T>& a, int dim, double sigma, bool cond = true)
+  template <typename T,unsigned int n>
+    Array<T,n>&
+    deriche_blur(Array<T,n>& a, unsigned int dim, double sigma, bool cond = true)
     {
       return deriche_filter(a, sigma, DERICHE_BLUR, dim, cond);
     }
@@ -215,12 +214,11 @@ namespace cuiloa
    * deriche_filter(Array<T>&,double,DericheFilteringType,int,bool)
    * \ingroup Filters
    */
-  template <typename T>
-    Array<T>&
-    deriche_blur(Array<T>& a, double sigma)
+  template <typename T, unsigned int n>
+    Array<T,n>&
+    deriche_blur(Array<T,n>& a, double sigma)
     {
-      int ndim = a.dimensions_count();
-      for (int i = 0; i < ndim; i++)
+      for (int i = 0; i < n; i++)
 	deriche_blur(a, i, sigma);
       return a;
     }

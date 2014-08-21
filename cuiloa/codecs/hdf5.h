@@ -34,6 +34,7 @@ namespace cuiloa
     PredType
     hdf5_pred_type(T t)
     {
+      (void) t;
       throw std::runtime_error("Unmanaged primitive type for the HDF5 codec");
     }
 
@@ -44,13 +45,17 @@ namespace cuiloa
       return PredType::NATIVE_DOUBLE;
     }
 
-  template <typename T>
-    Array<T> hdf5_load(const char* filename, const char* dset_name)
+  template <typename T,unsigned int n>
+    Array<T,n> hdf5_load(const char* filename, const char* dset_name)
     {
       H5File file(filename, H5F_ACC_RDONLY);
       DataSet dset = file.openDataSet (dset_name);
       DataSpace dspace = dset.getSpace();
       int rank = dspace.getSimpleExtentNdims();
+      if (rank != n) {
+        throw std::runtime_error("Invalid HDF5 dimensionality");
+      }
+
       hsize_t* hdims = new hsize_t[rank];
       dspace.getSimpleExtentDims(hdims);
       int size = 1;
@@ -67,7 +72,7 @@ namespace cuiloa
       PredType hptype = hdf5_pred_type(*data);
       dset.read(data, hptype, H5S_ALL, H5S_ALL);
 
-      Array<T> a(rank, dims, data);
+      Array<T,n> a(dims, data);
       delete [] dims;
       return a;
     }
