@@ -234,43 +234,43 @@ namespace cuiloa
       return "unsigned fixed\nPIXSIZE=32 bits\nSCALE=2**0";
     }
 
-  /**
-   * Save a complete Array as an INR sequence.
-   * The array to be saved must have a dimension count smaller than four.
-   *
-   * \param a The array to be saved.
-   * \param path Path to the output INR file.
-   * \ingroup Codecs
-   */
-  template <typename T,unsigned int n>
-    void
-    inr_save(const cuiloa::Array<T,n>& a, const char* path)
-    {
-      if (n < 3 || 4 < n)
-	throw std::runtime_error("Only arrays with dimensions count equal to"
-				 " 3 or 4 can be saved as INR");
+/**
+ * Save a complete Array as an INR sequence.
+ * The array to be saved must have a dimension count smaller than four.
+ *
+ * \param a The array to be saved.
+ * \param path Path to the output INR file.
+ * \ingroup Codecs
+ */
+template <typename T,ArrayIndex N>
+void
+inr_save(const cuiloa::Array<T,N>& a, const char* path)
+{
+  if (n < 3 || 4 < n)
+    throw std::runtime_error("Only arrays with dimensions count equal to"
+                             " 3 or 4 can be saved as INR");
 
-      std::ofstream of(path, std::ios::out|std::ios::binary);
-      if (of.fail())
-	throw std::runtime_error("Could not open output file");
-      inr_write_header(inr_type((const T*) NULL),
-		       a.dimensions(), a.dimensions_count(), of);
-      
-      int* pos = new int[a.dimensions_count()];
-      switch (n)
-	{
-	case 3:
-	  cuiloa_for_path3(a, pos, 1, 2, 0)
-	    of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
-	  break;
-	case 4:
-	  cuiloa_for_path4(a, pos, 0, 2, 3, 1)
-	    of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
-	  break;
-	default:
-	  throw std::runtime_error("Bad dims to save an INR!");
-	}
+  std::ofstream of(path, std::ios::out|std::ios::binary);
+  if (of.fail())
+    throw std::runtime_error("Could not open output file");
+  inr_write_header(inr_type((const T*) NULL),
+                   a.dimensions(), a.dimensions_count(), of);
+  
+  int* pos = new int[a.dimensions_count()];
+  switch (n)
+    {
+    case 3:
+      cuiloa_for_path3(a, pos, 1, 2, 0)
+        of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
+      break;
+    case 4:
+      cuiloa_for_path4(a, pos, 0, 2, 3, 1)
+        of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
+      break;
+    default:
+      throw std::runtime_error("Bad dims to save an INR!");
     }
+}
 
   /**
    * Write an INR sequence frame by frame.

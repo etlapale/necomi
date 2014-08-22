@@ -58,19 +58,17 @@ template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M==N>
 for_looper(Array<T,N>& a,
            std::array<ArrayIndex,N>& path,
-           //const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
            UnaryOperation f)
 {
   T* data = a.data();
   auto idx = a.index(path);
-  data[idx] = f(path, data[idx]);
+  f(path, data[idx]);
 }
 
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M<N>
 for_looper(Array<T,N>& a,
            std::array<ArrayIndex,N>& path,
-           //const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
            UnaryOperation f)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
@@ -319,7 +317,6 @@ public:
    * Apply a function to all the elements in the array.
    */
   template <typename UnaryOperation>
-  //void map(const std::function<T(const Path&, const T&)>& f)
   void map(UnaryOperation f)
   {
     std::array<ArrayIndex,N> path;
@@ -331,9 +328,9 @@ public:
    */
   void fill(const T& val)
   {
-    map([&val](auto path, auto& old) {
+    map([&val](auto& path, auto& old) {
         (void) path; (void) old;
-        return val;
+        old = val;
       });
   }
 
@@ -346,8 +343,8 @@ public:
   Array<T,N> copy()
   {
     Array<T,N> a(m_dims);
-    map([&a](auto path, auto& val) {
-        return a(path) = val;
+    map([&a](auto& path, auto& val) {
+        a(path) = val;
       });
     return a;
   }

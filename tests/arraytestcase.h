@@ -138,7 +138,7 @@ public:
   {
     auto incr([](auto& path, auto& val) {
         (void) path;
-        return val + 1;
+        val += 1;
       });
 
     Array<int,0> a0;
@@ -155,8 +155,7 @@ public:
 
     Array<int,3> a3(2,3,4);
     a3.map([](auto& path, auto& val) {
-        (void) val;
-        return path[0]*12 + path[1]*4 + path[2];
+        val = path[0]*12 + path[1]*4 + path[2];
       });
     CPPUNIT_ASSERT(a3(1,2,0) == 20);
 
