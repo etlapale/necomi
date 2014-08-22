@@ -114,14 +114,14 @@ public:
 
   void test_slices()
   {
-    Array<double,1> a1(127);
+    Array<int,1> a1(127);
     for (unsigned int i = 0; i < a1.size(); i++)
       a1(i) = i;
     auto a1s = a1[45];
     CPPUNIT_ASSERT(a1s.dimensions().empty()
         && a1s() == 45);
 
-    Array<double,2> a2(3,4);
+    Array<int,2> a2(3,4);
     for (unsigned int i = 0; i < a2.size(); i++)
       a2.data()[i] = i;
     auto a2s = a2[2];
@@ -132,6 +132,55 @@ public:
         && a2s.strides()[0] == 1);
     CPPUNIT_ASSERT(a2s(2) == 10);
     CPPUNIT_ASSERT(a2s(3) == 11);
+  }
+
+  void test_maps()
+  {
+    auto incr([](auto& path, auto& val) {
+        (void) path;
+        return val + 1;
+      });
+
+    Array<int,0> a0;
+    a0() = 123;
+    a0.map(incr);
+    CPPUNIT_ASSERT(a0() == 124);
+    
+    Array<int,1> a1(127);
+    for (unsigned int i = 0; i < a1.size(); i++)
+      a1(i) = i;
+    a1.map(incr);
+    CPPUNIT_ASSERT(a1(43) == 44
+        && a1(120) == 121);
+
+    Array<int,3> a3(2,3,4);
+    a3.map([](auto& path, auto& val) {
+        (void) val;
+        return path[0]*12 + path[1]*4 + path[2];
+      });
+    CPPUNIT_ASSERT(a3(1,2,0) == 20);
+
+    a1.fill(42);
+    CPPUNIT_ASSERT(a1(34) == 42 && a1(56) == 42);
+  }
+
+  void test_copies()
+  {
+    Array<int,0> a0;
+    a0() = 123;
+
+    auto a0v(a0);
+    CPPUNIT_ASSERT(a0v() == 123);
+    a0() = 456;
+    CPPUNIT_ASSERT(a0v() == 456);
+    a0v() = 789;
+    CPPUNIT_ASSERT(a0() == 789);
+
+    auto a0c = a0.copy();
+    a0() = 456;
+    CPPUNIT_ASSERT(a0() == 456
+        && a0c() == 789
+        && a0v() == 456);
   }
 #if 0
   void
@@ -190,6 +239,10 @@ public:
 	       ("test_data", &ArrayTestCase::test_data));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_slices", &ArrayTestCase::test_slices));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_maps", &ArrayTestCase::test_maps));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_copies", &ArrayTestCase::test_copies));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_indexing", &ArrayTestCase::test_indexing));

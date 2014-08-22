@@ -29,14 +29,6 @@ protected:
   std::string m_msg;
 };
   
-/** Duplicate the given array using new. */
-template <typename T>
-T* memdup(const T* src, unsigned int count)
-{
-  T* dst = new T[count];
-  memcpy(dst, src, count * sizeof(T));
-  return dst;
-}
 
 /**
  * Checks if a pack of types are all valid array indexes.
@@ -55,8 +47,37 @@ struct all_indices<Index, Indices...>
         all_indices<Indices...>::value>
 {};
 
+template <typename T, ArrayIndex N> class Array;
+
+/*
+ * Allows arbitrary for-loop nesting.
+ */
+template <typename T, ArrayIndex N, ArrayIndex M>
+std::enable_if_t<M==N>
+for_looper(Array<T,N>& a,
+           std::array<ArrayIndex,N>& path,
+           const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+{
+  T* data = a.data();
+  auto idx = a.index(path);
+  data[idx] = f(path, data[idx]);
+}
+
+template <typename T, ArrayIndex N, ArrayIndex M>
+std::enable_if_t<M<N>
+for_looper(Array<T,N>& a,
+           std::array<ArrayIndex,N>& path,
+           const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+{
+  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+    path[M] = i;
+    for_looper<T,N,M+1>(a, path, f);
+  }
+}
+
+
 /**
- * Multi-dimensional arrays allowing shared data and non-contiguity.
+ * Multi-dimensional contiguous arrays allowing shared data.
  * 
  * Arrays created via the copy constructor, the operator[] or any
  * other operation on a \c const Array will share the same data as
@@ -70,6 +91,8 @@ template <typename T, ArrayIndex N>
 class Array
 {
   template <typename U, ArrayIndex M> friend class Array;
+
+  typedef std::array<ArrayIndex,N> Path;
 public:
   /**
    * Create a new multi-dimensional array with uninitialized elements.
@@ -109,11 +132,6 @@ public:
     , m_data(src.m_data)
   {
   }
-
-#if 0
-  /** Construct a copy of an array. */
-  Array<T,N> copy() const;
-#endif
 
   const std::array<ArrayIndex,N>& dimensions() const
   { return m_dims; }
@@ -160,14 +178,24 @@ public:
    * the beginning of the data (m_data).
    */
   template <typename ...Indices>
+  ArrayIndex index(const Path& path)
+  {
+    return std::inner_product(path.cbegin(), path.cend(),
+                              m_strides.cbegin(), 0);
+  }
+
+  /**
+   * Convert a multi-dimensional position into an offset from
+   * the beginning of the data (m_data).
+   */
+  template <typename ...Indices>
   ArrayIndex index(Indices... indices)
   {
     static_assert(sizeof...(Indices) == N, "improper indices arity");
     static_assert(all_indices<Indices...>(), "invalid indices type");
 
     std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
-    return std::inner_product(idx.cbegin(), idx.cend(),
-                              m_strides.cbegin(), 0);
+    return index(idx);
   }
 
   /**
@@ -202,12 +230,40 @@ public:
   const T* data() const
   { return m_data; }
 
-#if 0
+  /**
+   * Apply a function to all the elements in the array.
+   */
+  void map(const std::function<T(const Path&, const T&)>& f)
+  {
+    std::array<ArrayIndex,N> path;
+    for_looper<T,N,0>(*this, path, f);
+  }
+
   /**
    * Fill an entire array with a single value.
    */
-  void fill(T val);
-#endif
+  void fill(const T& val)
+  {
+    map([&val](auto path, auto& old) {
+        (void) path; (void) old;
+        return val;
+      });
+  }
+
+  /**
+   * Construct a copy of an array.
+   * All the elements are put in a contiguous region of memory
+   * newly allocated with, initially, no other view on it.
+   * TODO Implement this for const arrays.
+   */
+  Array<T,N> copy()
+  {
+    Array<T,N> a(m_dims);
+    map([&a](auto path, auto& val) {
+        return a(path) = val;
+      });
+    return a;
+  }
 
 protected:
   std::array<ArrayIndex,N> m_dims;
@@ -221,17 +277,6 @@ protected:
 #if 0
 template <typename T, unsigned int n>
   Array<T,n>
-  Array<T,n>::copy() const
-  {
-    Array<T,n> a(m_dims);
-    for (auto i = 0; i < this->size(); i++)
-      a.m_data[i] = m_data[i];
-    return a;
-  }
-
-#if 0
-template <typename T, unsigned int n>
-  Array<T,n>
   Array<T,n>::view(unsigned int* dims, unsigned int* offset) const
   {
     Array<T,n> a(*this);
@@ -241,46 +286,5 @@ template <typename T, unsigned int n>
 
     return a;
   }
-#endif
-
-template <typename T, unsigned int n>
-  void
-  Array<T,n>::fill(T val)
-  {
-    auto sz = this->size();
-    for (auto i = 0; i < sz; i++)
-      m_data[i] = val;
-  }
-
-#define cuiloa_for(array, var, dim) \
-  for (unsigned int var = 0; var < (array).dimensions()[dim]; var++)
-
-#if 0
-  /*#define cuiloa_for(a, i)					\
-  for (unsigned int (i) = 0; (i) < (a).dimensions()[(i)]; (i)++)
-
-#define cuiloa_for2(a, i, j)			\
-  cuiloa_for(a, i) cuiloa_for(a, j)
-
-#define cuiloa_for3(a, i, j, k) \
-  cuiloa_for2(a, i, j) cuiloa_for(a, k)
-
-#define cuiloa_for4(a, i, j, k, l)  \
-  cuiloa_for2(a, i, j) cuiloa_for2(a, k, l)
-  */
-#endif
-
-
-#define cuiloa_for_path(a, path, i)					\
-  for ((path)[(i)] = 0; (path)[(i)] < (a).dimensions()[(i)]; (path)[(i)]++)
-
-#define cuiloa_for_path2(a, path, i, j)				\
-  cuiloa_for_path(a, path, i) cuiloa_for_path(a, path, j)
-
-#define cuiloa_for_path3(a, path, i, j, k)			\
-  cuiloa_for_path2(a, path, i, j) cuiloa_for_path(a, path, k)
-
-#define cuiloa_for_path4(a, path, i, j, k, l)				\
-  cuiloa_for_path2(a, path, i, j) cuiloa_for_path2(a, path, k, l)
 #endif
 }
