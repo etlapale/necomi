@@ -92,18 +92,18 @@ public:
   void
   test_data()
   {
-    Array<double,0> a0;
-    a0() = 123.456;
-    CPPUNIT_ASSERT(a0() == 123.456
-        && a0.data()[0] == 123.456);
+    Array<int,0> a0;
+    a0() = 123;
+    CPPUNIT_ASSERT(a0() == 123
+        && a0.data()[0] == 123);
 
-    Array<double,1> a1(127);
-    a1(32) = 123.456;
-    a1(69) = 456.123;
-    CPPUNIT_ASSERT(a1(32) == 123.456
-        && a1(69) == 456.123
-        && a1.data()[32] == 123.456
-        && a1.data()[69] == 456.123);
+    Array<int,1> a1(127);
+    a1(32) = 123;
+    a1(69) = 456;
+    CPPUNIT_ASSERT(a1(32) == 123
+        && a1(69) == 456
+        && a1.data()[32] == 123
+        && a1.data()[69] == 456);
 
     Array<double,2> a2(3,4);
     for (unsigned int i = 0; i < a2.size(); i++)
@@ -182,6 +182,29 @@ public:
         && a0c() == 789
         && a0v() == 456);
   }
+
+  void test_iterators()
+  {
+#if 0
+    Array<int,0> a0;
+    a0() = 123;
+    a0.map(incr);
+    CPPUNIT_ASSERT(a0() == 124);
+#endif
+    
+    Array<int,1> a1(127);
+    for (unsigned int i = 0; i < a1.size(); i++)
+      a1(i) = i;
+
+    int i = 0;
+    for (auto val : a1) {
+      if (i == 67) {
+        CPPUNIT_ASSERT(val == 67);
+        break;
+      }
+      i++;
+    }
+  }
 #if 0
   void
   testViews()
@@ -243,11 +266,9 @@ public:
 	       ("test_maps", &ArrayTestCase::test_maps));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_copies", &ArrayTestCase::test_copies));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_iterators", &ArrayTestCase::test_iterators));
 #if 0
-    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
-	       ("test_indexing", &ArrayTestCase::test_indexing));
-    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
-	       ("testStrides", &ArrayTestCase::testStrides));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));
     /*s->addTest(new CppUnit::TestCaller<ArrayTestCase>

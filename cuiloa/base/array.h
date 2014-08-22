@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include <algorithm>
 #include <array>
 #include <exception>
 #include <iostream>
@@ -15,6 +16,7 @@ namespace cuiloa
 {
 
 typedef unsigned int ArrayIndex;
+typedef int ArrayOffset;
 
 /**
  * Indicate an indexing error in an Array.
@@ -52,28 +54,100 @@ template <typename T, ArrayIndex N> class Array;
 /*
  * Allows arbitrary for-loop nesting.
  */
-template <typename T, ArrayIndex N, ArrayIndex M>
+template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M==N>
 for_looper(Array<T,N>& a,
            std::array<ArrayIndex,N>& path,
-           const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+           //const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+           UnaryOperation f)
 {
   T* data = a.data();
   auto idx = a.index(path);
   data[idx] = f(path, data[idx]);
 }
 
-template <typename T, ArrayIndex N, ArrayIndex M>
+template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M<N>
 for_looper(Array<T,N>& a,
            std::array<ArrayIndex,N>& path,
-           const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+           //const std::function<T(const std::array<ArrayIndex,N>&, const T&)>& f)
+           UnaryOperation f)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
     path[M] = i;
-    for_looper<T,N,M+1>(a, path, f);
+    for_looper<UnaryOperation,T,N,M+1>(a, path, f);
   }
 }
+
+/**
+ * Iterator over an array.
+ */
+template <typename T, ArrayIndex N>
+class ArrayIterator
+{
+public:
+  ArrayIterator(Array<T,N>& array)
+    : m_array(array)
+    , m_dims(array.dimensions())
+    , size(array.size())
+    , count(0)
+  {
+    m_path.fill(0);
+  }
+
+  ArrayIterator(Array<T,N>& array, const std::array<ArrayIndex,N>& path)
+    : m_array(array)
+    , m_dims(array.dimensions())
+    , m_path(path)
+    , size(array.size())
+    , count(0)
+  {}
+
+  const std::array<ArrayIndex,N> path() const
+  {
+    return m_path;
+  }
+
+  T& operator*()
+  {
+    return m_array(m_path);
+  }
+
+  T* operator->()
+  {
+    return &(operator*());
+  }
+      //if (i == 0 || m_path[i] < m_array.dimensions()[i] - 1) {
+
+  ArrayIterator<T,N>& operator++()
+  {
+    // Find first dimension to increment
+    for (int i = N-1; i >= 0; i--) {
+      if (i == 0 || m_path[i] < m_dims[i] - 1) {
+        m_path[i]++;
+        break;
+      }
+      else {
+        m_path[i] = 0;
+      }
+    }
+    return *this;
+  }
+
+  bool operator!=(const ArrayIterator<T,N>& other)
+  {
+    //std::cout << this << " " << count << "/" << size << std::endl;
+    return count++ < size;
+    //return &m_array != &other.m_array || m_path != other.m_path;
+  }
+
+protected:
+  Array<T,N>& m_array;
+  std::array<ArrayIndex,N> m_dims;
+  std::array<ArrayIndex,N> m_path;
+  ArrayIndex size;
+  ArrayIndex count;
+};
 
 
 /**
@@ -90,9 +164,21 @@ for_looper(Array<T,N>& a,
 template <typename T, ArrayIndex N>
 class Array
 {
+public:
   template <typename U, ArrayIndex M> friend class Array;
 
   typedef std::array<ArrayIndex,N> Path;
+
+  typedef forward_iterator_tag iterator_category;
+  typedef ArrayIterator<T,N> iterator;
+  typedef ArrayOffset difference_type;
+  typedef ArrayIndex size_type;
+  typedef T value_type;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+
 public:
   /**
    * Create a new multi-dimensional array with uninitialized elements.
@@ -230,13 +316,30 @@ public:
   const T* data() const
   { return m_data; }
 
+  // Iterators
+  
+  iterator begin()
+  {
+    return iterator(*this);
+  }
+
+  iterator end()
+  {
+    Path path = m_dims;
+    std::transform(path.begin(), path.end(), path.begin(),
+                   [](auto val) { return val - 1; });
+    return ++iterator(*this, path);
+  }
+
   /**
    * Apply a function to all the elements in the array.
    */
-  void map(const std::function<T(const Path&, const T&)>& f)
+  template <typename UnaryOperation>
+  //void map(const std::function<T(const Path&, const T&)>& f)
+  void map(UnaryOperation f)
   {
     std::array<ArrayIndex,N> path;
-    for_looper<T,N,0>(*this, path, f);
+    for_looper<UnaryOperation,T,N,0>(*this, path, f);
   }
 
   /**
