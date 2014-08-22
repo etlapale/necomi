@@ -246,30 +246,19 @@ template <typename T,ArrayIndex N>
 void
 inr_save(const cuiloa::Array<T,N>& a, const char* path)
 {
-  if (n < 3 || 4 < n)
-    throw std::runtime_error("Only arrays with dimensions count equal to"
-                             " 3 or 4 can be saved as INR");
+  static_assert(N == 3 || N == 4,
+                "Only 3D and 4D arrays can be stored as INR");
 
   std::ofstream of(path, std::ios::out|std::ios::binary);
   if (of.fail())
     throw std::runtime_error("Could not open output file");
-  inr_write_header(inr_type((const T*) NULL),
-                   a.dimensions(), a.dimensions_count(), of);
-  
-  int* pos = new int[a.dimensions_count()];
-  switch (n)
-    {
-    case 3:
-      cuiloa_for_path3(a, pos, 1, 2, 0)
-        of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
-      break;
-    case 4:
-      cuiloa_for_path4(a, pos, 0, 2, 3, 1)
-        of.write((const char*) (a.data() + a.index(pos)), sizeof(T));
-      break;
-    default:
-      throw std::runtime_error("Bad dims to save an INR!");
-    }
+  inr_write_header(inr_type((const T*) NULL), a.dimensions(), N, of);
+
+  // TODO Write in a single block for contiguous arrays
+  a.map([&of](auto&path, auto&val) {
+      (void) path;
+      of.write(&val, sizeof(T));
+    });
 }
 
   /**
@@ -340,13 +329,12 @@ inr_save(const cuiloa::Array<T,N>& a, const char* path)
 	       || m_channels != dims[0]) //frame.dimz())
 	throw std::runtime_error("Cannot append different dimensions frames");
     
-      //fwrite(frame.data, sizeof(T), frame.size(), fp);
-      /*cimg_forXY(frame, x, y)
-	cimg_forZ(frame, k)
-        fwrite(&(frame(x, y, k)), sizeof(T), 1, fp);*/
-      int* pos = new int[frame.dimensions_count()];
-      cuiloa_for_path3(frame, pos, 1, 2, 0)
-	m_of.write((const char*) (frame.data() + frame.index(pos)), sizeof(T));
+      // TODO Write in a single block for contiguous arrays
+      frame.map([this](auto&path, auto&val) {
+          (void) path;
+          m_of.write(&val, sizeof(T));
+        });
+
       m_depth++;
       
       if (m_auto_flush)
