@@ -89,8 +89,6 @@ public:
   ArrayIterator(Array<T,N>& array)
     : m_array(array)
     , m_dims(array.dimensions())
-    , size(array.size())
-    , count(0)
   {
     m_path.fill(0);
   }
@@ -99,8 +97,6 @@ public:
     : m_array(array)
     , m_dims(array.dimensions())
     , m_path(path)
-    , size(array.size())
-    , count(0)
   {}
 
   const std::array<ArrayIndex,N> path() const
@@ -117,13 +113,13 @@ public:
   {
     return &(operator*());
   }
-      //if (i == 0 || m_path[i] < m_array.dimensions()[i] - 1) {
 
   ArrayIterator<T,N>& operator++()
   {
     // Find first dimension to increment
     for (int i = N-1; i >= 0; i--) {
       if (i == 0 || m_path[i] < m_dims[i] - 1) {
+      //if (i == 0 || m_path[i] < m_array.dimensions()[i] - 1) {
         m_path[i]++;
         break;
       }
@@ -136,30 +132,18 @@ public:
 
   bool operator!=(const ArrayIterator<T,N>& other)
   {
-    //std::cout << this << " " << count << "/" << size << std::endl;
-    return count++ < size;
-    //return &m_array != &other.m_array || m_path != other.m_path;
+    return &m_array != &other.m_array || m_path != other.m_path;
   }
 
 protected:
   Array<T,N>& m_array;
   std::array<ArrayIndex,N> m_dims;
   std::array<ArrayIndex,N> m_path;
-  ArrayIndex size;
-  ArrayIndex count;
 };
 
 
 /**
- * Multi-dimensional contiguous arrays allowing shared data.
- * 
- * Arrays created via the copy constructor, the operator[] or any
- * other operation on a \c const Array will share the same data as
- * their source. To get a real copy of an array, use the
- * Array::copy() method.
- * The \c const qualifier is only there to say the array view cannot be
- * changed (unmodifiable view dimensions, target data, ...). Unmodifiable
- * data should be marked as such in the template parameter.
+ * Multi-dimensional arrays allowing shared data and non-contiguous regions.
  */
 template <typename T, ArrayIndex N>
 class Array
