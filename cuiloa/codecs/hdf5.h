@@ -117,6 +117,9 @@ struct pred_type<unsigned long long>
   { return PredType::NATIVE_ULLONG; }
 };
 
+/**
+ * \ingroup Codecs
+ */
 template <typename T, ArrayIndex N>
   Array<T,N> hdf5_load(const char* filename, const char* dset_name)
   {
@@ -150,6 +153,10 @@ template <typename T, ArrayIndex N>
   }
 
 /**
+ * Store a **contiguous** array in a single-dataset HDF5 file.
+ *
+ * \ingroup Codecs
+ * \warning The array **must** be contiguous.
  * \warning If the HDF5 file already exists, it will be erased.
  */
 template <typename T, ArrayIndex N>
