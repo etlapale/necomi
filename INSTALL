@@ -1,0 +1,42 @@
+Cuiloa installation guide
+=========================
+
+Quick install
+-------------
+
+Cuiloa uses [CMake] as build system. You can simply configure the library
+and generate the appropriate platform dependent make files with
+
+    $ cmake .
+
+passing it options to customize your build or installation.
+
+Running the unit tests is recommended to make sure that everything is
+working on your system, particularly if you are using the git repository.
+Use the `check` target to build and run the unit tests:
+
+    $ make check
+
+Finally, you can install the library with the `install` target, assuming you
+have the proper rights to write in the chosen install prefix.
+
+    $ sudo make install
+
+Building
+--------
+
+Cuiloa is distributed as a templatized library, so no code will be compiled
+with a plain `make` call. The `check` target will build and run the unit
+tests.
+
+To use cuiloa, you need a compiler with support for C++14. The library
+has been succesfully built with GCC 4.9.1 and clang 3.4.2.
+
+Testing
+-------
+
+The unit tests are written using Freedesktop’s [CppUnit], which is required
+to be found by CMake in order to create the `check` target.
+
+[CMake]: http://cmake.org
+[CppUnit]: http://www.freedesktop.org/wiki/Software/cppunit/
