@@ -7,6 +7,5 @@ main()
 {
   CppUnit::TextUi::TestRunner runner;
   runner.addTest(ArrayTestCase::suite());
-  runner.run();
-  return 0;
+  return !runner.run();
 }

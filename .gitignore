@@ -7,3 +7,5 @@ CMakeFiles
 cmake_install.cmake
 cuiloa-cppunit-test
 Makefile
+install_manifest.txt
+cuiloa.pc

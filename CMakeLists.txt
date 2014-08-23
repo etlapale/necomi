@@ -16,7 +16,20 @@ endif ()
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 find_package (CppUnit)
 if (CPPUNIT_FOUND)
+  # Build the unit tests
   include_directories (${CPPUNIT_INCLUDE_DIRS})
-  add_executable (cuiloa-cppunit-test tests/main.cc)
+  add_executable (cuiloa-cppunit-test EXCLUDE_FROM_ALL tests/main.cc)
   target_link_libraries (cuiloa-cppunit-test "${CPPUNIT_LIBRARIES} ${HDF5_LIBRARIES}")
+  # Add a `check` target
+  add_custom_target (check)
+  add_dependencies (check cuiloa-cppunit-test)
+  #execute_process (COMMAND cuiloa-cppunit-test)
+  add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-cppunit-test)
 endif ()
+
+# pkg-config support
+configure_file (cuiloa.pc.in cuiloa.pc @ONLY)
+
+# Installlation
+install (DIRECTORY cuiloa DESTINATION include)
+install (FILES cuiloa.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
