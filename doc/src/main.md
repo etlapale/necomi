@@ -47,3 +47,7 @@ recursive ones such as Canny-Deriche or Gamma filters.
 // Blur the 2D image `b`
 deriche_blur(b, 2.0);
 ~~~
+
+Please refer to [INSTALL.md](@ref install) for the installation notes.
+Cuiloa is released under the
+[Apache License, version 2.0](http://www.apache.org/licenses/LICENSE-2.0).

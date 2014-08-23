@@ -9,3 +9,4 @@ cuiloa-cppunit-test
 Makefile
 install_manifest.txt
 cuiloa.pc
+doc/Doxyfile

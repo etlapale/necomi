@@ -1,4 +1,4 @@
-Cuiloa installation guide
+Cuiloa installation guide	{#install}
 =========================
 
 Quick install

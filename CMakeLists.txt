@@ -23,8 +23,15 @@ if (CPPUNIT_FOUND)
   # Add a `check` target
   add_custom_target (check)
   add_dependencies (check cuiloa-cppunit-test)
-  #execute_process (COMMAND cuiloa-cppunit-test)
   add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-cppunit-test)
+endif ()
+
+# Documentation
+find_package (Doxygen)
+if (DOXYGEN_FOUND)
+  add_custom_target (doc)
+  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
+  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
 endif ()
 
 # pkg-config support
