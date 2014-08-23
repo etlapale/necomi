@@ -3,3 +3,5 @@ Copyright 2007–2014 Xīcò <xico@atelo.org>
 
 Portions of this library were developped at the University of California,
 Irvine.
+
+Canny-Deriche recursive filtering was generalized from the CImg library.
