@@ -38,5 +38,27 @@ Testing
 The unit tests are written using Freedesktop’s [CppUnit], which is required
 to be found by CMake in order to create the `check` target.
 
+Installing
+----------
+
+By default, CMake installs the package content in `/usr/local` on various
+systems. You can customize the installation path by setting the standard
+variable
+
+    $ cmake -D -DCMAKE_INSTALL_PREFIX=$HOME/usr .
+
+Be aware that some environement variable will then need to be modified
+for the package to work properly. In particular if using `pkg-config`, you
+may need to set `PKG_CONFIG_PATH` afterwards.
+
+API documentation
+-----------------
+
+If [Doxygen] is installed and found by CMake during the configuration, you
+can generate the documentation by running
+
+    $ make doc
+
 [CMake]: http://cmake.org
 [CppUnit]: http://www.freedesktop.org/wiki/Software/cppunit/
+[Doxygen]: http://www.stack.nl/~dimitri/doxygen/
