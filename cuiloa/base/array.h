@@ -64,8 +64,11 @@ struct all_indices<Index, Indices...>
 
 template <typename T, ArrayIndex N> class Array;
 
-/*
- * Allows arbitrary for-loop nesting.
+/**
+ * Recursion case of for loops through template metaprogramming.
+ *
+ * \ingroup Core
+ * \see Array::map
  */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M==N>
@@ -78,6 +81,12 @@ for_looper(Array<T,N>& a,
   f(path, data[idx]);
 }
 
+/**
+ * Final case of for loops through template metaprogramming.
+ *
+ * \ingroup Core
+ * \see Array::map
+ */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
 std::enable_if_t<M<N>
 for_looper(Array<T,N>& a,
@@ -92,6 +101,7 @@ for_looper(Array<T,N>& a,
 
 /**
  * Iterator over an array.
+ * \ingroup Core
  */
 template <typename T, ArrayIndex N>
 class ArrayIterator
@@ -155,6 +165,7 @@ protected:
 
 /**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
+ * \ingroup Core
  */
 template <typename T, ArrayIndex N>
 class Array

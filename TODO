@@ -1,0 +1,11 @@
+# TODO list for cuiloa
+
+## Core
+
+- Faster STL iterators through template metaprogramming
+- Constant arrays handling clearly defined inplace/copy distinctions
+
+## Filters
+
+- New Canny-Deriche implementation from CImg/Haskell
+- Gamma and exponential recursive filters
