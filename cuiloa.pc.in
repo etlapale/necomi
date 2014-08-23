@@ -5,6 +5,6 @@ includedir=${prefix}/include
 
 Name: cuiloa
 Description: A multidimensional array library.
-Version: 0.2
+Version: @PROJECT_VERSION@
 
 Cflags: -I${includedir}
