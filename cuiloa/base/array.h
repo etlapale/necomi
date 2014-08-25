@@ -1,5 +1,5 @@
 /*
- * Copyright 2007–2014 Xīcò <xico@atelo.org>
+ * Copyright © 2014	University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -374,6 +374,28 @@ public:
       });
     return a;
   }
+
+  /**
+   * Create an array with the same dimensions filled with a constant
+   * value.
+   * \see zeros_like
+   */
+  Array<T,N> constants_like(const T& value) const
+  {
+    Array<T,N> a(m_dims);
+    std::fill_n(a.data(), a.size(), value);
+    return a;
+  }
+
+  /**
+   * Create an a array with the same dimensions but filled with zeros.
+   * \see constants_like
+   */
+  Array<T,N> zeros_like() const
+  {
+    return constants_like(0);
+  }
+
 
 protected:
   std::array<ArrayIndex,N> m_dims;

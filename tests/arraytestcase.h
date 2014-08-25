@@ -204,6 +204,19 @@ public:
       i++;
     }
   }
+
+  void test_likes()
+  {
+    Array<int,1> a(127);
+
+    auto b = a.zeros_like();
+    CPPUNIT_ASSERT(b.dimensions() == a.dimensions());
+    CPPUNIT_ASSERT(b(42) == 0 && b(73) == 0);
+
+    auto c = a.constants_like(42);
+    CPPUNIT_ASSERT(c.dimensions() == a.dimensions());
+    CPPUNIT_ASSERT(c(14) == 42 && c(88) == 42);
+  }
 #if 0
   void
   testViews()
@@ -267,6 +280,8 @@ public:
 	       ("test_copies", &ArrayTestCase::test_copies));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_iterators", &ArrayTestCase::test_iterators));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_likes", &ArrayTestCase::test_likes));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));
