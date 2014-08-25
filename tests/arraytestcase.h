@@ -112,6 +112,21 @@ public:
         && a2(2,3) == a2.index(2,3));
   }
 
+  void test_from_data()
+  {
+    const unsigned int height = 7;
+    const unsigned int width = 6;
+    
+    double* data = new double[height*width];
+    for (unsigned int i = 0; i < height; i++)
+      for (unsigned int j = 0; j < width; j++)
+        data[j+i*width] = j+i*width;
+
+    Array<double,2> a(data, height, width);
+    CPPUNIT_ASSERT(a(3,2) == 2+3*width
+        && a(5,7) == 7+5*width);
+  }
+
   void test_slices()
   {
     Array<int,1> a1(127);
@@ -264,6 +279,8 @@ public:
     CppUnit::TestSuite* s = new CppUnit::TestSuite("ArrayTestSuite");
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_creation", &ArrayTestCase::test_creation));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_from_data", &ArrayTestCase::test_from_data));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_dimensions", &ArrayTestCase::test_dimensions));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>

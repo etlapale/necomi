@@ -185,17 +185,24 @@ public:
   typedef T& reference;
   typedef const T& const_reference;
 
+protected:
+  void build_strides() {
+    if (N > 0) {
+      auto prev = m_strides[N - 1] = 1;
+      for (int i = N - 2; i >= 0; i--)
+        prev = m_strides[i] = m_dims[i + 1] * prev;
+    }
+  }
+
 public:
   /**
    * Create a new multi-dimensional array with uninitialized elements.
    */
-  template <typename ...Dim>
+  template <typename ...Dim,
+            typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
   Array(Dim ...dims)
     : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
   {
-    // Duplicate of m_dims to get a better message
-    static_assert(sizeof...(Dim) == N, "improper dimensions arity");
-    static_assert(all_indices<Dim...>(), "invalid dimensions type");
   }
 
   /**
@@ -206,12 +213,7 @@ public:
     , m_shared_data(new T[size()], [](T* p){ delete [] p; })
     , m_data(m_shared_data.get())
   {
-    // Build the strides
-    if (N > 0) {
-      auto prev = m_strides[N - 1] = 1;
-      for (int i = N - 2; i >= 0; i--)
-        prev = m_strides[i] = m_dims[i + 1] * prev;
-    }
+    build_strides();
   }
 
   /**
@@ -223,6 +225,20 @@ public:
     , m_shared_data(src.m_shared_data)
     , m_data(src.m_data)
   {
+  }
+
+  /**
+   * Construct an array from already existing data.
+   * The given data is never destroyed.
+   */
+  template <typename ...Dim,
+            typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
+  Array(T* data, Dim ...dims)
+    : m_dims{{dims...}}
+    , m_shared_data(data, [](T* p){(void) p;})
+    , m_data(data)
+  {
+    build_strides();
   }
 
   const std::array<ArrayIndex,N>& dimensions() const
