@@ -10,3 +10,4 @@ Makefile
 install_manifest.txt
 cuiloa.pc
 doc/Doxyfile
+sync

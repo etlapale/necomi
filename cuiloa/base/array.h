@@ -339,6 +339,8 @@ public:
 
   /**
    * Apply a function to all the elements in the array.
+   * \param f is a callable taking a path and an element, such as
+   *        a std::function<void(Path&,T&)>.
    */
   template <typename UnaryOperation>
   void map(UnaryOperation f)

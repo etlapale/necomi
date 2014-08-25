@@ -1,7 +1,8 @@
 Cuiloa – A multidimensional array library
-Copyright 2007–2014 Xīcò <xico@atelo.org>
+Copyright © 2014	University of California, Irvine
 
-Portions of this library were developped at the University of California,
-Irvine.
+This library was developed in the Memory, Attention and Perception
+Laboratory at the University of California, Irvine, and supported by
+the National Eye Institute Grant #17491.
 
 Canny-Deriche recursive filtering was generalized from the CImg library.
