@@ -234,7 +234,7 @@ namespace cuiloa
     Array<T,n>&
     deriche_blur(Array<T,n>& a, double sigma)
     {
-      for (int i = 0; i < n; i++)
+      for (ArrayIndex i = 0; i < n; i++)
 	deriche_blur(a, i, sigma);
       return a;
     }
