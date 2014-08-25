@@ -38,5 +38,6 @@ endif ()
 configure_file (cuiloa.pc.in cuiloa.pc @ONLY)
 
 # Installlation
-install (DIRECTORY cuiloa DESTINATION include)
+install (DIRECTORY cuiloa DESTINATION include
+         FILES_MATCHING PATTERN "*.h")
 install (FILES cuiloa.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
