@@ -284,6 +284,15 @@ public:
         && a(1,0,3) == 7
         && a(0,2,2) == 5);
   }
+
+  void test_is_contiguous()
+  {
+    Array<int,3> a(2,3,4);
+    CPPUNIT_ASSERT(a.contiguous());
+
+    auto b = a[1];
+    CPPUNIT_ASSERT(b.contiguous());
+  }
 #if 0
   void
   testViews()
@@ -355,6 +364,8 @@ public:
 	       ("test_sum", &ArrayTestCase::test_sum));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("in-place operators", &ArrayTestCase::test_inplace_opers));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("contiguity check", &ArrayTestCase::test_is_contiguous));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));

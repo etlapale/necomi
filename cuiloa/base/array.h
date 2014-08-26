@@ -211,8 +211,7 @@ public:
             typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
   Array(Dim ...dims)
     : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
-  {
-  }
+  {}
 
   /**
    * Create a new multi-dimensional array with uninitialized elements.
@@ -243,7 +242,15 @@ public:
   template <typename ...Dim,
             typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
   Array(T* data, Dim ...dims)
-    : m_dims{{dims...}}
+    : Array(data, std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
+  {}
+
+  /**
+   * Construct an array from already existing data.
+   * The given data is never destroyed.
+   */
+  Array(T* data, const std::array<ArrayIndex,N>& dims)
+    : m_dims(dims)
     , m_shared_data(data, [](T* p){(void) p;})
     , m_data(data)
   {
@@ -263,6 +270,24 @@ public:
   {
     return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
+  }
+
+  /**
+   * Checks whether the array is contiguous.
+   */
+  bool
+  contiguous() const
+  {
+    if (N == 0)
+      return true;
+
+    ArrayIndex prev = 1;
+    for (int i = N - 1; i >= 0; i--) {
+      if (m_strides[i] != prev)
+        return false;
+      prev *= m_dims[i];
+    }
+    return true;
   }
 
 #if 0

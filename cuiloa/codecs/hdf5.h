@@ -1,5 +1,5 @@
 /*
- * Copyright 2007–2014 Xīcò <xico@atelo.org>
+ * Copyright © 2014	University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,21 +169,83 @@ template <typename T, ArrayIndex N>
   }
 
 /**
- * Store a **contiguous** array in a single-dataset HDF5 file.
+ * Create a new dataset of the given dimension in an opened HDF5 file.
+ * If `duplicates` is greater than zero, an extra first dimension will
+ * be added into the dataset, allowing storage of several copies of the
+ * array.
  *
  * \ingroup Codecs
- * \warning The array **must** be contiguous.
- * \warning If the HDF5 file already exists, it will be erased.
  */
 template <typename T, ArrayIndex N>
-void hdf5_save(Array<T,N>& a,
-               const char* path,
+DataSet hdf5_create_dataset(const Array<T,N>& a,
+                            H5File& hf,
+                            const char* dset_name,
+                            hsize_t duplicates=0,
+                            PredType output_type = pred_type<T>::type())
+{
+  // Dataset dimensions
+  auto ndims = N + (duplicates > 0);
+  hsize_t dims[ndims];
+  if (duplicates > 0)
+    dims[0] = duplicates;
+  std::copy(a.dimensions().cbegin(),
+            a.dimensions().cend(),
+            dims + (duplicates > 0));
+  DataSpace dspace(ndims, dims);
+
+  // Create the dataset
+  return hf.createDataSet(dset_name, output_type, dspace);
+}
+
+/**
+ * Store an array as a slice in a dataset.
+ * The dataset would have typically been created by hdf5_create_dataset.
+ *
+ * \ingroup Codecs
+ * \param   slice       Number of the slice that should be stored.
+ * \see     hdf5_create_dataset
+ * \note The current implementation creates a temporary copy of
+ *       the array if the original one is not contiguous.
+ */
+template <typename T, ArrayIndex N>
+void hdf5_store_slice(const Array<T,N>& a, DataSet& dset, hsize_t slice)
+{
+  // Get the dataset dimensions
+  auto dset_space = dset.getSpace();
+  auto dset_ndims = dset_space.getSimpleExtentNdims();
+  hsize_t dset_dims[dset_ndims];
+  dset_space.getSimpleExtentDims(dset_dims);
+
+  // Select a slab in the dataset
+  hsize_t dset_start[dset_ndims];
+  std::fill_n(dset_start, dset_ndims, 0);
+  dset_dims[0] = 1;
+  dset_start[0] = slice;
+  dset_space.selectHyperslab (H5S_SELECT_SET, dset_dims, dset_start);
+
+  // Define slice size
+  DataSpace mem_space(dset_ndims, dset_dims);
+
+  // Copy the slice
+  dset.write((a.contiguous() ? a : a.copy()).data(),
+             pred_type<T>::type(),
+             mem_space,
+             dset_space);
+}
+
+/**
+ * Store an array in an already opened HDF5 file.
+ *
+ * \ingroup Codecs
+ * \note The current implementation creates a temporary copy of
+ *       the array if the original one is not contiguous.
+ */
+template <typename T, ArrayIndex N>
+void hdf5_save(const Array<T,N>& a,
+               H5File& hf,
                const char* dset_name,
                PredType output_type = pred_type<T>::type())
 {
-  // Create the HDF5 file
-  H5File hf(path, H5F_ACC_TRUNC);
-
   // Dataset dimensions
   hsize_t dims[N];
   std::copy(a.dimensions().cbegin(), a.dimensions().cend(), dims);
@@ -192,9 +254,27 @@ void hdf5_save(Array<T,N>& a,
   // Create the dataset
   auto dset = hf.createDataSet(dset_name, output_type, dspace);
 
-  // TODO check for array contiguity!!!
-  std::cerr << "WARNING: assuming array contiguity for hdf5_save!" << std::endl;
-  dset.write(a.data(), pred_type<T>::type());
+  // Copy the dataset
+  dset.write((a.contiguous() ? a : a.copy()).data(), pred_type<T>::type());
+}
+
+/**
+ * Store a array in a single-dataset HDF5 file.
+ *
+ * \ingroup Codecs
+ * \warning If the HDF5 file already exists, it will be erased.
+ */
+template <typename T, ArrayIndex N>
+void hdf5_save(const Array<T,N>& a,
+               const char* path,
+               const char* dset,
+               PredType output_type = pred_type<T>::type())
+{
+  // Create the HDF5 file
+  H5File hf(path, H5F_ACC_TRUNC);
+
+  // Store the dataset
+  hdf5_save<T,N>(a, hf, dset, output_type);
 }
 
 } // namespace cuiloa
