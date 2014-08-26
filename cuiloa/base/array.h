@@ -109,6 +109,43 @@ for_looper(Array<T,N>& a,
 }
 
 /**
+ * Recursion case of for loops through template metaprogramming
+ * for constant arrays.
+ *
+ * \ingroup Core
+ * \see Array::map
+ */
+template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
+std::enable_if_t<M==N>
+for_looper(const Array<T,N>& a,
+           std::array<ArrayIndex,N>& path,
+           UnaryOperation f)
+{
+  const T* data = a.data();
+  auto idx = a.index(path);
+  f(path, data[idx]);
+}
+
+/**
+ * Final case of for loops through template metaprogramming
+ * for constant arrays.
+ *
+ * \ingroup Core
+ * \see Array::map
+ */
+template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
+std::enable_if_t<M<N>
+for_looper(const Array<T,N>& a,
+           std::array<ArrayIndex,N>& path,
+           UnaryOperation f)
+{
+  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+    path[M] = i;
+    for_looper<UnaryOperation,T,N,M+1>(a, path, f);
+  }
+}
+
+/**
  * Iterator over an array.
  * \ingroup Core
  */
@@ -400,6 +437,18 @@ public:
   }
 
   /**
+   * Apply a function to all the elements in the array.
+   * \param f is a callable taking a path and an element, such as
+   *        a std::function<void(Path&, const& T)>.
+   */
+  template <typename UnaryOperation>
+  void map(UnaryOperation f) const
+  {
+    std::array<ArrayIndex,N> path;
+    for_looper<UnaryOperation,T,N,0>(*this, path, f);
+  }
+
+  /**
    * Fill an entire array with a single value.
    */
   void fill(const T& val)
@@ -414,9 +463,8 @@ public:
    * Construct a copy of an array.
    * All the elements are put in a contiguous region of memory
    * newly allocated with, initially, no other view on it.
-   * TODO Implement this for const arrays.
    */
-  Array<T,N> copy()
+  Array<T,N> copy() const
   {
     Array<T,N> a(m_dims);
     map([&a](auto& path, auto& val) {
