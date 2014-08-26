@@ -153,10 +153,10 @@ deriche(Array<T,N>& a, int dim, double sigma,
  */
 template <typename T, ArrayIndex N>
 std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
-deriche_blur(Array<T,N>& a, double sigma)
+deriche(Array<T,N>& a, double sigma, DericheFilteringType order=DERICHE_BLUR)
 {
   for (ArrayIndex i = 0; i < N; i++)
-    deriche_filter(a, i, sigma);
+    deriche<T,N>(a, i, sigma,order);
   return a;
 }
 
