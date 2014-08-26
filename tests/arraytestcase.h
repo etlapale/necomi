@@ -263,6 +263,26 @@ public:
         && a2(0,0) == 6
         && a2(1,1) == 70
         && a2(1,2) == 86);
+
+    CPPUNIT_ASSERT(a.sum() == 276
+        && a1.sum() == 276
+        && a2.sum() == 276);
+  }
+
+  void test_inplace_opers()
+  {
+    Array<int,3> a(2,3,4);
+    a.map([](auto& path, auto& val) {
+        val = path[0]*12 + path[1] * 4 + path[2];
+      });
+
+    auto& b = a /= 2;
+
+    CPPUNIT_ASSERT(&a == &b
+        && a(0,0,0) == 0
+        && a(1,1,1) == 8
+        && a(1,0,3) == 7
+        && a(0,2,2) == 5);
   }
 #if 0
   void
@@ -333,6 +353,8 @@ public:
 	       ("test_likes", &ArrayTestCase::test_likes));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_sum", &ArrayTestCase::test_sum));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("in-place operators", &ArrayTestCase::test_inplace_opers));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));

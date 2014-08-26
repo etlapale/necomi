@@ -422,6 +422,19 @@ public:
   }
 
   /**
+   * Sum all the elements of an array.
+   * \warning This may overflow.
+   */
+  T sum() {
+    T total = 0;
+    map([&](auto& path, auto& val) {
+        (void) path;
+        total += val;
+      });
+    return total;
+  }
+
+  /**
    * Sum an array along a given dimension.
    */
   std::enable_if_t<true,Array<T,N-1>>
@@ -448,6 +461,21 @@ public:
         }
       });
     return a;
+  }
+
+  /**
+   * Divide each element of the array by a number.
+   * \warning Follows standard C++ rules.
+   */
+  template <typename U>
+  Array<T,N>&
+  operator/=(const U& div)
+  {
+    map([&div](auto& path, T& val) {
+        (void) path;
+        val /= div;
+      });
+    return *this;
   }
 
 
