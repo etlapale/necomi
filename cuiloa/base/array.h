@@ -25,6 +25,15 @@
 #include <numeric>
 #include <string>
 
+template <std::size_t N>
+std::ostream&
+operator<<(std::ostream& os, const std::array<unsigned int,N>& a)
+{
+  for (std::size_t i = 0; i < N-1; i++)
+    os << a[i] << ',';
+  return os << a[N-1];
+}
+
 namespace cuiloa
 {
 
@@ -286,7 +295,7 @@ public:
    * the beginning of the data (m_data).
    */
   template <typename ...Indices>
-  ArrayIndex index(const Path& path)
+  ArrayIndex index(const Path& path) const
   {
     return std::inner_product(path.cbegin(), path.cend(),
                               m_strides.cbegin(), 0);
@@ -297,7 +306,7 @@ public:
    * the beginning of the data (m_data).
    */
   template <typename ...Indices>
-  ArrayIndex index(Indices... indices)
+  ArrayIndex index(Indices... indices) const
   {
     static_assert(sizeof...(Indices) == N, "improper indices arity");
     static_assert(all_indices<Indices...>(), "invalid indices type");
@@ -410,6 +419,35 @@ public:
   Array<T,N> zeros_like() const
   {
     return constants_like(0);
+  }
+
+  /**
+   * Sum an array along a given dimension.
+   */
+  std::enable_if_t<true,Array<T,N-1>>
+  sum(ArrayIndex dim) const
+  {
+    // Compute the dimensions of the new array
+    std::array<ArrayIndex,N-1> dims;
+    auto oit = std::copy_n(m_dims.cbegin(), dim, dims.begin());
+    if (dim != N-1)
+      std::copy(m_dims.cbegin()+dim+1, m_dims.cend(), oit);
+
+    Array<T,N-1> a(dims);
+    std::array<ArrayIndex,N> orig_path;
+    a.map([&](auto& path, auto& val) {
+        // Compute the index in the original array
+        auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
+        if (dim != N-1)
+          std::copy(path.cbegin()+dim, path.cend(), oit+1);
+
+        val = 0;
+        for (ArrayIndex i = 0; i < m_dims[dim]; i++) {
+          orig_path[dim] = i;
+          val += m_data[this->index(orig_path)];
+        }
+      });
+    return a;
   }
 
 

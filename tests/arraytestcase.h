@@ -232,6 +232,38 @@ public:
     CPPUNIT_ASSERT(c.dimensions() == a.dimensions());
     CPPUNIT_ASSERT(c(14) == 42 && c(88) == 42);
   }
+
+  void test_sum()
+  {
+    Array<int,3> a(2,3,4);
+    a.map([](auto& path, auto& val) {
+        val = path[0]*12 + path[1] * 4 + path[2];
+      });
+
+    auto a0 = a.sum(0);
+    CPPUNIT_ASSERT(a0.dimensions().size() == 2
+        && a0.dimensions()[0] == 3
+        && a0.dimensions()[1] == 4
+        && a0(0,0) == 12
+        && a0(1,1) == 22
+        && a0(2,3) == 34);
+
+    auto a1 = a.sum(1);
+    CPPUNIT_ASSERT(a1.dimensions().size() == 2
+        && a1.dimensions()[0] == 2
+        && a1.dimensions()[1] == 4
+        && a1(0,0) == 12
+        && a1(0,1) == 15
+        && a1(1,1) == 51);
+
+    auto a2 = a.sum(2);
+    CPPUNIT_ASSERT(a2.dimensions().size() == 2
+        && a2.dimensions()[0] == 2
+        && a2.dimensions()[1] == 3
+        && a2(0,0) == 6
+        && a2(1,1) == 70
+        && a2(1,2) == 86);
+  }
 #if 0
   void
   testViews()
@@ -299,6 +331,8 @@ public:
 	       ("test_iterators", &ArrayTestCase::test_iterators));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("test_likes", &ArrayTestCase::test_likes));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("test_sum", &ArrayTestCase::test_sum));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));
