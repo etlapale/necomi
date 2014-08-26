@@ -7,6 +7,4 @@
 
 ## Filters
 
-- New Canny-Deriche implementation from CImg/Haskell
-- Faster Deriche with templates
 - Gamma and exponential recursive filters
