@@ -32,13 +32,16 @@ using namespace H5;
 /**
  * \file hdf5.h HDF5 files utilities.
  * \ingroup Codecs
- * 
- * This file defines codecs for HDF5 files.
  */
 
 namespace cuiloa
 {
 
+/**
+ * Converts a C++ type to an HDF5 PredType value.
+ * This class template is specialized for the supported C++ types
+ * by defining a static function `type()` returning a `PredType`.
+ */
 template <typename T>
 struct pred_type;
 

@@ -73,6 +73,7 @@ struct all_indices<Index, Indices...>
 
 template <typename T, ArrayIndex N> class Array;
 
+#ifndef IN_DOXYGEN
 /**
  * Recursion case of for loops through template metaprogramming.
  *
@@ -144,6 +145,7 @@ for_looper(const Array<T,N>& a,
     for_looper<UnaryOperation,T,N,M+1>(a, path, f);
   }
 }
+#endif  // IN_DOXYGEN
 
 /**
  * Iterator over an array.

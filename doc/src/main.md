@@ -40,12 +40,12 @@ unsafe methods to bypass them when performance is required.
 
 Additionally, the library defines several [codecs](@ref Codecs) offering
 input/ouput functionality to formats such as HDF5 or INR, and a few
-[filtering algorithms](@ref Filters) defined on the arrays, in particular
+[filtering algorithms](@ref filters) defined on the arrays, in particular
 recursive ones such as Canny-Deriche or Gamma filters.
 
 ~~~
 // Blur the 2D image `b`
-deriche_blur(b, 2.0);
+deriche(b, 2.0);
 ~~~
 
 ## Downloads

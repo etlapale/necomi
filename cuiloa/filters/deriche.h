@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #pragma once
 
 #include <cmath>
@@ -22,10 +21,29 @@
 
 #include "../base/array.h"
 
+/**
+ * \file deriche.h Canny-Deriche recursive filtering
+ * \ingroup filters
+ */
 
 namespace cuiloa
 {
 
+/**
+ * Filtering type used by the Canny-Deriche filter.
+ *
+ * \ingroup filters
+ */
+typedef enum {/** Approximate a Gaussian convolution. */
+              DERICHE_BLUR,
+              /** Approximate a convolution with the derivative of a Gaussian. */
+              DERICHE_FIRST_DERIVATIVE,
+              /** Approximate a convolution with the second derivative of a Gaussian. */
+              DERICHE_SECOND_DERIVATIVE
+             } DericheFilteringType;
+
+  
+#ifndef IN_DOXYGEN
 template <typename T, ArrayIndex N, ArrayIndex K>
 std::enable_if_t<K<N && 0<N && std::is_floating_point<T>::value,void>
 inner_loop(std::array<ArrayIndex,N>& path,
@@ -96,15 +114,31 @@ inner_loop(std::array<ArrayIndex,N>& path,
   }
 }
 
-/**
- * Filtering type used by the Canny-Deriche filter.
- * \ingroup Filters
- */
-typedef enum {DERICHE_BLUR} DericheFilteringType;
+#endif // IN_DOXYGEN
 
+#ifdef IN_DOXYGEN
+/**
+ * Filter an array using Canny-Deriche along a single dimension.
+ * This function is recursive, hence always takes a linear time depending
+ * on the size of the dimensions to be filtered, irrespective of the
+ * given parameter `sigma`.
+ *
+ * \param a     Array to be filtered in-place. Its type `T` must be a
+ *              floating point number and its dimensionality `>0`.
+ * \param dim	Dimension along which to filter, must be less than `N`.
+ * \param sigma	Deviation of the approximated Gaussian.
+ * \param cond  Whether borders values are taken into account or ignored.
+ * \ingroup filters
+ */
+template <typename T, ArrayIndex N>
+Array<T,N>&
+deriche(Array<T,N>& a, ArrayIndex dim, double sigma,
+        DericheFilteringType order=DERICHE_BLUR,
+        bool cond=true);
+#else
 template <typename T, ArrayIndex N>
 std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
-deriche(Array<T,N>& a, int dim, double sigma,
+deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
         DericheFilteringType order=DERICHE_BLUR,
         bool cond=true)
 {
@@ -112,10 +146,10 @@ deriche(Array<T,N>& a, int dim, double sigma,
   if (sigma == 0)
     return a;
   // σ must be >0
-  sigma = fabs(sigma);
+  sigma = std::abs(sigma);
 
   T alpha = 1.695 / sigma;
-  T ena = exp (-alpha);
+  T ena = std::exp(-alpha);
   T ens = ena * ena;
   T b1 = -2 * ena;
   T b2 = ens;
@@ -133,24 +167,45 @@ deriche(Array<T,N>& a, int dim, double sigma,
     a2 =  k * ena * (alpha + 1);
     a3 = -k * ens;
     break;
+  case DERICHE_FIRST_DERIVATIVE:
+    k = -(1-ena) * (1-ena) * (1-ena) / (2*(ena+1)*ena);
+    a0 = a3 = 0;
+    a1 = k*ena;
+    a2 = -a1;
+    break;
+  case DERICHE_SECOND_DERIVATIVE: {
+    const T ea = std::exp(-alpha);
+    const T k = -(ens-1)/(2*alpha*ena);
+    const T kn = -2*(-1 + 3*ea - 3*ea*ea + ea*ea*ea)
+        / (3*ea + 1 + 3*ea*ea + ea*ea*ea);
+
+    a0 = kn;
+    a1 = -kn*(1+k*alpha)*ena;
+    a2 = kn*(1-k*alpha)*ena;
+    a3 = -kn*ens;
+    }
+    break;
   }
 
   std::array<ArrayIndex,N> path;
   T y[dims[dim]];
 
-  inner_loop<T,N,0>(path, dim, cond,
-	            a, y, a0, a1, a2, a3, b1, b2);
+  inner_loop<T,N,0>(path, dim, cond, a, y, a0, a1, a2, a3, b1, b2);
 
   return a;
 }
+#endif // IN_DOXYGEN
   
+#ifdef IN_DOXYGEN
 /**
- * Blur the given array along all its dimensions.
- * To blur only along a given dimension use either
- * deriche_blur(Array<T>&,int,double,bool) or
- * deriche_filter(Array<T>&,double,DericheFilteringType,int,bool)
- * \ingroup Filters
+ * Filter an array using Canny-Deriche along all its dimensions.
+ * \see deriche(Array<T,N>&, ArrayIndex, double, DericheFilteringType, bool) for subjacent implementation.
+ * \ingroup filters
  */
+template <typename T, ArrayIndex N>
+Array<T,N>&
+deriche(Array<T,N>& a, T sigma, DericheFilteringType order=DERICHE_BLUR);
+#else
 template <typename T, ArrayIndex N>
 std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
 deriche(Array<T,N>& a, double sigma, DericheFilteringType order=DERICHE_BLUR)
@@ -159,5 +214,6 @@ deriche(Array<T,N>& a, double sigma, DericheFilteringType order=DERICHE_BLUR)
     deriche<T,N>(a, i, sigma,order);
   return a;
 }
+#endif // IN_DOXYGEN
 
-}
+} // namespace cuiloa

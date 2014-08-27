@@ -17,19 +17,21 @@
 #pragma once
 
 /**
- * \defgroup Core
- * Core array library.
- *
- * \defgroup Codecs
- * Define input/output utilities to save or restore arrays.
- *
- * \defgroup Filters
- * Define some filters which can be used on arrays.
+ * \defgroup Core Core array library.
  */
-
 #include "base/array.h"
-#include "filters/deriche.h"
+
+/**
+ * \defgroup Codecs Input/output functions.
+ *
+ * Define input/output utilities to store arrays on disk or load them.
+ */
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
 #include "codecs/inr.h"
+
+/**
+ * \defgroup filters Recursive filtering
+ */
+#include "filters/deriche.h"
