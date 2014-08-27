@@ -17,12 +17,13 @@
 #pragma once
 
 /**
- * \defgroup Core Core array library.
+ * \defgroup core Core array library
+ * Define the base Array objects and its core functionalities.
  */
 #include "base/array.h"
 
 /**
- * \defgroup Codecs Input/output functions.
+ * \defgroup Codecs Input/output functions
  *
  * Define input/output utilities to store arrays on disk or load them.
  */
@@ -33,5 +34,6 @@
 
 /**
  * \defgroup filters Recursive filtering
+ * Implement recursive filters such as Canny-Deriche or Gamma filters.
  */
 #include "filters/deriche.h"

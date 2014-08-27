@@ -199,7 +199,7 @@ deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
 #ifdef IN_DOXYGEN
 /**
  * Filter an array using Canny-Deriche along all its dimensions.
- * \see deriche(Array<T,N>&, ArrayIndex, double, DericheFilteringType, bool) for subjacent implementation.
+ * \see deriche(Array<T,N>&, ArrayIndex, double, DericheFilteringType, bool) for description.
  * \ingroup filters
  */
 template <typename T, ArrayIndex N>

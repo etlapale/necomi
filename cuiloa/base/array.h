@@ -77,7 +77,7 @@ template <typename T, ArrayIndex N> class Array;
 /**
  * Recursion case of for loops through template metaprogramming.
  *
- * \ingroup Core
+ * \ingroup core
  * \see Array::map
  */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
@@ -94,7 +94,7 @@ for_looper(Array<T,N>& a,
 /**
  * Final case of for loops through template metaprogramming.
  *
- * \ingroup Core
+ * \ingroup core
  * \see Array::map
  */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
@@ -113,7 +113,7 @@ for_looper(Array<T,N>& a,
  * Recursion case of for loops through template metaprogramming
  * for constant arrays.
  *
- * \ingroup Core
+ * \ingroup core
  * \see Array::map
  */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
@@ -131,7 +131,7 @@ for_looper(const Array<T,N>& a,
  * Final case of for loops through template metaprogramming
  * for constant arrays.
  *
- * \ingroup Core
+ * \ingroup core
  * \see Array::map
  */
 template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
@@ -149,7 +149,7 @@ for_looper(const Array<T,N>& a,
 
 /**
  * Iterator over an array.
- * \ingroup Core
+ * \ingroup core
  */
 template <typename T, ArrayIndex N>
 class ArrayIterator
@@ -213,7 +213,37 @@ protected:
 
 /**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
- * \ingroup Core
+ *
+ * Arrays can have any number of dimensions, including 0 which represents
+ * simple scalars. 
+ *
+ * ~~~
+ * cuiloa::Array<double,0> a0;     // Represent a simple double scalar
+ * cuiloa::Array<int,1> a1(12);    // 1D array (vector)
+ * cuiloa::Array<int,2> a2(4,3);   // 2D array (matrix)
+ * ~~~
+ *
+ * Elements are directly accessible through the `()` operator, by specifying
+ * their coordinates.
+ *
+ * ~~~
+ * double d = a0() + a1(3) + a2(1,2);
+ * ~~~
+ *
+ * Interfacing with other libraries is possible by fetching the underlying
+ * elements array with \ref data(). It is also possible to construct an
+ * Array instance to wrap a raw array of elements with the constructors
+ * taking a `T` and dimensions as argument.
+ *
+ * ~~~
+ * double f1[12];
+ * cuiloa::Array<double,2> f2(a, 3, 4); // f1 and f2 share their elements
+ * ~~~
+ *
+ * A standard `iterator` interface is offered, but users are encouraged to
+ * use the fast \ref map functions.
+ *
+ * \ingroup core
  */
 template <typename T, ArrayIndex N>
 class Array
