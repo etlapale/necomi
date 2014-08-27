@@ -59,6 +59,16 @@ can generate the documentation by running
 
     $ make doc
 
+Linking
+-------
+
+Building a software with the library simply requires adding an appropriate
+`#include <cuiloa/cuiloa.h>` in your source code, and making sure the
+compiler can find the headers. With clang or GCC this requires adding
+an `-I/path/to/cuiloa` option, if not installed in the standard locations.
+You may prefer to delegate the options finding to pkg-config or CMake.
+We provide both `cuiloa.pc` and `FindCuiloa.cmake` in the source distribution.
+
 [CMake]: http://cmake.org
 [CppUnit]: http://www.freedesktop.org/wiki/Software/cppunit/
 [Doxygen]: http://www.stack.nl/~dimitri/doxygen/
