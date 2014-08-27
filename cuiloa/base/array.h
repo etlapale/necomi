@@ -37,7 +37,11 @@ operator<<(std::ostream& os, const std::array<unsigned int,N>& a)
 namespace cuiloa
 {
 
+/**
+ * Standard type to denote coordinate indices or dimensions.
+ */
 typedef unsigned int ArrayIndex;
+
 typedef int ArrayOffset;
 
 /**
@@ -251,6 +255,9 @@ class Array
 public:
   template <typename U, ArrayIndex M> friend class Array;
 
+  /**
+   * Represent the coordinates to an element.
+   */
   typedef std::array<ArrayIndex,N> Path;
 
   typedef std::forward_iterator_tag iterator_category;
