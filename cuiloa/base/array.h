@@ -284,7 +284,7 @@ public:
    * Create a new multi-dimensional array with uninitialized elements.
    */
   template <typename ...Dim,
-            typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
+            typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
   Array(Dim ...dims)
     : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
   {}
@@ -316,7 +316,7 @@ public:
    * The given data is never destroyed.
    */
   template <typename ...Dim,
-            typename enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
+            typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
   Array(T* data, Dim ...dims)
     : Array(data, std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
   {}
