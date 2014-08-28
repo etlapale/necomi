@@ -137,39 +137,40 @@ struct pred_type<unsigned long long>
 };
 
 /**
+ * Read a full dataset into a new contiguous Array.
+ * The dataset dimensionality must be `N`.
  * \ingroup Codecs
  */
 template <typename T, ArrayIndex N>
-  Array<T,N> hdf5_load(const char* filename, const char* dset_name)
-  {
-    H5File file(filename, H5F_ACC_RDONLY);
-    DataSet dset = file.openDataSet (dset_name);
-    DataSpace dspace = dset.getSpace();
-    int rank = dspace.getSimpleExtentNdims();
-    if (rank != N) {
-      throw std::runtime_error("Invalid HDF5 dimensionality");
-    }
+Array<T,N> hdf5_load(const char* filename, const char* dset_name)
+{
+  // Open the file and its dataset
+  H5File file(filename, H5F_ACC_RDONLY);
+  DataSet dset = file.openDataSet (dset_name);
+  DataSpace dspace = dset.getSpace();
 
-    hsize_t* hdims = new hsize_t[rank];
-    dspace.getSimpleExtentDims(hdims);
-    int size = 1;
-    int* dims = new int[rank];
-    for (int i = 0; i < rank; i++)
-      {
-        dims[i] = hdims[i];
-        size *= dims[i];
-      }
-    delete [] hdims;
-
-    T* data = new T[size];
-
-    PredType hptype = pred_type<T>::type();
-    dset.read(data, hptype, H5S_ALL, H5S_ALL);
-
-    Array<T,N> a(dims, data);
-    delete [] dims;
-    return a;
+  // Make sure we have the same rank
+  int rank = dspace.getSimpleExtentNdims();
+  if (rank != N) {
+    throw std::runtime_error("Invalid HDF5 dimensionality");
   }
+
+  // Get the dimensions and copy them to an std::array
+  hsize_t hdims[N];
+  dspace.getSimpleExtentDims(hdims);
+  std::array<ArrayIndex,N> dims;
+  for (auto i = 0; i < N; i++)
+    dims[i] = hdims[i];
+
+  // Create the array (allocates the data)
+  Array<T,N> a(dims);
+
+  // Read the data from the dataset in the array
+  PredType hptype = pred_type<T>::type();
+  dset.read(a.data(), hptype, H5S_ALL, H5S_ALL);
+
+  return a;
+}
 
 /**
  * Create a new dataset of the given dimension in an opened HDF5 file.
