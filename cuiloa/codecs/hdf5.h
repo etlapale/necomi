@@ -159,7 +159,7 @@ Array<T,N> hdf5_load(const char* filename, const char* dset_name)
   hsize_t hdims[N];
   dspace.getSimpleExtentDims(hdims);
   std::array<ArrayIndex,N> dims;
-  for (auto i = 0; i < N; i++)
+  for (ArrayIndex i = 0; i < N; i++)
     dims[i] = hdims[i];
 
   // Create the array (allocates the data)

@@ -1,8 +1,4 @@
-#ifndef __CUILOA_ARRAY_TEST_CASE
-#define __CUILOA_ARRAY_TEST_CASE
-
-#include <iostream>
-using namespace std;
+#pragma once
 
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
@@ -376,4 +372,6 @@ public:
   }
 };
 
-#endif
+// Local variables:
+// mode: c++
+// End:
