@@ -23,12 +23,50 @@
 namespace cuiloa
 {
 
-template <typename T, ArrayIndex N, typename PRNG>
-Array<T,N> normal_distribution(const T& mean, const T& deviation,
-			       PRNG& prng)
+/**
+ * Implements the SeedSequence concept for std::random_device.
+ */
+struct RandomDevSeedSequence
+{
+  typedef std::uint32_t result_type;
+  RandomDevSeedSequence() {}
+
+  template <typename InputIterator>
+  RandomDevSeedSequence(InputIterator ia, InputIterator ib)
+  {
+    (void) ia; (void) ib;
+  }
+
+  RandomDevSeedSequence(std::initializer_list<std::uint32_t> il)
+  {
+    (void) il;
+  }
+
+  template <typename InputIterator>
+  void generate(InputIterator ia, InputIterator ib) {
+    for (; ia != ib; ++ia)
+      *ia = m_dist(m_dev);
+  }
+
+  size_t size() { return 0; }
+
+  template <typename OutputIterator>
+  void param(OutputIterator ob)
+  {
+    (void) ob;
+  }
+protected:
+  std::random_device m_dev;
+  std::uniform_int_distribution<std::uint32_t> m_dist;
+};
+
+
+template <typename T, typename PRNG>
+Array<T,1> normal_distribution(const T& mean, const T& deviation,
+			       ArrayIndex size, PRNG& prng)
 {
   std::normal_distribution<T> dist(mean, deviation);
-  Array<T,N> a;
+  Array<T,1> a(size);
 
   a.map([&dist,&prng](auto& path, auto& val) {
       (void) path;
