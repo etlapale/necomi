@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014     University of California, Irvine
+ * Copyright © 2014 University of California
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,7 +260,7 @@ namespace cuiloa
  */
 template <typename T,ArrayIndex N>
 void
-inr_save(const cuiloa::Array<T,N>& a, const char* path)
+inr_save(const Array<T,N>& a, const char* path)
 {
   static_assert(N == 3 || N == 4,
                 "Only 3D and 4D arrays can be stored as INR");
@@ -300,14 +300,12 @@ inr_save(const cuiloa::Array<T,N>& a, const char* path)
       /**
        * Append an image to the INR stream.
        */
-      INRWriter<T>&
-      append(const cuiloa::Array<T,3>& frame);
+      INRWriter<T>& append(const Array<T,3>& frame);
       
       /**
        * Append an image to the INR stream.
        */
-      INRWriter<T>&
-      operator<<(const cuiloa::Array<T,3>& frame);
+      INRWriter<T>& operator<<(const Array<T,3>& frame);
       
       /**
        * Update the INR sequence header.
@@ -325,7 +323,7 @@ inr_save(const cuiloa::Array<T,N>& a, const char* path)
 
   template <typename T>
     INRWriter<T>&
-    INRWriter<T>::append(const cuiloa::Array<T,3>& frame)
+    INRWriter<T>::append(const Array<T,3>& frame)
     {
       const int* dims = frame.dimensions();
         
@@ -361,7 +359,7 @@ inr_save(const cuiloa::Array<T,N>& a, const char* path)
 
   template <typename T>
     INRWriter<T>&
-    INRWriter<T>::operator<<(const cuiloa::Array<T,3>& frame)
+    INRWriter<T>::operator<<(const Array<T,3>& frame)
     {
       return this->append(frame);
     }
@@ -432,3 +430,7 @@ inr_save(const cuiloa::Array<T,N>& a, const char* path)
 	m_of.flush();
     }
 }
+
+// Local Variables:
+// mode: c++
+// End:
