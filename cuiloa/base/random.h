@@ -16,25 +16,26 @@
 
 #pragma once
 
-/**
- * \defgroup core Core array library
- * Define the base Array objects and its core functionalities.
- */
-#include "base/array.h"
-#include "base/random.h"
+#include <random>
 
-/**
- * \defgroup Codecs Input/output functions
- *
- * Define input/output utilities to store arrays on disk or load them.
- */
-#ifdef HAVE_HDF5
-#include "codecs/hdf5.h"
-#endif
-#include "codecs/inr.h"
+#include "array.h"
 
-/**
- * \defgroup filters Recursive filtering
- * Implement recursive filters such as Canny-Deriche or Gamma filters.
- */
-#include "filters/deriche.h"
+namespace cuiloa
+{
+
+template <typename T, ArrayIndex N, typename PRNG>
+Array<T,N> normal_distribution(const T& mean, const T& deviation,
+			       PRNG& prng)
+{
+  std::normal_distribution<T> dist(mean, deviation);
+  Array<T,N> a;
+
+  a.map([&dist,&prng](auto& path, auto& val) {
+      (void) path;
+      val = dist(prng);
+    });
+
+  return a;
+}
+
+} // namespace cuiloa

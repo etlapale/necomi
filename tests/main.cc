@@ -5,8 +5,7 @@
 #include "hdf5testcase.h"
 #endif
 
-int
-main()
+int main()
 {
   CppUnit::TextUi::TestRunner runner;
 
