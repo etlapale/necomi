@@ -252,7 +252,6 @@ protected:
   std::array<ArrayIndex,N> m_path;
 };
 
-
 /**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
  *
@@ -433,7 +432,6 @@ public:
    * Convert a multi-dimensional position into an offset from
    * the beginning of the data (m_data).
    */
-  template <typename ...Indices>
   ArrayIndex index(const Path& path) const
   {
     return std::inner_product(path.cbegin(), path.cend(),
