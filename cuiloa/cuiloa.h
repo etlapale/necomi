@@ -21,6 +21,7 @@
  * Define the base Array objects and its core functionalities.
  */
 #include "base/array.h"
+#include "base/delayed.h"
 #include "base/random.h"
 
 /**

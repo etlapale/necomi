@@ -639,6 +639,20 @@ public:
     return *this;
   }
 
+  #if 0
+  /**
+   * Element wise multiplication of two arrays.
+   */
+  Array<T,N> operator*(const Array<T,N>& other) {
+    Array<T,N> res(m_dims);
+    res.map([&other](auto& path, auto& val) {
+
+      });
+    res.m_data[0] = 42;
+
+    return res;
+  }
+  #endif
 
 protected:
   std::array<ArrayIndex,N> m_dims;
