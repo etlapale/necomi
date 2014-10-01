@@ -13,3 +13,4 @@ doc/Doxyfile
 sync-doc
 cuiloa-*.*.tar.xz
 hdf5-test-*
+\#*\#
