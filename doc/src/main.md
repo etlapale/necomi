@@ -14,7 +14,7 @@ cuiloa::Array<int,3> a(4,5,6);
 std::cout << a(0,0,1) << std::endl;
 
 // 2D view of type cuiloa::Array<int,2>
-// and size 5×6, sharing the same elments
+// and size 5×6, sharing the same elements
 auto b = a[1];
 ~~~
 
