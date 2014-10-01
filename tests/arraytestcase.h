@@ -289,6 +289,19 @@ public:
     auto b = a[1];
     CPPUNIT_ASSERT(b.contiguous());
   }
+
+  void test_any_predicate()
+  {
+    Array<int,3> a(2,3,4);
+    a.fill(42);
+    CPPUNIT_ASSERT(! a.any([](auto& val) { return val != 42; }));
+    CPPUNIT_ASSERT(a.any([](auto& val) { return val == 42; }));
+    CPPUNIT_ASSERT(! a.any([](auto& val) { return val == 33; }));
+
+    a(1,1,1) = 33;
+    CPPUNIT_ASSERT(a.any([](auto& val) { return val == 33; }));
+  }
+
 #if 0
   void
   testViews()
@@ -362,6 +375,8 @@ public:
 	       ("in-place operators", &ArrayTestCase::test_inplace_opers));
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("contiguity check", &ArrayTestCase::test_is_contiguous));
+    s->addTest(new CppUnit::TestCaller<ArrayTestCase>
+	       ("any predicate", &ArrayTestCase::test_any_predicate));
 #if 0
     s->addTest(new CppUnit::TestCaller<ArrayTestCase>
 	       ("testViews", &ArrayTestCase::testViews));

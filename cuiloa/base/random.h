@@ -61,6 +61,10 @@ protected:
 };
 
 
+/**
+ * Generate a one dimensional array filled with random numbers
+ * following a normal distribution.
+ */
 template <typename T, typename PRNG>
 Array<T,1> normal_distribution(const T& mean, const T& deviation,
 			       ArrayIndex size, PRNG& prng)
