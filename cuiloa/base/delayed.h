@@ -23,6 +23,10 @@
 namespace cuiloa
 {
 
+/**
+ * Represent an array expression.
+ * Make sure to register each dependency with add_reference.
+ */
 template <typename Expr, typename T, ArrayIndex N>
 class DelayedArray
 {
@@ -62,9 +66,20 @@ public:
   {
     return m_e(path);
   }
+
+  /**
+   * Add a reference to the given array.
+   */
+  template <typename U, ArrayIndex M>
+  void add_reference(const Array<U,M>& a)
+  {
+    auto b = new Array<U,M>(a);
+    m_refs.push_back(std::shared_ptr<BaseArray>(b));
+  }
 protected:
   std::array<ArrayIndex,N> m_dims;
   Expr m_e;
+  std::vector<std::shared_ptr<BaseArray>> m_refs;
 };
 
 /**
@@ -93,9 +108,14 @@ namespace delayed
 #endif
     
     auto dims = a.dimensions();
-    return make_delayed<T,N>(dims, [&a,&b](auto& path) {
+    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
 	return a(path) * b(path);
       });
+
+    res.add_reference(a);
+    res.add_reference(b);
+
+    return res;
   }
 
 } // namespace delayed

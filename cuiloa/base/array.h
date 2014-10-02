@@ -44,19 +44,6 @@ typedef unsigned int ArrayIndex;
 
 typedef int ArrayOffset;
 
-/**
- * Indicate an indexing error in an Array.
- */
-class ArrayIndexException : public std::exception
-{
-public:
-  ArrayIndexException(const std::string & msg) { m_msg = msg; }
-  ~ArrayIndexException() throw() {}
-  virtual const char* what() const throw() { return m_msg.c_str(); }
-protected:
-  std::string m_msg;
-};
-  
 
 /**
  * Checks if a pack of types are all valid array indexes.
@@ -252,6 +239,16 @@ protected:
   std::array<ArrayIndex,N> m_path;
 };
 
+template <typename Expr, typename T, ArrayIndex N>
+class DelayedArray;
+
+/**
+ * The base class of all Array<T,N>.
+ */
+class BaseArray
+{
+};
+
 /**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
  *
@@ -287,7 +284,7 @@ protected:
  * \ingroup core
  */
 template <typename T, ArrayIndex N>
-class Array
+class Array : public BaseArray
 {
 public:
   template <typename U, ArrayIndex M> friend class Array;
@@ -484,6 +481,15 @@ public:
   const T* data() const
   { return m_data; }
 
+  /**
+   * Return a new shared pointer to the data.
+   */
+  std::shared_ptr<T> shared_data() const
+  {
+    return m_shared_data;
+  }
+
+
   // Iterators
   
   iterator begin()
@@ -542,6 +548,17 @@ public:
     map([&val](auto& path, auto& old) {
         (void) path; (void) old;
         old = val;
+      });
+  }
+
+  /**
+   * Fill an array with a delayed array.
+   */
+  template <typename Expr>
+  void operator=(const DelayedArray<Expr,T,N>& a)
+  {
+    map([&a](auto& path, auto& val) {
+	val = a(path);
       });
   }
 
