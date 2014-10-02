@@ -13,18 +13,12 @@ if (HDF5_FOUND)
 endif ()
 
 # Unit tests
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-find_package (CppUnit)
-if (CPPUNIT_FOUND)
-  # Build the unit tests
-  include_directories (${CPPUNIT_INCLUDE_DIRS})
-  add_executable (cuiloa-cppunit-test EXCLUDE_FROM_ALL tests/main.cc)
-  target_link_libraries (cuiloa-cppunit-test "${CPPUNIT_LIBRARIES} ${HDF5_LIBRARIES}")
-  # Add a `check` target
-  add_custom_target (check)
-  add_dependencies (check cuiloa-cppunit-test)
-  add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-cppunit-test)
-endif ()
+file (GLOB CATCH_SRC tests/*.cc)
+add_executable (cuiloa-catch-test EXCLUDE_FROM_ALL ${CATCH_SRC})
+target_link_libraries (cuiloa-catch-test "${HDF5_LIBRARIES}")
+add_custom_target (check)
+add_dependencies (check cuiloa-catch-test)
+add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-catch-test)
 
 # Documentation
 find_package (Doxygen)

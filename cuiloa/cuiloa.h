@@ -32,7 +32,7 @@
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
-#include "codecs/inr.h"
+//#include "codecs/inr.h"
 
 /**
  * \defgroup filters Recursive filtering
