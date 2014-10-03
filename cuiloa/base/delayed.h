@@ -164,6 +164,19 @@ namespace delayed
     return res;
   }
 
+  // TODO: Make add_reference take an AbstractArray<>
+
+  template <typename T, ArrayIndex N>
+  auto operator>(const Array<T,N>& a, const T& val)
+  //auto operator>(const AbstractArray<Concrete,T,N>& a, const T& val)
+  {
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,&val](auto& path) {
+        return a(path) > val;
+      });
+    res.add_reference(a);
+    return res;
+  }
+
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const Array<T,N>& b)
   {

@@ -5,7 +5,7 @@ using namespace cuiloa;
 using namespace cuiloa::delayed;
 
 
-TEST_CASE( "delayed arrays", "[delayed]" ) {
+TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "product" ) {
     Array<double,1> a3(4);
     a3.map([](auto& path, auto& val) {
@@ -91,5 +91,14 @@ TEST_CASE( "delayed arrays", "[delayed]" ) {
     REQUIRE( ! any(a > b) );
     a(5) = 42;
     REQUIRE( any(a > b) );
+  }
+
+  SECTION( "comparison with constant element" ) {
+    Array<int,1> a(34);
+    a.fill(8);
+
+    REQUIRE( ! any(a > 10) );
+    a(5) = 42;
+    REQUIRE( any(a > 10) );
   }
 }
