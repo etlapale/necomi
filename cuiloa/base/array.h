@@ -17,13 +17,14 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <exception>
 #include <iostream>
 #include <iterator>
 #include <memory>
-#include <numeric>
 #include <string>
+
+#include "basearray.h"
+
 
 template <std::size_t N>
 std::ostream&
@@ -36,11 +37,6 @@ operator<<(std::ostream& os, const std::array<unsigned int,N>& a)
 
 namespace cuiloa
 {
-
-/**
- * Standard type to denote coordinate indices or dimensions.
- */
-typedef unsigned int ArrayIndex;
 
 typedef int ArrayOffset;
 
@@ -65,78 +61,6 @@ struct all_indices<Index, Indices...>
 template <typename T, ArrayIndex N> class Array;
 
 #ifndef IN_DOXYGEN
-/**
- * Final case of for loops through template metaprogramming.
- *
- * \ingroup core
- * \see Array::map
- */
-template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<M==N>
-for_looper(Array<T,N>& a,
-           std::array<ArrayIndex,N>& path,
-           UnaryOperation f)
-{
-  T* data = a.data();
-  auto idx = a.index(path);
-  f(path, data[idx]);
-}
-
-/**
- * Recursion case of for loops through template metaprogramming.
- *
- * \ingroup core
- * \see Array::map
- */
-template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<M<N>
-for_looper(Array<T,N>& a,
-           std::array<ArrayIndex,N>& path,
-           UnaryOperation f)
-{
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
-    path[M] = i;
-    for_looper<UnaryOperation,T,N,M+1>(a, path, f);
-  }
-}
-
-/**
- * Final case of for loops through template metaprogramming
- * for constant arrays.
- *
- * \ingroup core
- * \see Array::map
- */
-template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<M==N>
-for_looper(const Array<T,N>& a,
-           std::array<ArrayIndex,N>& path,
-           UnaryOperation f)
-{
-  const T* data = a.data();
-  auto idx = a.index(path);
-  f(path, data[idx]);
-}
-
-/**
- * Recursion case of for loops through template metaprogramming
- * for constant arrays.
- *
- * \ingroup core
- * \see Array::map
- */
-template <typename UnaryOperation, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<M<N>
-for_looper(const Array<T,N>& a,
-           std::array<ArrayIndex,N>& path,
-           UnaryOperation f)
-{
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
-    path[M] = i;
-    for_looper<UnaryOperation,T,N,M+1>(a, path, f);
-  }
-}
-
 /**
  * Final case of brekable for loops through template metaprogramming
  * for constant arrays.
@@ -243,13 +167,6 @@ template <typename Expr, typename T, ArrayIndex N>
 class DelayedArray;
 
 /**
- * The base class of all Array<T,N>.
- */
-class BaseArray
-{
-};
-
-/**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
  *
  * Arrays can have any number of dimensions, including 0 which represents
@@ -284,10 +201,13 @@ class BaseArray
  * \ingroup core
  */
 template <typename T, ArrayIndex N>
-class Array : public BaseArray
+class Array : public AbstractArray<Array<T,N>,T,N>
 {
 public:
   template <typename U, ArrayIndex M> friend class Array;
+
+  /// Short name for the parent class
+  typedef AbstractArray<Array<T,N>,T,N> Parent;
 
   /**
    * Represent the coordinates to an element.
@@ -309,7 +229,7 @@ protected:
     if (N > 0) {
       auto prev = m_strides[N - 1] = 1;
       for (int i = N - 2; i >= 0; i--)
-        prev = m_strides[i] = m_dims[i + 1] * prev;
+        prev = m_strides[i] = this->m_dims[i + 1] * prev;
     }
   }
 
@@ -327,8 +247,8 @@ public:
    * Create a new multi-dimensional array with uninitialized elements.
    */
   Array(const std::array<ArrayIndex,N>& dims)
-    : m_dims(dims)
-    , m_shared_data(new T[size()], [](T* p){ delete [] p; })
+    : Parent(dims)
+    , m_shared_data(new T[Parent::size()], [](T* p){ delete [] p; })
     , m_data(m_shared_data.get())
   {
     build_strides();
@@ -338,7 +258,7 @@ public:
    * Create a shared view of the given array.
    */
   Array(const Array<T,N>& src)
-    : m_dims(src.m_dims)
+    : Parent(src.m_dims)
     , m_strides(src.m_strides)
     , m_shared_data(src.m_shared_data)
     , m_data(src.m_data)
@@ -360,27 +280,15 @@ public:
    * The given data is never destroyed.
    */
   Array(T* data, const std::array<ArrayIndex,N>& dims)
-    : m_dims(dims)
+    : Parent(dims)
     , m_shared_data(data, [](T* p){(void) p;})
     , m_data(data)
   {
     build_strides();
   }
 
-  const std::array<ArrayIndex,N>& dimensions() const
-  { return m_dims; }
-
   const std::array<ArrayIndex,N>& strides() const
   { return m_strides; }
-  
-  /**
-   * Return the number of elements in the array.
-   */
-  ArrayIndex size() const
-  {
-    return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
-        [] (ArrayIndex a, ArrayIndex b) { return a * b; });
-  }
 
   /**
    * Checks whether the array is contiguous.
@@ -395,7 +303,7 @@ public:
     for (int i = N - 1; i >= 0; i--) {
       if (m_strides[i] != prev)
         return false;
-      prev *= m_dims[i];
+      prev *= this->m_dims[i];
     }
     return true;
   }
@@ -415,7 +323,8 @@ public:
   Array<T,N-1> operator[](ArrayIndex index)
   {
     std::array<ArrayIndex,N-1> dims;
-    std::copy(std::next(m_dims.cbegin()), m_dims.cend(), dims.begin());
+    std::copy(std::next(this->m_dims.cbegin()),
+	      this->m_dims.cend(), dims.begin());
 
     Array<T,N-1> a(dims);
     a.m_data = &(m_data[index * m_strides[0]]);
@@ -499,7 +408,7 @@ public:
 
   iterator end()
   {
-    Path path = m_dims;
+    Path path = this->m_dims;
     std::transform(path.begin(), path.end(), path.begin(),
                    [](auto val) { return val - 1; });
     return ++iterator(*this, path);
@@ -517,35 +426,11 @@ public:
   }
 
   /**
-   * Apply a function to all the elements in the array.
-   * \param f is a callable taking a path and an element, such as
-   *        a std::function<void(Path&,T&)>.
-   */
-  template <typename UnaryOperation>
-  void map(UnaryOperation f)
-  {
-    std::array<ArrayIndex,N> path;
-    for_looper<UnaryOperation,T,N,0>(*this, path, f);
-  }
-
-  /**
-   * Apply a function to all the elements in the array.
-   * \param f is a callable taking a path and an element, such as
-   *        a std::function<void(Path&, const& T)>.
-   */
-  template <typename UnaryOperation>
-  void map(UnaryOperation f) const
-  {
-    std::array<ArrayIndex,N> path;
-    for_looper<UnaryOperation,T,N,0>(*this, path, f);
-  }
-
-  /**
    * Fill an entire array with a single value.
    */
   void fill(const T& val)
   {
-    map([&val](auto& path, auto& old) {
+    this->map([&val](auto& path, auto& old) {
         (void) path; (void) old;
         old = val;
       });
@@ -557,7 +442,7 @@ public:
   template <typename Expr>
   void operator=(const DelayedArray<Expr,T,N>& a)
   {
-    map([&a](auto& path, auto& val) {
+    this->map([&a](auto& path, auto& val) {
 	val = a(path);
       });
   }
@@ -569,10 +454,15 @@ public:
    */
   Array<T,N> copy() const
   {
-    Array<T,N> a(m_dims);
-    map([&a](auto& path, auto& val) {
+    Array<T,N> a(this->m_dims);
+    /*this->map([&a](auto& path, auto& val) {
         a(path) = val;
-      });
+	});*/
+    this->map([&a](auto& path, auto&& val) {
+	T v = val;
+	a(path) = v;
+        //a(path) = val;
+	});
     return a;
   }
 
@@ -583,7 +473,7 @@ public:
    */
   Array<T,N> constants_like(const T& value) const
   {
-    Array<T,N> a(m_dims);
+    Array<T,N> a(this->m_dims);
     std::fill_n(a.data(), a.size(), value);
     return a;
   }
@@ -603,7 +493,7 @@ public:
    */
   T sum() {
     T total = 0;
-    map([&](auto& path, auto& val) {
+    this->map([&](auto& path, auto& val) {
         (void) path;
         total += val;
       });
@@ -618,9 +508,9 @@ public:
   {
     // Compute the dimensions of the new array
     std::array<ArrayIndex,N-1> dims;
-    auto oit = std::copy_n(m_dims.cbegin(), dim, dims.begin());
+    auto oit = std::copy_n(this->m_dims.cbegin(), dim, dims.begin());
     if (dim != N-1)
-      std::copy(m_dims.cbegin()+dim+1, m_dims.cend(), oit);
+      std::copy(this->m_dims.cbegin()+dim+1, this->m_dims.cend(), oit);
 
     Array<T,N-1> a(dims);
     std::array<ArrayIndex,N> orig_path;
@@ -631,7 +521,7 @@ public:
           std::copy(path.cbegin()+dim, path.cend(), oit+1);
 
         val = 0;
-        for (ArrayIndex i = 0; i < m_dims[dim]; i++) {
+        for (ArrayIndex i = 0; i < this->m_dims[dim]; i++) {
           orig_path[dim] = i;
           val += m_data[this->index(orig_path)];
         }
@@ -647,7 +537,7 @@ public:
   Array<T,N>&
   operator/=(const U& div)
   {
-    map([&div](auto& path, T& val) {
+    this->map([&div](auto& path, T& val) {
         (void) path;
         val /= div;
       });
@@ -659,7 +549,7 @@ public:
    * Element wise multiplication of two arrays.
    */
   Array<T,N> operator*(const Array<T,N>& other) {
-    Array<T,N> res(m_dims);
+    Array<T,N> res(this->m_dims);
     res.map([&other](auto& path, auto& val) {
 
       });
@@ -670,7 +560,6 @@ public:
   #endif
 
 protected:
-  std::array<ArrayIndex,N> m_dims;
   std::array<ArrayIndex,N> m_strides;
 
   std::shared_ptr<T> m_shared_data;

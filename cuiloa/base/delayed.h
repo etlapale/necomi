@@ -28,22 +28,18 @@ namespace cuiloa
  * Make sure to register each dependency with add_reference.
  */
 template <typename Expr, typename T, ArrayIndex N>
-class DelayedArray
+class DelayedArray : public AbstractArray<DelayedArray<Expr,T,N>,T,N>
 {
 public:
+  template <typename Expr2, typename U, ArrayIndex M> friend class DelayedArray;
+
+  /// Short name for the parent class
+  typedef AbstractArray<DelayedArray<Expr,T,N>,T,N> Parent;
+
   DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
-    : m_dims(dims)
+    : Parent(dims)
     , m_e(e)
   {
-  }
-
-  const std::array<ArrayIndex,N>& dimensions() const
-  { return m_dims; }
-
-  ArrayIndex size() const
-  {
-    return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
-        [] (ArrayIndex a, ArrayIndex b) { return a * b; });
   }
 
   /**
@@ -76,8 +72,17 @@ public:
     auto b = new Array<U,M>(a);
     m_refs.push_back(std::shared_ptr<BaseArray>(b));
   }
+
+  /**
+   * Add a reference to the given array.
+   */
+  template <typename Expr2, typename U, ArrayIndex M>
+  void add_reference(const DelayedArray<Expr2,U,M>& a)
+  {
+    m_refs.insert(m_refs.end(), a.m_refs.begin(), a.m_refs.end());
+  }
+
 protected:
-  std::array<ArrayIndex,N> m_dims;
   Expr m_e;
   std::vector<std::shared_ptr<BaseArray>> m_refs;
 };
@@ -118,7 +123,47 @@ namespace delayed
     return res;
   }
 
+  template <typename T, ArrayIndex N>
+  auto operator+(const Array<T,N>& a, const Array<T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot sum arrays of different dimensions");
+#endif
+    
+    auto dims = a.dimensions();
+    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
+	return a(path) + b(path);
+      });
+
+    res.add_reference(a);
+    res.add_reference(b);
+
+    return res;
+  }
+
+  template <typename Expr1, typename Expr2, typename T, ArrayIndex N>
+  auto operator+(const DelayedArray<Expr1,T,N>& a, const DelayedArray<Expr2,T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot sum arrays of different dimensions");
+#endif
+
+    auto dims = a.dimensions();
+    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
+	return a(path) + b(path);
+      });
+
+    res.add_reference(a);
+    res.add_reference(b);
+
+    return res;
+  }
 } // namespace delayed
+
 } // namespace cuiloa
 
 

@@ -35,4 +35,3 @@ TEST_CASE( "HDF5 storage", "[hdf5]" ) {
     remove(path);
   }
 }
- 

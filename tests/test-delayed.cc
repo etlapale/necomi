@@ -70,4 +70,15 @@ TEST_CASE( "delayed arrays", "[delayed]" ) {
     REQUIRE( a(1,0) == 49 );
     REQUIRE( a(1,1) == 49 );
   }
+
+  SECTION( "mixing delayed and regular arrays" ) {
+    Array<int,1> a(7);
+    Array<int,1> b(7);
+    b.fill(13);
+
+    a = b*b + b*b;
+
+    REQUIRE( a(0) == 338 );
+    REQUIRE( a(5) == 338 );
+  }
 }
