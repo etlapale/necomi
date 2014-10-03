@@ -98,6 +98,7 @@ make_delayed(const std::array<ArrayIndex,N>& dims, Expr e)
   return DelayedArray<Expr,T,N>(dims, e);
 }
 
+
 /**
  * Namespace to work with DelayedArrays.
  */
@@ -155,6 +156,25 @@ namespace delayed
     auto dims = a.dimensions();
     auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
 	return a(path) + b(path);
+      });
+
+    res.add_reference(a);
+    res.add_reference(b);
+
+    return res;
+  }
+
+  template <typename T, ArrayIndex N>
+  auto operator>(const Array<T,N>& a, const Array<T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot sum arrays of different dimensions");
+#endif
+
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
+        return a(path) > b(path);
       });
 
     res.add_reference(a);

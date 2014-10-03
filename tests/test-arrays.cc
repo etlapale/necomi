@@ -271,12 +271,12 @@ TEST_CASE( "basic array operations", "[base]" ) {
   SECTION( "predicate any" ) {
     Array<int,3> a(2,3,4);
     a.fill(42);
-    REQUIRE( ! a.any([](auto& val) { return val != 42; }) );
-    REQUIRE( a.any([](auto& val) { return val == 42; }) );
-    REQUIRE( ! a.any([](auto& val) { return val == 33; }) );
+    REQUIRE( ! a.any([](auto val) { return val != 42; }) );
+    REQUIRE( a.any([](auto val) { return val == 42; }) );
+    REQUIRE( ! a.any([](auto val) { return val == 33; }) );
 
     a(1,1,1) = 33;
-    REQUIRE( a.any([](auto& val) { return val == 33; }) );
+    REQUIRE( a.any([](auto val) { return val == 33; }) );
   }
 
 }

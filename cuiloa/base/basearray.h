@@ -43,9 +43,6 @@ template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
 #ifndef IN_DOXYGEN
 /**
  * Final case of for loops through template metaprogramming.
- *
- * \ingroup core
- * \see Array::map
  */
 template <typename UnaryOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
@@ -59,9 +56,6 @@ for_looper(AbstractArray<Concrete,T,N>& a,
 
 /**
  * Recursion case of for loops through template metaprogramming.
- *
- * \ingroup core
- * \see Array::map
  */
 template <typename UnaryOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
@@ -79,9 +73,6 @@ for_looper(AbstractArray<Concrete,T,N>& a,
 /**
  * Final case of for loops through template metaprogramming
  * for constant arrays.
- *
- * \ingroup core
- * \see Array::map
  */
 template <typename ConstMapOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
@@ -96,9 +87,6 @@ const_for_looper(const AbstractArray<Concrete,T,N>& a,
 /**
  * Recursion case of for loops through template metaprogramming.
  * for constant arrays.
- *
- * \ingroup core
- * \see Array::map
  */
 template <typename ConstMapOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
@@ -111,6 +99,42 @@ const_for_looper(const AbstractArray<Concrete,T,N>& a,
     path[M] = i;
     const_for_looper<ConstMapOperation,M+1,Concrete,T,N>(a, path, f);
   }
+}
+
+/**
+ * Final case of breakable for loops through template metaprogramming
+ * for constant arrays.
+ */
+template <typename Predicate, ArrayIndex M,
+	  typename Concrete, typename T, ArrayIndex N>
+std::enable_if_t<M==N,bool>
+breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
+		     std::array<ArrayIndex,N>& path,
+		     Predicate p)
+{
+  return p(static_cast<const Concrete&>(a)(path));
+}
+
+/**
+ * Recursion case of for loops through template metaprogramming
+ * for constant arrays.
+ *
+ * \ingroup core
+ * \see Array::map
+ */
+template <typename Predicate, ArrayIndex M,
+	  typename Concrete, typename T, ArrayIndex N>
+std::enable_if_t<(M<N),bool>
+breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
+		     std::array<ArrayIndex,N>& path,
+		     Predicate p)
+{
+  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+    path[M] = i;
+    bool ret = breakable_for_looper<Predicate,M+1,Concrete,T,N>(a, path, p);
+    if (ret) return true;
+  }
+  return false;
 }
 #endif // IN_DOXYGEN
 
@@ -188,6 +212,14 @@ T sum(const AbstractArray<Concrete,T,N>& a) {
       total += val;
     });
   return total;
+}
+
+template <typename Concrete, ArrayIndex N>
+bool any(const AbstractArray<Concrete,bool,N>& a)
+{
+  std::array<ArrayIndex,N> path;
+  auto p = [](bool val) { return val; };
+  return breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
 }
 
 } // namespace cuiloa

@@ -61,43 +61,6 @@ struct all_indices<Index, Indices...>
 template <typename T, ArrayIndex N> class Array;
 
 #ifndef IN_DOXYGEN
-/**
- * Final case of brekable for loops through template metaprogramming
- * for constant arrays.
- *
- * \ingroup core
- */
-template <typename Predicate, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<M==N,bool>
-breakable_for_looper(const Array<T,N>& a,
-		     std::array<ArrayIndex,N>& path,
-		     Predicate p)
-{
-  const T* data = a.data();
-  auto idx = a.index(path);
-  return p(data[idx]);
-}
-
-/**
- * Recursion case of for loops through template metaprogramming
- * for constant arrays.
- *
- * \ingroup core
- * \see Array::map
- */
-template <typename Predicate, typename T, ArrayIndex N, ArrayIndex M>
-std::enable_if_t<(M<N),bool>
-breakable_for_looper(const Array<T,N>& a,
-		     std::array<ArrayIndex,N>& path,
-		     Predicate p)
-{
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
-    path[M] = i;
-    bool ret = breakable_for_looper<Predicate,T,N,M+1>(a, path, p);
-    if (ret) return true;
-  }
-  return false;
-}
 #endif  // IN_DOXYGEN
 
 /**
@@ -422,7 +385,7 @@ public:
   bool any(Predicate p) const
   {
     std::array<ArrayIndex,N> path;
-    return breakable_for_looper<Predicate,T,N,0>(*this, path, p);
+    return breakable_for_looper<Predicate,0,Array<T,N>,T,N>(*this, path, p);
   }
 
   /**

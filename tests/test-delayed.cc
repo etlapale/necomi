@@ -81,4 +81,15 @@ TEST_CASE( "delayed arrays", "[delayed]" ) {
     REQUIRE( a(0) == 338 );
     REQUIRE( a(5) == 338 );
   }
+
+  SECTION( "bool any" ) {
+    Array<int,1> a(34);
+    a.fill(8);
+    Array<int,1> b(34);
+    b.fill(10);
+    
+    REQUIRE( ! any(a > b) );
+    a(5) = 42;
+    REQUIRE( any(a > b) );
+  }
 }
