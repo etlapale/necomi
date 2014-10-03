@@ -18,7 +18,7 @@ TEST_CASE( "random number generation", "[random]" ) {
     auto a = normal_distribution<double>(avg, dev, size, prng);
 
     // Check the statistics
-    REQUIRE( fabs(a.sum()/size - avg) < 1e-1 );
+    REQUIRE( fabs(sum(a)/size - avg) < 1e-1 );
     double std = 0;
     a.map([&std,avg](auto& path, auto& val) {
 	(void) path;

@@ -168,7 +168,6 @@ public:
   void map(ConstMapOperation f) const
   {
     std::array<ArrayIndex,N> path;
-    //const_for_looper<UnaryOperation,0,Concrete,T,N>(*this, path, f);
     const_for_looper<ConstMapOperation,0,Concrete,T,N>(*this, path, f);
   }
 
@@ -176,6 +175,20 @@ protected:
   /// Storage for the array dimensions.
   std::array<ArrayIndex,N> m_dims;
 };
+
+/**
+ * Sum all the elements of an array.
+ * \warning This may overflow.
+ */
+template <typename Concrete, typename T, ArrayIndex N>
+T sum(const AbstractArray<Concrete,T,N>& a) {
+  T total = 0;
+  a.map([&](auto& path, auto val) {
+      (void) path;
+      total += val;
+    });
+  return total;
+}
 
 } // namespace cuiloa
 

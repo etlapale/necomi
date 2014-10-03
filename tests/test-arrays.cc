@@ -240,9 +240,9 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a2(1,1) == 70 );
     REQUIRE( a2(1,2) == 86 );
 
-    REQUIRE( a.sum() == 276 );
-    REQUIRE( a1.sum() == 276 );
-    REQUIRE( a2.sum() == 276 );
+    REQUIRE( sum(a) == 276 );
+    REQUIRE( sum(a1) == 276 );
+    REQUIRE( sum(a2) == 276 );
   }
 
   SECTION( "inplace mappping" ) {

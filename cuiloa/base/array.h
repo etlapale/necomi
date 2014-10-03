@@ -488,19 +488,6 @@ public:
   }
 
   /**
-   * Sum all the elements of an array.
-   * \warning This may overflow.
-   */
-  T sum() {
-    T total = 0;
-    this->map([&](auto& path, auto& val) {
-        (void) path;
-        total += val;
-      });
-    return total;
-  }
-
-  /**
    * Sum an array along a given dimension.
    */
   std::enable_if_t<true,Array<T,N-1>>
