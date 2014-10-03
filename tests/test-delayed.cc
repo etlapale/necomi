@@ -93,6 +93,19 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( any(a > b) );
   }
 
+  SECTION( "bool all" ) {
+    Array<int,1> a(34);
+    a.fill(8);
+    Array<int,1> b(34);
+    b.fill(10);
+    
+    REQUIRE( all(b > a) );
+    REQUIRE( ! all(a > b) );
+    a(5) = 42;
+    REQUIRE( ! all(b > a) );
+    REQUIRE( ! all(a > b) );
+  }
+
   SECTION( "comparison with constant element" ) {
     Array<int,1> a(34);
     a.fill(8);

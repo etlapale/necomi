@@ -178,6 +178,16 @@ namespace delayed
   }
 
   template <typename T, ArrayIndex N>
+  auto operator<(const Array<T,N>& a, const T& val)
+  {
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,&val](auto& path) {
+        return a(path) < val;
+      });
+    res.add_reference(a);
+    return res;
+  }
+
+  template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const Array<T,N>& b)
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
@@ -188,6 +198,25 @@ namespace delayed
 
     auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
         return a(path) > b(path);
+      });
+
+    res.add_reference(a);
+    res.add_reference(b);
+
+    return res;
+  }
+
+  template <typename T, ArrayIndex N>
+  auto operator<(const Array<T,N>& a, const Array<T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot sum arrays of different dimensions");
+#endif
+
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
+        return a(path) < b(path);
       });
 
     res.add_reference(a);

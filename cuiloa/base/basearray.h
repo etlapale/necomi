@@ -214,12 +214,28 @@ T sum(const AbstractArray<Concrete,T,N>& a) {
   return total;
 }
 
+/**
+ * Check if any element of an array of booleans is false.
+ * \see all()
+ */
 template <typename Concrete, ArrayIndex N>
 bool any(const AbstractArray<Concrete,bool,N>& a)
 {
   std::array<ArrayIndex,N> path;
   auto p = [](bool val) { return val; };
   return breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
+}
+
+/**
+ * Check that all elements of an array of booleans are true.
+ * \see any()
+ */
+template <typename Concrete, ArrayIndex N>
+bool all(const AbstractArray<Concrete,bool,N>& a)
+{
+  std::array<ArrayIndex,N> path;
+  auto p = [](bool val) { return !val; };
+  return !breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
 }
 
 } // namespace cuiloa
