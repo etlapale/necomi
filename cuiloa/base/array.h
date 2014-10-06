@@ -109,6 +109,16 @@ public:
     build_strides();
   }
 
+  /**
+   * Create an immediate array initialized from a delayed one.
+   */
+  template <typename Expr>
+  Array(const DelayedArray<T,N,Expr>& a)
+    : Array(a.dimensions())
+  {
+    this->operator=(a);
+  }
+
   const std::array<ArrayIndex,N>& strides() const
   { return m_strides; }
 
@@ -238,6 +248,11 @@ public:
   template <typename Expr>
   void operator=(const DelayedArray<T,N,Expr>& a)
   {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (this->dimensions() != a.dimensions())
+      throw std::length_error("cannot copy from array with different dimensions");
+#endif
     this->map([&a](auto& path, auto& val) {
 	val = a(path);
       });

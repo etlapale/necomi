@@ -129,4 +129,23 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     a(5) = 42;
     REQUIRE( any(a > 10) );
   }
+
+  SECTION( "convert an immediate to a delay and back" ) {
+    // Create an immediate array
+    Array<int,1> a(7);
+    a.map([](auto& path, auto& val) {
+	val = path[0];
+      });
+    // Delay the immediate array
+    auto b = delay(a);
+    REQUIRE( a(0) == b(0) );
+    REQUIRE( a(5) == b(5) );
+
+    // Cast back to an immediate array
+    Array<int,1> c = b;
+    REQUIRE( c(0) == b(0) );
+    REQUIRE( c(5) == b(5) );
+    REQUIRE( c(0) == a(0) );
+    REQUIRE( c(3) == a(3) );
+  }
 }

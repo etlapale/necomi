@@ -66,9 +66,15 @@ public:
   }
 protected:
   Expr m_e;
-  std::vector<std::shared_ptr<BaseArray>> m_refs;
 };
 
+/// Converts any array into a delayed one.
+template <typename Concrete, typename T, ArrayIndex N>
+auto delay(const AbstractArray<Concrete,T,N>& a)
+{
+  auto fun = [b=a.shallow_copy()](auto& path) {return b(path);};
+  return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
+}
 
 /**
  * Namespace to work with DelayedArrays.

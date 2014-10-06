@@ -171,6 +171,11 @@ public:
   {
   }
 
+  Concrete shallow_copy() const
+  {
+    return Concrete(*static_cast<const Concrete*>(this));
+  }
+
   /**
    * Dimensions of the array.
    */
@@ -178,7 +183,7 @@ public:
   {
     return m_dims;
   }
-  
+
   /**
    * Number of elements in the array.
    */
@@ -186,6 +191,11 @@ public:
   {
     return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
+  }
+
+  T operator()(const std::array<ArrayIndex,N>& path) const
+  {
+    return static_cast<const Concrete*>(this)->operator()(path);
   }
 
   /**
