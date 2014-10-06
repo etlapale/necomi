@@ -26,15 +26,6 @@
 #include "basearray.h"
 
 
-template <std::size_t N>
-std::ostream&
-operator<<(std::ostream& os, const std::array<unsigned int,N>& a)
-{
-  for (std::size_t i = 0; i < N-1; i++)
-    os << a[i] << ',';
-  return os << a[N-1];
-}
-
 namespace cuiloa
 {
 
@@ -531,3 +522,7 @@ template <typename T, unsigned int n>
   }
 #endif
 }
+
+// Local Variables:
+// mode: c++
+// End:
