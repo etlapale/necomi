@@ -262,15 +262,6 @@ public:
     return true;
   }
 
-#if 0
-  /**
-   * Return a shared view of the array.
-   * The view will be of the given size starting at the desired
-   * position.
-   */
-  //Array<T,n> view(unsigned int* dims, unsigned int* offset) const;
-
-#endif
   /**
    * Return a view on a slice of the array.
    */
@@ -506,21 +497,6 @@ protected:
   std::shared_ptr<T> m_shared_data;
   T* m_data;
 };
-
-
-#if 0
-template <typename T, unsigned int n>
-  Array<T,n>
-  Array<T,n>::view(unsigned int* dims, unsigned int* offset) const
-  {
-    Array<T,n> a(*this);
-
-    memcpy (a.m_dims, dims, n * sizeof(unsigned int));
-    a.m_data = &(m_data[this->index(offset)]);
-
-    return a;
-  }
-#endif
 }
 
 // Local Variables:
