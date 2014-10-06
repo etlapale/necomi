@@ -24,135 +24,14 @@
 #include <string>
 
 #include "basearray.h"
+#include "delayed.h"
 
 
 namespace cuiloa
 {
 
-typedef int ArrayOffset;
-
-
-/**
- * Checks if a pack of types are all valid array indexes.
- */
-template <typename ...Indices>
-struct all_indices;
-
-template <>
-struct all_indices<> : std::true_type
-{};
-
-template <typename Index, typename ...Indices>
-struct all_indices<Index, Indices...>
-  : std::integral_constant<bool,
-        std::is_convertible<Index, ArrayIndex>::value &&
-        all_indices<Indices...>::value>
-{};
-
-template <typename T, ArrayIndex N> class Array;
-
-#ifndef IN_DOXYGEN
-#endif  // IN_DOXYGEN
-
-/**
- * Iterator over an array.
- * \ingroup core
- */
-template <typename T, ArrayIndex N>
-class ArrayIterator
-{
-public:
-  ArrayIterator(Array<T,N>& array)
-    : m_array(array)
-    , m_dims(array.dimensions())
-  {
-    m_path.fill(0);
-  }
-
-  ArrayIterator(Array<T,N>& array, const std::array<ArrayIndex,N>& path)
-    : m_array(array)
-    , m_dims(array.dimensions())
-    , m_path(path)
-  {}
-
-  const std::array<ArrayIndex,N> path() const
-  {
-    return m_path;
-  }
-
-  T& operator*()
-  {
-    return m_array(m_path);
-  }
-
-  T* operator->()
-  {
-    return &(operator*());
-  }
-
-  ArrayIterator<T,N>& operator++()
-  {
-    // Find first dimension to increment
-    for (int i = N-1; i >= 0; i--) {
-      if (i == 0 || m_path[i] < m_dims[i] - 1) {
-      //if (i == 0 || m_path[i] < m_array.dimensions()[i] - 1) {
-        m_path[i]++;
-        break;
-      }
-      else {
-        m_path[i] = 0;
-      }
-    }
-    return *this;
-  }
-
-  bool operator!=(const ArrayIterator<T,N>& other)
-  {
-    return &m_array != &other.m_array || m_path != other.m_path;
-  }
-
-protected:
-  Array<T,N>& m_array;
-  std::array<ArrayIndex,N> m_dims;
-  std::array<ArrayIndex,N> m_path;
-};
-
-template <typename Expr, typename T, ArrayIndex N>
-class DelayedArray;
-
 /**
  * Multi-dimensional arrays allowing shared data and non-contiguous regions.
- *
- * Arrays can have any number of dimensions, including 0 which represents
- * simple scalars. 
- *
- * ~~~
- * cuiloa::Array<double,0> a0;     // Represent a simple double scalar
- * cuiloa::Array<int,1> a1(12);    // 1D array (vector)
- * cuiloa::Array<int,2> a2(4,3);   // 2D array (matrix)
- * ~~~
- *
- * Elements are directly accessible through the `()` operator, by specifying
- * their coordinates.
- *
- * ~~~
- * double d = a0() + a1(3) + a2(1,2);
- * ~~~
- *
- * Interfacing with other libraries is possible by fetching the underlying
- * elements array with \ref data(). It is also possible to construct an
- * Array instance to wrap a raw array of elements with the constructors
- * taking a `T` and dimensions as argument.
- *
- * ~~~
- * double f1[12];
- * cuiloa::Array<double,2> f2(a, 3, 4); // f1 and f2 share their elements
- * ~~~
- *
- * A standard `iterator` interface is offered, but users are encouraged to
- * use the fast \ref map functions.
- *
- * \ingroup core
  */
 template <typename T, ArrayIndex N>
 class Array : public AbstractArray<Array<T,N>,T,N>
@@ -167,16 +46,6 @@ public:
    * Represent the coordinates to an element.
    */
   typedef std::array<ArrayIndex,N> Path;
-
-  typedef std::forward_iterator_tag iterator_category;
-  typedef ArrayIterator<T,N> iterator;
-  typedef ArrayOffset difference_type;
-  typedef ArrayIndex size_type;
-  typedef T value_type;
-  typedef T* pointer;
-  typedef const T* const_pointer;
-  typedef T& reference;
-  typedef const T& const_reference;
 
 protected:
   void build_strides() {
@@ -247,8 +116,7 @@ public:
   /**
    * Checks whether the array is contiguous.
    */
-  bool
-  contiguous() const
+  bool contiguous() const
   {
     if (N == 0)
       return true;
@@ -341,22 +209,6 @@ public:
   std::shared_ptr<T> shared_data() const
   {
     return m_shared_data;
-  }
-
-
-  // Iterators
-  
-  iterator begin()
-  {
-    return iterator(*this);
-  }
-
-  iterator end()
-  {
-    Path path = this->m_dims;
-    std::transform(path.begin(), path.end(), path.begin(),
-                   [](auto val) { return val - 1; });
-    return ++iterator(*this, path);
   }
 
   /**

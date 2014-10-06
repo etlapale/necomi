@@ -27,6 +27,23 @@ namespace cuiloa
  */
 typedef unsigned int ArrayIndex;
 
+/**
+ * Checks if a pack of types are all valid array indexes.
+ */
+template <typename ...Indices>
+struct all_indices;
+
+template <>
+struct all_indices<> : std::true_type
+{};
+
+template <typename Index, typename ...Indices>
+struct all_indices<Index, Indices...>
+  : std::integral_constant<bool,
+        std::is_convertible<Index, ArrayIndex>::value &&
+        all_indices<Indices...>::value>
+{};
+
 
 /**
  * The parent class of all array types.

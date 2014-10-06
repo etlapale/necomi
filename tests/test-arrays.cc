@@ -181,21 +181,6 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a0v() == 456 );
   }
 
-  SECTION( "iterators" ) {
-    Array<int,1> a1(127);
-    for (unsigned int i = 0; i < a1.size(); i++)
-      a1(i) = i;
-
-    int i = 0;
-    for (auto val : a1) {
-      if (i == 67) {
-        REQUIRE( val == 67 );
-        break;
-      }
-      i++;
-    }
-  }
-
   SECTION( "similar shapes" ) {
     Array<int,1> a(127);
 

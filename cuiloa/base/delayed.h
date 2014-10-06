@@ -23,6 +23,9 @@
 namespace cuiloa
 {
 
+template <typename T, ArrayIndex N>
+class Array;
+
 /**
  * Represent an array expression.
  * Make sure to register each dependency with add_reference.
