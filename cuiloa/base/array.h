@@ -29,9 +29,8 @@
 
 namespace cuiloa
 {
-
 /**
- * Multi-dimensional arrays allowing shared data and non-contiguous regions.
+ * Multi-dimensional arrays supporting non-contiguous shared data.
  */
 template <typename T, ArrayIndex N>
 class Array : public AbstractArray<Array<T,N>,T,N>
@@ -228,7 +227,7 @@ public:
   void fill(const T& val)
   {
     this->map([&val](auto& path, auto& old) {
-        (void) path; (void) old;
+        (void) path;
         old = val;
       });
   }
@@ -252,13 +251,9 @@ public:
   Array<T,N> copy() const
   {
     Array<T,N> a(this->m_dims);
-    /*this->map([&a](auto& path, auto& val) {
-        a(path) = val;
-	});*/
     this->map([&a](auto& path, auto&& val) {
 	T v = val;
 	a(path) = v;
-        //a(path) = val;
 	});
     return a;
   }
@@ -315,7 +310,6 @@ public:
 
   /**
    * Divide each element of the array by a number.
-   * \warning Follows standard C++ rules.
    */
   template <typename U>
   Array<T,N>&
@@ -328,24 +322,8 @@ public:
     return *this;
   }
 
-  #if 0
-  /**
-   * Element wise multiplication of two arrays.
-   */
-  Array<T,N> operator*(const Array<T,N>& other) {
-    Array<T,N> res(this->m_dims);
-    res.map([&other](auto& path, auto& val) {
-
-      });
-    res.m_data[0] = 42;
-
-    return res;
-  }
-  #endif
-
 protected:
   std::array<ArrayIndex,N> m_strides;
-
   std::shared_ptr<T> m_shared_data;
   T* m_data;
 };

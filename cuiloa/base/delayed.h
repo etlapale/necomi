@@ -23,8 +23,7 @@
 namespace cuiloa
 {
 
-template <typename T, ArrayIndex N>
-class Array;
+  template <typename T, ArrayIndex N> class Array;
 
 /**
  * Represent an array expression.
@@ -65,26 +64,6 @@ public:
   {
     return m_e(path);
   }
-
-  /**
-   * Add a reference to the given array.
-   */
-  template <typename U, ArrayIndex M>
-  void add_reference(const Array<U,M>& a)
-  {
-    auto b = new Array<U,M>(a);
-    m_refs.push_back(std::shared_ptr<BaseArray>(b));
-  }
-
-  /**
-   * Add a reference to the given array.
-   */
-  template <typename Expr2, typename U, ArrayIndex M>
-  void add_reference(const DelayedArray<Expr2,U,M>& a)
-  {
-    m_refs.insert(m_refs.end(), a.m_refs.begin(), a.m_refs.end());
-  }
-
 protected:
   Expr m_e;
   std::vector<std::shared_ptr<BaseArray>> m_refs;
@@ -121,9 +100,6 @@ namespace delayed
 	return a(path) * b(path);
       });
 
-    res.add_reference(a);
-    res.add_reference(b);
-
     return res;
   }
 
@@ -140,9 +116,6 @@ namespace delayed
     auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
 	return a(path) + b(path);
       });
-
-    res.add_reference(a);
-    res.add_reference(b);
 
     return res;
   }
@@ -161,32 +134,25 @@ namespace delayed
 	return a(path) + b(path);
       });
 
-    res.add_reference(a);
-    res.add_reference(b);
-
     return res;
   }
-
-  // TODO: Make add_reference take an AbstractArray<>
 
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const T& val)
   //auto operator>(const AbstractArray<Concrete,T,N>& a, const T& val)
   {
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,&val](auto& path) {
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,val](auto& path) {
         return a(path) > val;
       });
-    res.add_reference(a);
     return res;
   }
 
   template <typename T, ArrayIndex N>
   auto operator<(const Array<T,N>& a, const T& val)
   {
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,&val](auto& path) {
+    auto res = make_delayed<bool,N>(a.dimensions(), [a,val](auto& path) {
         return a(path) < val;
       });
-    res.add_reference(a);
     return res;
   }
 
@@ -203,9 +169,6 @@ namespace delayed
         return a(path) > b(path);
       });
 
-    res.add_reference(a);
-    res.add_reference(b);
-
     return res;
   }
 
@@ -221,9 +184,6 @@ namespace delayed
     auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
         return a(path) < b(path);
       });
-
-    res.add_reference(a);
-    res.add_reference(b);
 
     return res;
   }

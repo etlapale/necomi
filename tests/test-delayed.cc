@@ -39,7 +39,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "memory references" ) {
     // Return an expression whose array dependencies are stack allocated
-    auto fun = [](int x, int y) {
+    auto pfun = [](int x, int y) {
       Array<double,1> a(5);
       a.fill(x);
       Array<double,1> b(5);
@@ -48,12 +48,27 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     };
 
     // Try smashing the stack by successive calls
-    auto d = fun(3, 4);
-    auto e = fun(7, 8);
+    auto d = pfun(3, 4);
+    auto e = pfun(7, 8);
     REQUIRE( d(0) == 12 );
     REQUIRE( d(4) == 12 );
     REQUIRE( e(0) == 56 );
     REQUIRE( e(4) == 56) ;
+
+    // Same with sum
+    auto sfun = [](int x, int y) {
+      Array<double,1> a(5);
+      a.fill(x);
+      Array<double,1> b(5);
+      b.fill(y);
+      return a + b;
+    };
+    auto f = sfun(9, 4);
+    auto g = sfun(7, 5);
+    REQUIRE( f(0) == 13 );
+    REQUIRE( f(4) == 13 );
+    REQUIRE( g(0) == 12 );
+    REQUIRE( g(4) == 12) ;
   }
 
   SECTION( "copy delayed into regular array" ) {
