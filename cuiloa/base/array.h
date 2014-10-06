@@ -236,7 +236,7 @@ public:
    * Fill an array with a delayed array.
    */
   template <typename Expr>
-  void operator=(const DelayedArray<Expr,T,N>& a)
+  void operator=(const DelayedArray<T,N,Expr>& a)
   {
     this->map([&a](auto& path, auto& val) {
 	val = a(path);

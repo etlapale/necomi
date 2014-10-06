@@ -29,14 +29,14 @@ namespace cuiloa
  * Represent an array expression.
  * Make sure to register each dependency with add_reference.
  */
-template <typename Expr, typename T, ArrayIndex N>
-class DelayedArray : public AbstractArray<DelayedArray<Expr,T,N>,T,N>
+template <typename T, ArrayIndex N, typename Expr>
+class DelayedArray : public AbstractArray<DelayedArray<T,N,Expr>,T,N>
 {
 public:
-  template <typename Expr2, typename U, ArrayIndex M> friend class DelayedArray;
+  template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
 
   /// Short name for the parent class
-  typedef AbstractArray<DelayedArray<Expr,T,N>,T,N> Parent;
+  typedef AbstractArray<DelayedArray<T,N,Expr>,T,N> Parent;
 
   DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
     : Parent(dims)
@@ -69,17 +69,6 @@ protected:
   std::vector<std::shared_ptr<BaseArray>> m_refs;
 };
 
-/**
- * DelayedArray factory with template forwarding.
- * Allows the deducting the type of Expr.
- */
-template <typename T, ArrayIndex N, typename Expr>
-DelayedArray<Expr,T,N>
-make_delayed(const std::array<ArrayIndex,N>& dims, Expr e)
-{
-  return DelayedArray<Expr,T,N>(dims, e);
-}
-
 
 /**
  * Namespace to work with DelayedArrays.
@@ -94,13 +83,10 @@ namespace delayed
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot multiply arrays of different dimensions");
 #endif
-    
-    auto dims = a.dimensions();
-    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
-	return a(path) * b(path);
-      });
-
-    return res;
+    auto fun = [a,b](auto& path) {
+      return a(path) * b(path);
+    };
+    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -111,49 +97,44 @@ namespace delayed
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-    
-    auto dims = a.dimensions();
-    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
+    auto fun = [a,b](auto& path) {
 	return a(path) + b(path);
-      });
-
-    return res;
+      };
+    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename Expr1, typename Expr2, typename T, ArrayIndex N>
-  auto operator+(const DelayedArray<Expr1,T,N>& a, const DelayedArray<Expr2,T,N>& b)
+  auto operator+(const DelayedArray<T,N,Expr1>& a,
+		 const DelayedArray<T,N,Expr2>& b)
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-
-    auto dims = a.dimensions();
-    auto res = make_delayed<T,N>(dims, [a,b](auto& path) {
+    auto fun = [a,b](auto& path) {
 	return a(path) + b(path);
-      });
-
-    return res;
+      };
+    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const T& val)
   //auto operator>(const AbstractArray<Concrete,T,N>& a, const T& val)
   {
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,val](auto& path) {
+    auto fun = [a,val](auto& path) {
         return a(path) > val;
-      });
-    return res;
+      };
+    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename T, ArrayIndex N>
   auto operator<(const Array<T,N>& a, const T& val)
   {
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,val](auto& path) {
+    auto fun = [a,val](auto& path) {
         return a(path) < val;
-      });
-    return res;
+      };
+    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -164,12 +145,10 @@ namespace delayed
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
+    auto fun = [a,b](auto& path) {
         return a(path) > b(path);
-      });
-
-    return res;
+      };
+    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -180,17 +159,13 @@ namespace delayed
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-
-    auto res = make_delayed<bool,N>(a.dimensions(), [a,b](auto& path) {
+    auto fun = [a,b](auto& path) {
         return a(path) < b(path);
-      });
-
-    return res;
+      };
+    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
   }
 } // namespace delayed
-
 } // namespace cuiloa
-
 
 // Local Variables:
 // mode: c++
