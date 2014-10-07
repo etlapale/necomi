@@ -1,0 +1,133 @@
+/*
+ * Copyright © 2014	University of California, Irvine
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#pragma once
+
+#include <fstream>
+
+#include <png.h>
+
+namespace cuiloa {
+
+  class png_exception : public std::runtime_error
+  {
+  public:
+    png_exception(const std::string& what_arg)
+      : std::runtime_error(what_arg)
+    {
+    }
+  };
+
+  static inline void libpng_read_callback(png_structp ps,
+				   png_bytep data,
+				   png_size_t length)
+  {
+    auto is = static_cast<std::istream*>(png_get_io_ptr(ps));
+    is->read((char*) data, length);
+    // TODO: add some error handling here
+  }
+
+  inline Array<unsigned char,3> png_load(std::istream&& is)
+  {
+    // Read the PNG signature
+    png_byte sig[8];
+    is.read((char*)sig, sizeof(sig));
+    // Check it
+    if (png_sig_cmp(sig, 0, sizeof(sig)))
+      throw png_exception("invalid PNG signature");
+
+    // Create a PNG read structure
+    png_structp ps = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+					    nullptr, nullptr, nullptr);
+    if (! ps)
+      throw png_exception("could not create a PNG read structure");
+    auto pi = png_create_info_struct(ps);
+    if (! pi) {
+      png_destroy_read_struct(&ps, 0, 0);
+      throw png_exception("could not create a PNG info structure");
+    }
+
+    // Error handling
+    if (setjmp(png_jmpbuf(ps))) {
+      png_destroy_read_struct(&ps, &pi, 0);
+      throw png_exception("error while reading the PNG image");
+    }
+
+    // Callbacks
+    png_set_read_fn(ps, (png_voidp) &is, &cuiloa::libpng_read_callback);
+
+    // Parse image metadata
+    png_set_sig_bytes(ps, sizeof(sig));
+    png_read_info(ps, pi);
+
+    auto width = png_get_image_width(ps, pi);
+    auto height = png_get_image_height(ps, pi);
+    auto depth = png_get_bit_depth(ps, pi);
+    auto channels = png_get_channels(ps, pi);
+    auto color_type = png_get_color_type(ps, pi);
+    auto interlace_type = png_get_interlace_type(ps, pi);
+
+    /*std::cout << "width: " << width << std::endl
+	      << "height: " << height << std::endl
+	      << "depth: " << (int) depth << std::endl
+	      << "channels: " << (int) channels << std::endl
+	      << "color type: " << (int) color_type << std::endl
+	      << "interlace type: " << (int) interlace_type << std::endl;*/
+
+    switch (color_type) {
+    case PNG_COLOR_TYPE_PALETTE:
+      png_set_palette_to_rgb(ps);
+      break;
+    case PNG_COLOR_TYPE_GRAY:
+      if (depth < 8)
+	png_set_expand_gray_1_2_4_to_8(ps);
+      break;
+    }
+
+    // TODO: strip 16-bits images
+
+    if (depth != 8 || channels != 3 ||  color_type != PNG_COLOR_TYPE_RGB) {
+      png_destroy_read_struct(&ps, &pi, 0);
+      throw png_exception("only 3 channels RGB images are supported");
+    }
+    
+    // Read the image
+    Array<unsigned char,3> a(height, width, channels);
+
+    // Get the address of each row
+    png_bytep rows[height];
+    for (unsigned y = 0; y < height; y++)
+      rows[y] = (png_bytep) a[y].data();
+
+    // Read the whole image
+    png_read_image(ps, rows);
+
+    // Cleanup
+    png_destroy_read_struct(&ps, &pi, 0);
+
+    return a;
+  }
+
+  inline Array<unsigned char,3> png_load(const char* filename)
+  {
+    return png_load(std::ifstream(filename));
+  }
+
+} // namespace cuiloa
+
+// Local Variables:
+// mode: c++
+// End:

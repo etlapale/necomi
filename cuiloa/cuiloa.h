@@ -32,6 +32,11 @@
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
+
+#ifdef HAVE_LIBPNG
+#include "codecs/png.h"
+#endif
+
 //#include "codecs/inr.h"
 
 /**

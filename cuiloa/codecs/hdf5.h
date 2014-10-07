@@ -282,3 +282,7 @@ void hdf5_save(const Array<T,N>& a,
 }
 
 } // namespace cuiloa
+
+// Local Variables:
+// mode: c++
+// End:

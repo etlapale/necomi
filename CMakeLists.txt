@@ -8,15 +8,22 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g")
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 
+# Optional libraries:
+# - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
 if (HDF5_FOUND)
   add_definitions ("-DHAVE_HDF5")
+endif ()
+# - libpng
+find_package (PNG)
+if (PNG_FOUND)
+  add_definitions ("-DHAVE_LIBPNG")
 endif ()
 
 # Unit tests
 file (GLOB CATCH_SRC tests/*.cc)
 add_executable (cuiloa-catch-test EXCLUDE_FROM_ALL ${CATCH_SRC})
-target_link_libraries (cuiloa-catch-test "${HDF5_LIBRARIES}")
+target_link_libraries (cuiloa-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES})
 add_custom_target (check)
 add_dependencies (check cuiloa-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-catch-test)
