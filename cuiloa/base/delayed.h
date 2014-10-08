@@ -76,6 +76,13 @@ auto delay(const AbstractArray<Concrete,T,N>& a)
   return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
 }
 
+  template <typename T, size_t N, typename Expr>
+  DelayedArray<T,N,Expr>
+  make_delayed(const std::array<ArrayIndex,N>& dimensions, Expr fun)
+  {
+    return DelayedArray<T,N,Expr>(dimensions, fun);
+  }
+
 /**
  * Namespace to work with DelayedArrays.
  */
