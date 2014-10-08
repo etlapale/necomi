@@ -50,7 +50,7 @@ protected:
   void build_strides() {
     if (N > 0) {
       auto prev = m_strides[N - 1] = 1;
-      for (int i = N - 2; i >= 0; i--)
+      for (long i = N - 2; i >= 0; i--)
         prev = m_strides[i] = this->m_dims[i + 1] * prev;
     }
   }
@@ -142,7 +142,7 @@ public:
   /**
    * Return a view on a slice of the array.
    */
-  Array<T,N-1> operator[](ArrayIndex index)
+  Array<T,N-1> operator[](ArrayIndex index) const
   {
     std::array<ArrayIndex,N-1> dims;
     std::copy(std::next(this->m_dims.cbegin()),
