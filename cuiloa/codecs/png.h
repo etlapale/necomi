@@ -32,11 +32,27 @@ namespace cuiloa {
   };
 
   static inline void libpng_read_callback(png_structp ps,
-				   png_bytep data,
-				   png_size_t length)
+					  png_bytep data,
+					  png_size_t length)
   {
     auto is = static_cast<std::istream*>(png_get_io_ptr(ps));
     is->read((char*) data, length);
+    // TODO: add some error handling here
+  }
+
+  static inline void libpng_write_callback(png_structp ps,
+					   png_bytep data,
+					   png_size_t length)
+  {
+    auto os = static_cast<std::ostream*>(png_get_io_ptr(ps));
+    os->write((char*) data, length);
+    // TODO: add some error handling here
+  }
+
+  static inline void libpng_flush_callback(png_structp ps)
+  {
+    auto os = static_cast<std::ostream*>(png_get_io_ptr(ps));
+    os->flush();
     // TODO: add some error handling here
   }
 
@@ -121,9 +137,55 @@ namespace cuiloa {
     return a;
   }
 
-  inline Array<unsigned char,3> png_load(const char* filename)
+  inline Array<unsigned char,3> png_load(const std::string& filename)
   {
     return png_load(std::ifstream(filename));
+  }
+
+  inline void png_save(const Array<unsigned char,3>& a,
+		       std::ostream&& os)
+  {
+    auto ps = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+				      nullptr, nullptr, nullptr);
+    if (! ps)
+      throw png_exception("could not create a PNG write structure");
+    auto pi = png_create_info_struct(ps);
+    if (! pi) {
+      png_destroy_write_struct(&ps, 0);
+      throw png_exception("could not create a PNG info structure");
+    }
+
+    // Error handling
+    if (setjmp(png_jmpbuf(ps))) {
+      png_destroy_write_struct(&ps, &pi);
+      throw png_exception("error while writing the PNG image");
+    }
+    
+    // Callbacks
+    png_set_write_fn(ps, (png_voidp) &os,
+		     &cuiloa::libpng_write_callback,
+		     &cuiloa::libpng_flush_callback);
+
+    // Write the header
+    auto& dims = a.dimensions();
+    png_set_IHDR(ps, pi, dims[1], dims[0], 8,
+		 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
+		 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+    png_write_info(ps, pi);
+
+    // Write the rows
+    for (unsigned int y = 0; y < dims[0]; y++)
+      png_write_row(ps, a[y].data());
+
+    // Cleanup
+    png_write_end(ps, pi);
+    png_destroy_write_struct(&ps, &pi);
+  }
+
+  inline void png_save(const Array<unsigned char,3>& a,
+		       const std::string& filename)
+  {
+    png_save(a, std::ofstream(filename));
   }
 
 } // namespace cuiloa
