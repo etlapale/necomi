@@ -132,6 +132,32 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a2s.strides()[0] == 1 );
     REQUIRE( a2s(2) == 10 );
     REQUIRE( a2s(3) == 11 );
+
+    // Out of bounds slicing
+
+    bool exception_thrown = false;
+    try {
+      auto bad_a1 = a1[200];
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+
+    exception_thrown = false;
+    try {
+      auto bad_a2 = a2[0][7];
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+
+    exception_thrown = false;
+    try {
+      auto bad_a2 = a2[7][0];
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
   }
 
   SECTION( "maps" ) {

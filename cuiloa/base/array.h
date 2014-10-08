@@ -142,8 +142,14 @@ public:
   /**
    * Return a view on a slice of the array.
    */
-  Array<T,N-1> operator[](ArrayIndex index) const
+  Array<T,N-1>
+  operator[](ArrayIndex index) const
   {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Check slicing index
+    if (index > this->m_dims[0])
+      throw std::out_of_range("invalid slicing index");
+#endif
     std::array<ArrayIndex,N-1> dims;
     std::copy(std::next(this->m_dims.cbegin()),
 	      this->m_dims.cend(), dims.begin());
