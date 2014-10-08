@@ -25,7 +25,7 @@ namespace cuiloa
 /**
  * Standard type to denote coordinate indices or dimensions.
  */
-typedef unsigned int ArrayIndex;
+  typedef std::size_t ArrayIndex;
 
 /**
  * Checks if a pack of types are all valid array indexes.
