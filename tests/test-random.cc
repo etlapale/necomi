@@ -25,7 +25,7 @@ TEST_CASE( "random number generation", "[random]" ) {
 	std += (val-avg)*(val-avg);
       });
     std = sqrt(std/size);
-    REQUIRE( fabs(std-dev) < 1e-2 );
+    REQUIRE( fabs(std-dev) < 2e-2 );
   }
 }
  
