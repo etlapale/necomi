@@ -141,8 +141,11 @@ public:
 
   /**
    * Return a view on a slice of the array.
+   * Template argument M is a trick to allow std::enable_if_t and
+   * disable the function for N=0. You should ignore it.
    */
-  Array<T,N-1>
+  template <ArrayIndex M = N>
+  std::enable_if_t<M!=0,Array<T,M-1>>
   operator[](ArrayIndex index) const
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
