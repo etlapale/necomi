@@ -181,20 +181,6 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a0v() == 456 );
   }
 
-  SECTION( "similar shapes" ) {
-    Array<int,1> a(127);
-
-    auto b = a.zeros_like();
-    REQUIRE( b.dimensions() == a.dimensions() );
-    REQUIRE( b(42) == 0 );
-    REQUIRE( b(73) == 0 );
-
-    auto c = a.constants_like(42);
-    REQUIRE( c.dimensions() == a.dimensions() );
-    REQUIRE( c(14) == 42 );
-    REQUIRE( c(88) == 42 );
-  }
-
   SECTION( "sums" ) {
     Array<int,3> a(2,3,4);
     a.map([](auto& path, auto& val) {
@@ -252,16 +238,4 @@ TEST_CASE( "basic array operations", "[base]" ) {
     auto b = a[1];
     REQUIRE( b.contiguous() );
   }
-
-  SECTION( "predicate any" ) {
-    Array<int,3> a(2,3,4);
-    a.fill(42);
-    REQUIRE( ! a.any([](auto val) { return val != 42; }) );
-    REQUIRE( a.any([](auto val) { return val == 42; }) );
-    REQUIRE( ! a.any([](auto val) { return val == 33; }) );
-
-    a(1,1,1) = 33;
-    REQUIRE( a.any([](auto val) { return val == 33; }) );
-  }
-
 }

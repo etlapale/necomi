@@ -177,4 +177,19 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a.dimensions()[0] == 11 );
     REQUIRE( a(3,7) == 42 );
   }
+
+  SECTION( "similar shape constructors" ) {
+    Array<int,1> a(127);
+
+    auto b = zeros_like(a);
+    REQUIRE( b.dimensions() == a.dimensions() );
+    REQUIRE( b(42) == 0 );
+    REQUIRE( b(73) == 0 );
+
+    auto c = constants_like(a, 42);
+    REQUIRE( c.dimensions() == a.dimensions() );
+    REQUIRE( c(14) == 42 );
+    REQUIRE( c(88) == 42 );
+  }
+
 }

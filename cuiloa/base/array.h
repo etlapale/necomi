@@ -221,17 +221,6 @@ public:
   }
 
   /**
-   * Check if a predicate is true for any element in the array.
-   * Return as soon as one matching element is found.
-   */
-  template <typename Predicate>
-  bool any(Predicate p) const
-  {
-    std::array<ArrayIndex,N> path;
-    return breakable_for_looper<Predicate,0,Array<T,N>,T,N>(*this, path, p);
-  }
-
-  /**
    * Fill an entire array with a single value.
    */
   void fill(const T& val)
@@ -271,27 +260,6 @@ public:
 	a(path) = v;
 	});
     return a;
-  }
-
-  /**
-   * Create an array with the same dimensions filled with a constant
-   * value.
-   * \see zeros_like
-   */
-  Array<T,N> constants_like(const T& value) const
-  {
-    Array<T,N> a(this->m_dims);
-    std::fill_n(a.data(), a.size(), value);
-    return a;
-  }
-
-  /**
-   * Create an a array with the same dimensions but filled with zeros.
-   * \see constants_like
-   */
-  Array<T,N> zeros_like() const
-  {
-    return constants_like(0);
   }
 
   /**

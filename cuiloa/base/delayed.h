@@ -68,20 +68,21 @@ protected:
   Expr m_e;
 };
 
-/// Converts any array into a delayed one.
-template <typename Concrete, typename T, ArrayIndex N>
-auto delay(const AbstractArray<Concrete,T,N>& a)
-{
-  auto fun = [b=a.shallow_copy()](auto& path) {return b(path);};
-  return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
-}
-
   template <typename T, size_t N, typename Expr>
   DelayedArray<T,N,Expr>
   make_delayed(const std::array<ArrayIndex,N>& dimensions, Expr fun)
   {
     return DelayedArray<T,N,Expr>(dimensions, fun);
   }
+
+  /// Converts any array into a delayed one.
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto delay(const AbstractArray<Concrete,T,N>& a)
+  {
+    auto fun = [b=a.shallow_copy()](auto& path) {return b(path);};
+    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
+  }
+
 
 /**
  * Namespace to work with DelayedArrays.
@@ -176,6 +177,27 @@ namespace delayed
         return a(path) < b(path);
       };
     return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
+  }
+
+  /**
+   * Create an array with the same dimensions filled with a constant
+   * value.
+   * \see zeros_like
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto constants_like(const AbstractArray<Concrete,T,N>& a, const T& value)
+  {
+    return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
+  }
+
+  /**
+   * Create an array with the same dimensions filled with zero values.
+   * \see constants_like
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto zeros_like(const AbstractArray<Concrete,T,N>& a)
+  {
+    return constants_like<Concrete,T,N>(a, 0);
   }
 } // namespace delayed
 } // namespace cuiloa
