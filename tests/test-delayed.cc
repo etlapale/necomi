@@ -4,6 +4,11 @@
 using namespace cuiloa;
 using namespace cuiloa::delayed;
 
+static double my_constant_function(const std::array<ArrayIndex,2>& path)
+{
+  (void) path;
+  return 42.0;
+}
 
 TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "product" ) {
@@ -147,5 +152,29 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(5) == b(5) );
     REQUIRE( c(0) == a(0) );
     REQUIRE( c(3) == a(3) );
+  }
+
+  SECTION( "delayed from standalone function" ) {
+    std::array<ArrayIndex,2> dimensions{{11,21}};
+    DelayedArray<int,2,double(&)(const std::array<ArrayIndex,2>&)>
+      a(dimensions, my_constant_function);
+    Array<int,2> b = a;
+    REQUIRE( a(1,1) == b(1,1) );
+    REQUIRE( b(4,2) == 42 );
+  }
+
+  SECTION( "delayed one-liner" ) {
+    auto a = make_delayed<int,2>({{11,21}}, [](auto&) { return 42; });
+    REQUIRE( a.dimensions().size() == 2 );
+    REQUIRE( a.dimensions()[0] == 11 );
+    REQUIRE( a(3,7) == 42 );
+  }
+
+  SECTION( "infer make_delayed size template argument" ) {
+    std::array<ArrayIndex,2> dims{{11,21}};
+    auto a = make_delayed<int>(dims, [](auto&) { return 42; });
+    REQUIRE( a.dimensions().size() == 2 );
+    REQUIRE( a.dimensions()[0] == 11 );
+    REQUIRE( a(3,7) == 42 );
   }
 }
