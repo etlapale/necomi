@@ -25,6 +25,7 @@
 
 #include "basearray.h"
 #include "delayed.h"
+#include "slices.h"
 
 
 namespace cuiloa
@@ -60,7 +61,7 @@ public:
    * Create a new multi-dimensional array with uninitialized elements.
    */
   template <typename ...Dim,
-            typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
+            typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),void>::type* = nullptr>
   Array(Dim ...dims)
     : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
   {}
@@ -141,11 +142,11 @@ public:
 
   /**
    * Return a view on a slice of the array.
-   * Template argument M is a trick to allow std::enable_if_t and
+   * Template argument DepN is a trick to allow std::enable_if_t and
    * disable the function for N=0. You should ignore it.
    */
-  template <ArrayIndex M = N>
-  std::enable_if_t<M!=0,Array<T,M-1>>
+  template <ArrayIndex DepN = N>
+  std::enable_if_t<DepN!=0,Array<T,DepN-1>>
   operator[](ArrayIndex index) const
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
