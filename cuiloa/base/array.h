@@ -211,7 +211,7 @@ public:
   }
 
   /**
-   * Return a sliced view on the array.
+   * Return a restricted view on the array.
    */
   Array<T,N> slice(const Slice<N>& s) 
   {

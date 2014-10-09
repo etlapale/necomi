@@ -54,7 +54,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "slicing an immediate array" ) {
-    Array<double,2> a(4, 5);
+    Array<int,2> a(4, 5);
     a.map([](auto& path, auto& val) { val = path[0]*5 + path[1]; });
     REQUIRE( a(0,0) == 0 );
     REQUIRE( a(1,1) == 6 );
@@ -78,7 +78,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "double slicing" ) {
-    Array<double,2> a(4, 5);
+    Array<int,2> a(4, 5);
     a.map([](auto& path, auto& val) { val = path[0]*5 + path[1]; });
     auto b = a.slice((slice(1,3),slice(1,4)));
     auto c = b.slice((slice(0,3),slice(2,2)));
@@ -96,5 +96,18 @@ TEST_CASE( "slices", "[base]" ) {
     REQUIRE( c(1,1) == 14 );
     REQUIRE( c(2,0) == 18 );
     REQUIRE( c(2,1) == 19 );
+  }
+
+  SECTION( "slicing with stride" ) {
+    using namespace cuiloa::delayed;
+    
+    Array<int,1> a(100);
+    a.map([](auto& path, auto& val) { val = path[0]; });
+
+    auto evens = a.slice(slice(0,49,2));
+    Array<int,1> b(49);
+    b.map([](auto& path, auto& val) { val = 2*path[0]; });
+    REQUIRE( all(evens == b) );
+    REQUIRE( ! any(evens != b) );
   }
 }
