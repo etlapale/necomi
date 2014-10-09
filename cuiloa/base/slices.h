@@ -26,46 +26,15 @@ namespace cuiloa
   public:
     template <ArrayIndex DepN=N,
 	      typename std::enable_if<DepN==1>::type* = nullptr>
-    Slice(ArrayIndex start, ArrayIndex end, ArrayIndex strides=1)
-      : m_start{{start}} , m_end{{end}} , m_strides{{strides}}
+    Slice(ArrayIndex start, ArrayIndex size, ArrayIndex strides=1)
+      : m_start{{start}} , m_size{{size}} , m_strides{{strides}}
     {}
-
-    /*Slice(const std::array<ArrayIndex,N>& start,
-	  const std::array<ArrayIndex,N>& end)
-      : m_start(start), m_end(end)
-    {
-      m_strides.fill(1);
-    }
-
-    Slice(const std::array<ArrayIndex,N>& start,
-	  const std::array<ArrayIndex,N>& end,
-	  const std::array<ArrayIndex,N>& strides)
-      : m_start(start), m_end(end), m_strides(strides)
-      {}*/
-
-    //template <typename ...Slices>
-    //Slice(std::initializer_list<std::array<ArrayIndex,N>> slices)
-    //{
-      //std::array<ArrayIndex,N> start = {slices
-      //std::array<ArrayIndex,2*N> a{{slices...}};
-
-      //std::vector<Slices...> args = {slices...};
-
-      /*std::size_t i = 0;
-      auto fun = [&i]() {
-	std::cout << i << std::endl;
-	i++;
-	};*/
-      //std::initializer_list<int>{(fun(slices),0),...};
-
-      //throw std::runtime_error("free form NYI");
-    //}
 
     Slice(const std::array<std::array<ArrayIndex,3>,N>& args)
     {
       for (ArrayIndex i = 0; i < N; i++) {
 	m_start[i] = args[i][0];
-	m_end[i] = args[i][1] == 0 ? m_start[i] : args[i][1];
+	m_size[i] = args[i][1] == 0 ? 1 : args[i][1];
 	m_strides[i] = args[i][2] == 0 ? 1 : args[i][2];
       }
     }
@@ -73,15 +42,15 @@ namespace cuiloa
     const std::array<ArrayIndex,N>& start() const
     { return m_start; }
 
-    const std::array<ArrayIndex,N>& end() const
-    { return m_end; }
+    const std::array<ArrayIndex,N>& size() const
+    { return m_size; }
 
     const std::array<ArrayIndex,N>& strides() const
     { return m_strides; }
 
   protected:
     std::array<ArrayIndex,N> m_start;
-    std::array<ArrayIndex,N> m_end;
+    std::array<ArrayIndex,N> m_size;
     std::array<ArrayIndex,N> m_strides;
   };
 
@@ -91,19 +60,19 @@ namespace cuiloa
     std::array<std::array<ArrayIndex,3>,N+1> args;
     for (ArrayIndex i = 0; i < N; i++) {
       args[i][0] = a.start()[i];
-      args[i][1] = a.end()[i];
+      args[i][1] = a.size()[i];
       args[i][2] = a.strides()[i];
     }
     args[N][0] = b.start()[0];
-    args[N][1] = b.end()[0];
+    args[N][1] = b.size()[0];
     args[N][2] = b.strides()[0];
     return Slice<N+1>(args);
   }
 
   inline Slice<1>
-  slice(ArrayIndex start, ArrayIndex end, ArrayIndex stride=1)
+  slice(ArrayIndex start, ArrayIndex size, ArrayIndex stride=1)
   {
-    return Slice<1>(start, end, stride);
+    return Slice<1>(start, size, stride);
   }
 } // namespace cuiloa
 

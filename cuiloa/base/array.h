@@ -211,117 +211,135 @@ public:
   }
 
   /**
-   * Return the data associated with the array.
+   * Return a sliced view on the array.
    */
-  T* data()
-  { return m_data; }
-
-  /**
-   * Return the immutable data associated with the array.
-   */
-  const T* data() const
-  { return m_data; }
-
-  /**
-   * Return a new shared pointer to the data.
-   */
-  std::shared_ptr<T> shared_data() const
+  Array<T,N> slice(const Slice<N>& s) 
   {
-    return m_shared_data;
+    Array<T,N> a(*this);
+    // Starting point
+    a.m_data = &a(s.start());
+    // Dimensions
+    // TODO: bound checks
+    a.m_dims = s.size();
+    // Strides
+    std::transform(s.strides().cbegin(), s.strides().cend(),
+		   m_strides.cbegin(), a.m_strides.begin(), 
+		   [](auto a, auto b) { return a * b; });
+    return a;
   }
 
-  /**
-   * Fill an entire array with a single value.
-   */
-  void fill(const T& val)
-  {
-    this->map([&val](auto& path, auto& old) {
-        (void) path;
-        old = val;
-      });
-  }
+    /**
+     * Return the data associated with the array.
+     */
+    T* data()
+    { return m_data; }
 
-  /**
-   * Fill an array with a delayed array.
-   */
-  template <typename Expr>
-  void operator=(const DelayedArray<T,N,Expr>& a)
-  {
-#ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (this->dimensions() != a.dimensions())
-      throw std::length_error("cannot copy from array with different dimensions");
-#endif
-    this->map([&a](auto& path, auto& val) {
-	val = a(path);
-      });
-  }
+    /**
+     * Return the immutable data associated with the array.
+     */
+    const T* data() const
+    { return m_data; }
 
-  /**
-   * Construct a copy of an array.
-   * All the elements are put in a contiguous region of memory
-   * newly allocated with, initially, no other view on it.
-   */
-  Array<T,N> copy() const
-  {
-    Array<T,N> a(this->m_dims);
-    this->map([&a](auto& path, auto&& val) {
-	T v = val;
-	a(path) = v;
+    /**
+     * Return a new shared pointer to the data.
+     */
+    std::shared_ptr<T> shared_data() const
+    {
+      return m_shared_data;
+    }
+
+    /**
+     * Fill an entire array with a single value.
+     */
+    void fill(const T& val)
+    {
+      this->map([&val](auto& path, auto& old) {
+	  (void) path;
+	  old = val;
 	});
-    return a;
+    }
+
+    /**
+     * Fill an array with a delayed array.
+     */
+    template <typename Expr>
+    void operator=(const DelayedArray<T,N,Expr>& a)
+    {
+  #ifndef CUILOA_NO_BOUND_CHECKS
+      // Make sure the dimensions of a and b are the same
+      if (this->dimensions() != a.dimensions())
+	throw std::length_error("cannot copy from array with different dimensions");
+  #endif
+      this->map([&a](auto& path, auto& val) {
+	  val = a(path);
+	});
+    }
+
+    /**
+     * Construct a copy of an array.
+     * All the elements are put in a contiguous region of memory
+     * newly allocated with, initially, no other view on it.
+     */
+    Array<T,N> copy() const
+    {
+      Array<T,N> a(this->m_dims);
+      this->map([&a](auto& path, auto&& val) {
+	  T v = val;
+	  a(path) = v;
+	  });
+      return a;
+    }
+
+    /**
+     * Sum an array along a given dimension.
+     */
+    std::enable_if_t<true,Array<T,N-1>>
+    sum(ArrayIndex dim) const
+    {
+      // Compute the dimensions of the new array
+      std::array<ArrayIndex,N-1> dims;
+      auto oit = std::copy_n(this->m_dims.cbegin(), dim, dims.begin());
+      if (dim != N-1)
+	std::copy(this->m_dims.cbegin()+dim+1, this->m_dims.cend(), oit);
+
+      Array<T,N-1> a(dims);
+      std::array<ArrayIndex,N> orig_path;
+      a.map([&](auto& path, auto& val) {
+	  // Compute the index in the original array
+	  auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
+	  if (dim != N-1)
+	    std::copy(path.cbegin()+dim, path.cend(), oit+1);
+
+	  val = 0;
+	  for (ArrayIndex i = 0; i < this->m_dims[dim]; i++) {
+	    orig_path[dim] = i;
+	    val += m_data[this->index(orig_path)];
+	  }
+	});
+      return a;
+    }
+
+    /**
+     * Divide each element of the array by a number.
+     */
+    template <typename U>
+    Array<T,N>&
+    operator/=(const U& div)
+    {
+      this->map([&div](auto& path, T& val) {
+	  (void) path;
+	  val /= div;
+	});
+      return *this;
+    }
+
+  protected:
+    std::array<ArrayIndex,N> m_strides;
+    std::shared_ptr<T> m_shared_data;
+    T* m_data;
+  };
   }
 
-  /**
-   * Sum an array along a given dimension.
-   */
-  std::enable_if_t<true,Array<T,N-1>>
-  sum(ArrayIndex dim) const
-  {
-    // Compute the dimensions of the new array
-    std::array<ArrayIndex,N-1> dims;
-    auto oit = std::copy_n(this->m_dims.cbegin(), dim, dims.begin());
-    if (dim != N-1)
-      std::copy(this->m_dims.cbegin()+dim+1, this->m_dims.cend(), oit);
-
-    Array<T,N-1> a(dims);
-    std::array<ArrayIndex,N> orig_path;
-    a.map([&](auto& path, auto& val) {
-        // Compute the index in the original array
-        auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
-        if (dim != N-1)
-          std::copy(path.cbegin()+dim, path.cend(), oit+1);
-
-        val = 0;
-        for (ArrayIndex i = 0; i < this->m_dims[dim]; i++) {
-          orig_path[dim] = i;
-          val += m_data[this->index(orig_path)];
-        }
-      });
-    return a;
-  }
-
-  /**
-   * Divide each element of the array by a number.
-   */
-  template <typename U>
-  Array<T,N>&
-  operator/=(const U& div)
-  {
-    this->map([&div](auto& path, T& val) {
-        (void) path;
-        val /= div;
-      });
-    return *this;
-  }
-
-protected:
-  std::array<ArrayIndex,N> m_strides;
-  std::shared_ptr<T> m_shared_data;
-  T* m_data;
-};
-}
-
-// Local Variables:
-// mode: c++
-// End:
+  // Local Variables:
+  // mode: c++
+  // End:
