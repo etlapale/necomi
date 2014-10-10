@@ -152,33 +152,19 @@ namespace delayed
 			     (auto& path) { return a(path)*value; });
   }
 
-  template <typename T, ArrayIndex N>
-  auto operator+(const Array<T,N>& a, const Array<T,N>& b)
+  template <typename Concrete1, typename T, ArrayIndex N,
+	    typename Concrete2>
+  auto operator+(const AbstractArray<Concrete1,T,N>& a,
+		 const AbstractArray<Concrete2,T,N>& b)
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-    auto fun = [a,b](auto& path) {
-	return a(path) + b(path);
-      };
-    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
-  }
-
-  template <typename Expr1, typename Expr2, typename T, ArrayIndex N>
-  auto operator+(const DelayedArray<T,N,Expr1>& a,
-		 const DelayedArray<T,N,Expr2>& b)
-  {
-#ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot sum arrays of different dimensions");
-#endif
-    auto fun = [a,b](auto& path) {
-	return a(path) + b(path);
-      };
-    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(),b=b.shallow_copy()]
+			     (auto& path) { return a(path) + b(path); });
   }
 
   template <typename T, ArrayIndex N>
