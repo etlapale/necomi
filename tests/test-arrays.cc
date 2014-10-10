@@ -277,6 +277,21 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( b(3) == 10 );
     REQUIRE( b(4) == 15 );
     REQUIRE( b(5) == 21 );
+
+    auto c = reshape<2>(range(56), {{7,8}});
+    auto c0a = cumsum(c);
+    REQUIRE( c0a(0,0) == 0 );
+    REQUIRE( c0a(3,5) == 68 );
+    REQUIRE( c0a(6,2) == 182 );
+    auto c0b = cumsum(c, 0);
+    REQUIRE( c0b(0,0) == 0 );
+    REQUIRE( c0b(3,5) == 68 );
+    REQUIRE( c0b(6,2) == 182 );
+
+    auto c1 = cumsum(c, 1);
+    REQUIRE( c1(0,4) == 10 );
+    REQUIRE( c1(3,2) == 75 );
+    REQUIRE( c1(5,6) == 301 );
   }
 
   SECTION( "index to path" ) {
