@@ -61,6 +61,46 @@ namespace cuiloa {
       {
 	return cuiloa::delayed::operator*(a, widen<N>(b, a.dimensions()));
       }
+
+      template <typename Concrete1, typename T, ArrayIndex N,
+		typename Concrete2, ArrayIndex M,
+		typename std::enable_if<(M>N)>::type* = nullptr
+		>
+      auto operator/(const AbstractArray<Concrete1,T,N>& a,
+		     const AbstractArray<Concrete2,T,M>& b)
+      {
+	return cuiloa::delayed::operator/(widen<M>(a, b.dimensions()), b);
+      }
+
+      template <typename Concrete1, typename T, ArrayIndex N,
+		typename Concrete2, ArrayIndex M,
+		typename std::enable_if<(N>M)>::type* = nullptr
+		>
+      auto operator/(const AbstractArray<Concrete1,T,N>& a,
+		     const AbstractArray<Concrete2,T,M>& b)
+      {
+	return cuiloa::delayed::operator/(a, widen<N>(b, a.dimensions()));
+      }
+
+      template <typename Concrete1, typename T, ArrayIndex N,
+		typename Concrete2, ArrayIndex M,
+		typename std::enable_if<(M>N)>::type* = nullptr
+		>
+      auto operator+(const AbstractArray<Concrete1,T,N>& a,
+		     const AbstractArray<Concrete2,T,M>& b)
+      {
+	return cuiloa::delayed::operator+(widen<M>(a, b.dimensions()), b);
+      }
+
+      template <typename Concrete1, typename T, ArrayIndex N,
+		typename Concrete2, ArrayIndex M,
+		typename std::enable_if<(N>M)>::type* = nullptr
+		>
+      auto operator+(const AbstractArray<Concrete1,T,N>& a,
+		     const AbstractArray<Concrete2,T,M>& b)
+      {
+	return cuiloa::delayed::operator+(a, widen<N>(b, a.dimensions()));
+      }
     } // namespace broadcasting
   } // namespace delayed
 } // namespace cuiloa

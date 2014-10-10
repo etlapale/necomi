@@ -154,6 +154,37 @@ namespace delayed
 
   template <typename Concrete1, typename T, ArrayIndex N,
 	    typename Concrete2>
+  auto operator/(const AbstractArray<Concrete1,T,N>& a,
+		 const AbstractArray<Concrete2,T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot multiply arrays of different dimensions");
+#endif
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(),b=b.shallow_copy()]
+			     (auto& path) { return a(path) / b(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto operator/(T value, const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value]
+			     (auto& path) { return value/a(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto operator/(const AbstractArray<Concrete,T,N>& a, T value)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value]
+			     (auto& path) { return a(path)/value; });
+  }
+
+  template <typename Concrete1, typename T, ArrayIndex N,
+	    typename Concrete2>
   auto operator+(const AbstractArray<Concrete1,T,N>& a,
 		 const AbstractArray<Concrete2,T,N>& b)
   {
@@ -279,6 +310,54 @@ namespace delayed
 					       new_strides.cbegin(), 0);
 		 auto old_path = index_to_path(idx, old_strides);
 		 return a(old_path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto exp(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()]
+      (auto& path) { return std::exp(a(path)); });
+  }
+
+  /**
+   * Sum an array across a given dimension.
+   */
+  template <typename Concrete, typename T, ArrayIndex N,
+	    typename std::enable_if<N!=0>::type* = nullptr>
+  auto sum(const AbstractArray<Concrete,T,N>&a, ArrayIndex dim)
+  {
+    // Compute the dimensions of the new array
+    std::array<ArrayIndex,N-1> dims;
+    auto oit = std::copy_n(a.dimensions().cbegin(), dim, dims.begin());
+    if (dim != N-1)
+      std::copy(a.dimensions().cbegin()+dim+1, a.dimensions().cend(), oit);
+
+    return make_delayed<T,N-1>(dims,
+      [a=a.shallow_copy(),dim] (auto& path) {
+        // Path in the original array
+        Coordinates<N> orig_path;
+	auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
+	if (dim != N-1)
+	  std::copy(path.cbegin()+dim, path.cend(), oit+1);
+	// Sum all the elements in the dimension
+	T val = 0;
+	for (ArrayIndex i = 0; i < a.dimensions()[dim]; i++) {
+          orig_path[dim] = i;
+	  val += a(orig_path);
+        }
+	return val;
+      });
+  }
+
+  /**
+   * Average an array across a given dimension.
+   */
+  template <typename Concrete, typename T, ArrayIndex N,
+	    typename std::enable_if<N!=0>::type* = nullptr>
+  auto average(const AbstractArray<Concrete,T,N>&a, ArrayIndex dim)
+  {
+    return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
   }
 } // namespace delayed
 } // namespace cuiloa

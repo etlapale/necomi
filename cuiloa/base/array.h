@@ -292,35 +292,6 @@ namespace cuiloa
     }
 
     /**
-     * Sum an array along a given dimension.
-     */
-    std::enable_if_t<true,Array<T,N-1>>
-      sum(ArrayIndex dim) const
-    {
-      // Compute the dimensions of the new array
-      std::array<ArrayIndex,N-1> dims;
-      auto oit = std::copy_n(this->m_dims.cbegin(), dim, dims.begin());
-      if (dim != N-1)
-	std::copy(this->m_dims.cbegin()+dim+1, this->m_dims.cend(), oit);
-
-      Array<T,N-1> a(dims);
-      std::array<ArrayIndex,N> orig_path;
-      a.map([&](auto& path, auto& val) {
-	  // Compute the index in the original array
-	  auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
-	  if (dim != N-1)
-	    std::copy(path.cbegin()+dim, path.cend(), oit+1);
-
-	  val = 0;
-	  for (ArrayIndex i = 0; i < this->m_dims[dim]; i++) {
-	    orig_path[dim] = i;
-	    val += m_data[this->index(orig_path)];
-	  }
-	});
-      return a;
-    }
-
-    /**
      * Divide each element of the array by a number.
      */
     template <typename U>

@@ -207,41 +207,6 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a0v() == 456 );
   }
 
-  SECTION( "sums" ) {
-    Array<int,3> a(2,3,4);
-    a.map([](auto& path, auto& val) {
-        val = path[0]*12 + path[1] * 4 + path[2];
-      });
-
-    auto a0 = a.sum(0);
-    REQUIRE( a0.dimensions().size() == 2 );
-    REQUIRE( a0.dimensions()[0] == 3 );
-    REQUIRE( a0.dimensions()[1] == 4 );
-    REQUIRE( a0(0,0) == 12 );
-    REQUIRE( a0(1,1) == 22 );
-    REQUIRE( a0(2,3) == 34 );
-
-    auto a1 = a.sum(1);
-    REQUIRE( a1.dimensions().size() == 2 );
-    REQUIRE( a1.dimensions()[0] == 2 );
-    REQUIRE( a1.dimensions()[1] == 4 );
-    REQUIRE( a1(0,0) == 12 );
-    REQUIRE( a1(0,1) == 15 );
-    REQUIRE( a1(1,1) == 51 );
-
-    auto a2 = a.sum(2);
-    REQUIRE( a2.dimensions().size() == 2 );
-    REQUIRE( a2.dimensions()[0] == 2 );
-    REQUIRE( a2.dimensions()[1] == 3 );
-    REQUIRE( a2(0,0) == 6 );
-    REQUIRE( a2(1,1) == 70 );
-    REQUIRE( a2(1,2) == 86 );
-
-    REQUIRE( sum(a) == 276 );
-    REQUIRE( sum(a1) == 276 );
-    REQUIRE( sum(a2) == 276 );
-  }
-
   SECTION( "inplace mappping" ) {
     Array<int,3> a(2,3,4);
     a.map([](auto& path, auto& val) {
