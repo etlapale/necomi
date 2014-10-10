@@ -192,4 +192,20 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(88) == 42 );
   }
 
+  SECTION( "range creation" ) {
+    auto a = range(8);
+    REQUIRE( a.dimensions().size() == 1 );
+    REQUIRE( a.dimensions()[0] == 8 );
+    REQUIRE( a(0) == 0 );
+    REQUIRE( a(4) == 4 );
+    REQUIRE( a(7) == 7 );
+
+    auto b = range(2,8);
+    REQUIRE( b.dimensions().size() == 1 );
+    REQUIRE( b.dimensions()[0] == 6 );
+    REQUIRE( b(0) == 2 );
+    REQUIRE( b(4) == 6 );
+    REQUIRE( b(5) == 7 );
+  }
+
 }

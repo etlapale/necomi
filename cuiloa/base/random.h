@@ -81,3 +81,7 @@ Array<T,1> normal_distribution(const T& mean, const T& deviation,
 }
 
 } // namespace cuiloa
+
+// Local Variables:
+// mode: c++
+// End:

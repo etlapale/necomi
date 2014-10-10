@@ -61,7 +61,6 @@ TEST_CASE( "slices", "[base]" ) {
     REQUIRE( a(3,2) == 17 );
 
     auto b = a.slice((slice(1,3),slice(1,2)));
-
     REQUIRE( b.dimensions().size() == 2 );
     REQUIRE( b.dimensions()[0] == 3 );
     REQUIRE( b.dimensions()[1] == 2 );

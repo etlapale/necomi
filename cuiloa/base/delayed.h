@@ -233,6 +233,20 @@ namespace delayed
   {
     return constants_like<Concrete,T,N>(a, 0);
   }
+
+  template <typename T>
+  auto range(T stop)
+  {
+    return make_delayed<T,1>({{static_cast<ArrayIndex>(stop)}},
+			     [](auto& path){ return path[0]; });
+  }
+
+  template <typename T>
+  auto range(T start, T stop)
+  {
+    return make_delayed<T,1>({{static_cast<ArrayIndex>(stop-start)}},
+			     [start](auto& path){ return start+path[0]; });
+  }
 } // namespace delayed
 } // namespace cuiloa
 
