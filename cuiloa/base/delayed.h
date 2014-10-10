@@ -263,6 +263,15 @@ namespace delayed
 			     [start](auto& path){ return start+path[0]; });
   }
 
+  template <typename T>
+  auto range(T start, T stop, T step)
+  {
+    auto size = static_cast<ArrayIndex>(std::ceil(static_cast<double>(stop-start)/step));
+    return make_delayed<T,1>({{size}},
+			     [start,step](auto& path)
+			     { return start+step*path[0]; });
+  }
+
   template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N>
   auto reshape(const AbstractArray<Concrete,T,N>& a,
 	       const std::array<ArrayIndex,M>& dims)

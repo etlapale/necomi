@@ -212,6 +212,25 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( b(0) == 2 );
     REQUIRE( b(4) == 6 );
     REQUIRE( b(5) == 7 );
+
+    auto c = range(0,6,2);
+    REQUIRE( c.dimensions()[0] == 3 );
+    REQUIRE( c(0) == 0 );
+    REQUIRE( c(1) == 2 );
+    REQUIRE( c(2) == 4 );
+
+    auto d = range(0,6,2);
+    REQUIRE( d.dimensions()[0] == 3 );
+    REQUIRE( d(0) == 0 );
+    REQUIRE( d(1) == 2 );
+    REQUIRE( d(2) == 4 );
+
+    auto e = range(0,7,2);
+    REQUIRE( e.dimensions()[0] == 4 );
+    REQUIRE( e(0) == 0 );
+    REQUIRE( e(1) == 2 );
+    REQUIRE( e(2) == 4 );
+    REQUIRE( e(3) == 6 );
   }
 
   SECTION( "reshaping" ) {

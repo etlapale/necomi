@@ -15,7 +15,7 @@ TEST_CASE( "random number generation", "[random]" ) {
     // Create a array filled from a normal distribution
     ArrayIndex size = 1e6;
     double avg = 95, dev = 4.3;
-    auto a = normal_distribution<double>(avg, dev, size, prng);
+    auto a = normal<double>(avg, dev, size, prng);
 
     // Check the statistics
     REQUIRE( fabs(sum(a)/size - avg) < 1e-1 );

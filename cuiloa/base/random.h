@@ -65,12 +65,13 @@ protected:
  * Generate a one dimensional array filled with random numbers
  * following a normal distribution.
  */
-template <typename T, typename PRNG>
-Array<T,1> normal_distribution(const T& mean, const T& deviation,
-			       ArrayIndex size, PRNG& prng)
+template <typename T, ArrayIndex N, typename PRNG>
+Array<T,N> normal(const T& mean, const T& deviation,
+		  const std::array<ArrayIndex,N>& dims,
+		  PRNG& prng)
 {
   std::normal_distribution<T> dist(mean, deviation);
-  Array<T,1> a(size);
+  Array<T,N> a(dims);
 
   a.map([&dist,&prng](auto& path, auto& val) {
       (void) path;
@@ -78,6 +79,17 @@ Array<T,1> normal_distribution(const T& mean, const T& deviation,
     });
 
   return a;
+}
+
+/**
+ * Generate a one dimensional array filled with random numbers
+ * following a normal distribution.
+ */
+template <typename T, typename PRNG>
+Array<T,1> normal(const T& mean, const T& deviation,
+		  ArrayIndex size, PRNG& prng)
+{
+  return normal<T,1>(mean, deviation, {{size}}, prng);
 }
 
 } // namespace cuiloa
