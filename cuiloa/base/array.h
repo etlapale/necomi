@@ -338,8 +338,24 @@ public:
     std::shared_ptr<T> m_shared_data;
     T* m_data;
   };
+
+
+  /**
+   * Cumulative sum.
+   */
+  template <typename Concrete, typename T>
+  Array<T,1> cumsum(const AbstractArray<Concrete,T,1>& a) {
+    Array<T,1> res(a.dimensions());
+    T sum = 0;
+    a.map([&res,&sum](auto& path, auto& val) {
+	sum += val;
+	res(path) = sum;
+      });
+    return res;
   }
 
-  // Local Variables:
-  // mode: c++
-  // End:
+}
+
+// Local Variables:
+// mode: c++
+// End:
