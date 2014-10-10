@@ -265,11 +265,12 @@ namespace delayed
 
   template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N>
   auto reshape(const AbstractArray<Concrete,T,N>& a,
-	       const std::array<ArrayIndex,N>& dims)
+	       const std::array<ArrayIndex,M>& dims)
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
     // Make sure the input and output array sizes are the same
-    auto out_size = std::accumulate(dims.cbegin(), dims.cend(), 1,
+    auto out_size = std::accumulate(dims.cbegin(), dims.cend(),
+				    static_cast<ArrayIndex>(1),
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
     if (out_size != a.size())
       throw std::length_error("invalid size for reshaped array");

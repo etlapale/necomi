@@ -265,6 +265,9 @@ bool all(const AbstractArray<Concrete,bool,N>& a)
   return !breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
 }
 
+  /**
+   * Compute the default strides for the given dimensions.
+   */
   template <ArrayIndex N>
   std::array<ArrayIndex,N>
   default_strides(const std::array<ArrayIndex,N>& dims)
@@ -278,6 +281,11 @@ bool all(const AbstractArray<Concrete,bool,N>& a)
     return strides;
   }
 
+  /**
+   * Convert a scalar index into a multi-dimensional indexing path.
+   * \param strides The strides of the underlying array.
+   * \see default_strides to get strides for some dimensions.
+   */
   template <ArrayIndex N>
   std::array<ArrayIndex,N>
   index_to_path(ArrayIndex idx, const std::array<ArrayIndex,N>& strides)

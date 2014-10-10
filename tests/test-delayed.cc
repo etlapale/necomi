@@ -214,4 +214,13 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( b(5) == 7 );
   }
 
+  SECTION( "reshaping" ) {
+    auto a = range(20);
+    std::array<ArrayIndex,2> dims{{4,5}};
+    auto b = reshape(a, dims);
+    REQUIRE( b.dimensions() == dims );
+    REQUIRE( b(0,0) == 0);
+    REQUIRE( b(1,1) == 6 );
+    REQUIRE( b(3,2) == 17 );
+  }
 }
