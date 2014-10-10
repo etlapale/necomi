@@ -42,12 +42,15 @@ namespace cuiloa {
   namespace delayed {
     namespace broadcasting {
 
-      /*template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M>
+      template <typename Concrete1, typename T, ArrayIndex N,
+		typename Concrete2, ArrayIndex M,
+		typename std::enable_if<(M>N)>::type* = nullptr
+		>
       auto operator*(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,N>& b)
+		     const AbstractArray<Concrete2,T,M>& b)
       {
-      }*/
+	return cuiloa::delayed::operator*(widen<M>(a, b.dimensions()), b);
+      }
     } // namespace broadcasting
   } // namespace delayed
 } // namespace cuiloa
