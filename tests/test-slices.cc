@@ -109,4 +109,32 @@ TEST_CASE( "slices", "[base]" ) {
     REQUIRE( all(evens == b) );
     REQUIRE( ! any(evens != b) );
   }
+
+  SECTION(" out of bounds slicing" ) {
+
+    Array<int,1> a(7);
+    bool exception_thrown = false;
+    try {
+      a.slice(slice(0, 8));
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+
+    exception_thrown = false;
+    try {
+      a.slice(slice(7, 2));
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+
+    exception_thrown = false;
+    try {
+      a.slice(slice(5, 3));
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+  }
 }
