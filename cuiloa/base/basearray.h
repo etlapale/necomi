@@ -22,39 +22,54 @@
 namespace cuiloa
 {
 
-/**
- * Standard type to denote coordinate indices or dimensions.
- */
-  typedef std::size_t ArrayIndex;
+  /**
+   * Single coordinate component.
+   */
+  using ArrayIndex = std::size_t;
 
-/**
- * Checks if a pack of types are all valid array indexes.
- */
-template <typename ...Indices>
-struct all_indices;
+  /**
+   * Single dimension component.
+   */
+  using ArrayDimension = std::size_t;
 
-template <>
-struct all_indices<> : std::true_type
-{};
+  /**
+   * Coordinates to access an element in an array.
+   */
+  template <ArrayIndex N> using Coordinates = std::array<ArrayIndex,N>;
 
-template <typename Index, typename ...Indices>
-struct all_indices<Index, Indices...>
-  : std::integral_constant<bool,
-        std::is_convertible<Index, ArrayIndex>::value &&
-        all_indices<Indices...>::value>
-{};
+  /**
+   * Dimensions on a multidimensional array.
+   */
+  template <ArrayDimension N> using Dimensions = std::array<ArrayDimension,N>;
+
+  /**
+   * Checks if a pack of types are all valid array indexes.
+   */
+  template <typename ...Indices>
+  struct all_indices;
+
+  template <>
+  struct all_indices<> : std::true_type
+  {};
+
+  template <typename Index, typename ...Indices>
+  struct all_indices<Index, Indices...>
+    : std::integral_constant<bool,
+			     std::is_convertible<Index, ArrayIndex>::value &&
+			     all_indices<Indices...>::value>
+  {};
 
 
-/**
- * The parent class of all array types.
- * Useful for managing heterogenous set of pointer to arrays.
- */
-class BaseArray
-{
-};
+  /**
+   * The parent class of all array types.
+   * Useful for managing heterogenous set of pointer to arrays.
+   */
+  class BaseArray
+  {
+  };
 
 
-template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
+  template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
 
 
 #ifndef IN_DOXYGEN
