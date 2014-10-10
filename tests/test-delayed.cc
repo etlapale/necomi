@@ -12,11 +12,11 @@ static double my_constant_function(const std::array<ArrayIndex,2>& path)
 
 TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "product" ) {
-    Array<double,1> a3(4);
+    Array<int,1> a3(4);
     a3.map([](auto& path, auto& val) {
 	val = path[0];
       });
-    Array<double,1> b3(4);
+    Array<int,1> b3(4);
     b3.map([](auto& path, auto& val) {
 	val = 2*path[0];
       });
@@ -24,6 +24,12 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto c3 = a3 * b3;
     REQUIRE( c3(0) == 0 );
     REQUIRE( c3(3) == 18 );
+
+    int x = 13;
+    auto d3 = x * a3;
+    REQUIRE( d3(0) == 0 );
+    REQUIRE( d3(1) == 13 );
+    REQUIRE( d3(3) == 39 );
   }
 
   SECTION( "product bounds" ) {

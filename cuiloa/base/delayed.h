@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014	University of California, Irvine
+ * Copyright © 2014 University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,22 @@ namespace delayed
     return make_delayed<T,N>(a.dimensions(),
 			     [a=a.shallow_copy(),b=b.shallow_copy()]
 			     (auto& path) { return a(path) * b(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto operator*(T value, const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value]
+			     (auto& path) { return value*a(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto operator*(const AbstractArray<Concrete,T,N>& a, T value)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value]
+			     (auto& path) { return a(path)*value; });
   }
 
   template <typename T, ArrayIndex N>
