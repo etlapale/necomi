@@ -47,15 +47,6 @@ namespace cuiloa
      */
     typedef std::array<ArrayIndex,N> Path;
 
-  protected:
-    void build_strides() {
-      if (N > 0) {
-	auto prev = m_strides[N - 1] = 1;
-	for (long i = N - 2; i >= 0; i--)
-	  prev = m_strides[i] = this->m_dims[i + 1] * prev;
-      }
-    }
-
   public:
     /**
      * Create a new multi-dimensional array with uninitialized elements.
@@ -71,10 +62,10 @@ namespace cuiloa
      */
     Array(const std::array<ArrayIndex,N>& dims)
       : Parent(dims)
+      , m_strides(default_strides(dims))
       , m_shared_data(new T[Parent::size()], [](T* p){ delete [] p; })
       , m_data(m_shared_data.get())
     {
-      build_strides();
     }
 
     /**
@@ -104,10 +95,10 @@ namespace cuiloa
      */
     Array(T* data, const std::array<ArrayIndex,N>& dims)
       : Parent(dims)
+      , m_strides(default_strides(dims))
       , m_shared_data(data, [](T* p){(void) p;})
       , m_data(data)
     {
-      build_strides();
     }
 
     /**
@@ -353,13 +344,19 @@ namespace cuiloa
   /**
    * Cumulative sum.
    */
-  template <typename Concrete, typename T>
-  Array<T,1> cumsum(const AbstractArray<Concrete,T,1>& a) {
-    Array<T,1> res(a.dimensions());
-    T sum = 0;
-    a.map([&res,&sum](auto& path, auto val) {
-	sum += val;
-	res(path) = sum;
+  template <typename Concrete, typename T, ArrayIndex N>
+  Array<T,N> cumsum(const AbstractArray<Concrete,T,N>& a,
+		    ArrayIndex dim = 0) {
+    Array<T,N> res(a.dimensions());
+    a.map([&res,dim](auto& path, auto val) {
+	if (path[dim] == 0) {
+	  res(path) = val;
+	}
+	else {
+	  auto prev = path;
+	  prev[dim]--;
+	  res(path) = res(prev) + val;
+	}
       });
     return res;
   }

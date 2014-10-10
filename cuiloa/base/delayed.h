@@ -262,6 +262,28 @@ namespace delayed
     return make_delayed<T,1>({{static_cast<ArrayIndex>(stop-start)}},
 			     [start](auto& path){ return start+path[0]; });
   }
+
+  template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N>
+  auto reshape(const AbstractArray<Concrete,T,N>& a,
+	       const std::array<ArrayIndex,N>& dims)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the input and output array sizes are the same
+    auto out_size = std::accumulate(dims.cbegin(), dims.cend(), 1,
+        [] (ArrayIndex a, ArrayIndex b) { return a * b; });
+    if (out_size != a.size())
+      throw std::length_error("invalid size for reshaped array");
+#endif
+    auto old_strides = default_strides(a.dimensions());
+    auto new_strides = default_strides(dims);
+    return make_delayed<T,M>(dims,
+			     [a=a.shallow_copy(),old_strides,new_strides]
+			     (auto& path)
+	       { auto idx = std::inner_product(path.cbegin(), path.cend(),
+					       new_strides.cbegin(), 0);
+		 auto old_path = index_to_path(idx, old_strides);
+		 return a(old_path); });
+  }
 } // namespace delayed
 } // namespace cuiloa
 

@@ -265,6 +265,31 @@ bool all(const AbstractArray<Concrete,bool,N>& a)
   return !breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
 }
 
+  template <ArrayIndex N>
+  std::array<ArrayIndex,N>
+  default_strides(const std::array<ArrayIndex,N>& dims)
+  {
+    std::array<ArrayIndex,N> strides;
+    if (N > 0) {
+      auto prev = strides[N - 1] = 1;
+      for (long i = N - 2; i >= 0; i--)
+	prev = strides[i] = dims[i + 1] * prev;
+    }
+    return strides;
+  }
+
+  template <ArrayIndex N>
+  std::array<ArrayIndex,N>
+  index_to_path(ArrayIndex idx, const std::array<ArrayIndex,N>& strides)
+  {
+    std::array<ArrayIndex,N> res;
+    for (ArrayIndex i = 0; i < N; i++) {
+      res[i] = idx / strides[i];
+      idx %= strides[i];
+    }
+    return res;
+  }
+
 } // namespace cuiloa
 
 // Local Variables:

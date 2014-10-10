@@ -278,4 +278,16 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( b(4) == 15 );
     REQUIRE( b(5) == 21 );
   }
+
+  SECTION( "index to path" ) {
+    auto strides = default_strides<2>({{4, 5}});
+    REQUIRE( strides.size() == 2 );
+    REQUIRE( strides[0] == 5 );
+    REQUIRE( strides[1] == 1 );
+
+    auto path = index_to_path(17, strides);
+    REQUIRE( path.size() == 2 );
+    REQUIRE( path[0] == 3 );
+    REQUIRE( path[1] == 2 );
+  }
 }
