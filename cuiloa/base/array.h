@@ -347,7 +347,7 @@ public:
   Array<T,1> cumsum(const AbstractArray<Concrete,T,1>& a) {
     Array<T,1> res(a.dimensions());
     T sum = 0;
-    a.map([&res,&sum](auto& path, auto& val) {
+    a.map([&res,&sum](auto& path, auto val) {
 	sum += val;
 	res(path) = sum;
       });

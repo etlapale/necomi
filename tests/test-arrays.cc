@@ -266,7 +266,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "cumulative sum" ) {
-    /*using namespace delayed;
+    using namespace delayed;
     auto a = range(1,7);
     auto b = cumsum(a);
 
@@ -276,6 +276,6 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( b(2) == 6 );
     REQUIRE( b(3) == 10 );
     REQUIRE( b(4) == 15 );
-    REQUIRE( b(5) == 21 );*/
+    REQUIRE( b(5) == 21 );
   }
 }
