@@ -32,5 +32,8 @@ TEST_CASE( "broadcasting", "[core]" ) {
     REQUIRE( c(1,1) == 5 );
     REQUIRE( c(1,2) == 12 );
     REQUIRE( c(1,3) == 21 );
+
+    auto d = b * a;
+    REQUIRE( all(c == d) );
   }
 }
