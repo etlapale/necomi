@@ -89,7 +89,13 @@ template <typename T, typename PRNG>
 Array<T,1> normal(const T& mean, const T& deviation,
 		  ArrayIndex size, PRNG& prng)
 {
-  return normal<T,1>(mean, deviation, {{size}}, prng);
+  return normal<T,1>(mean, deviation, {size}, prng);
+}
+
+template <typename T=double, typename PRNG>
+Array<T,1> normal(ArrayIndex size, PRNG& prng)
+{
+  return normal<T,1>(0, 1, {size}, prng);
 }
 
 } // namespace cuiloa
