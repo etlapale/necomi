@@ -277,4 +277,44 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( sum(a1) == 276 );
     REQUIRE( sum(a2) == 276 );
   }
+
+  const double float_tol = 1e-2;
+
+  SECTION( "absolute value" ) {
+    auto a = abs(range(5) - 2);
+    REQUIRE( a(0) == 2 );
+    REQUIRE( a(1) == 1 );
+    REQUIRE( a(2) == 0 );
+    REQUIRE( a(3) == 1 );
+    REQUIRE( a(4) == 2 );
+
+    auto b = abs(range(-4.7, 3.2, 0.43));
+    REQUIRE( std::fabs(b(0) - 4.7) < float_tol );
+    REQUIRE( std::fabs(b(4) - 2.98) < float_tol );
+    REQUIRE( std::fabs(b(14) - 1.32) < float_tol );
+  }
+
+  SECTION( "norms" ) {
+    auto a = range(-4.7, 3.2, 0.43) * range(19.0);
+    REQUIRE( std::fabs(norm(a, InfinityNorm) - 54.72) < float_tol );
+  }
+
+  SECTION( "roll" ) {
+    auto a = roll(range(10), 1);
+    REQUIRE( a(0) == 9 );
+    REQUIRE( a(1) == 0 );
+    REQUIRE( a(9) == 8 );
+
+    auto b = roll(reshape<2>(range(10), {2,5}), 1, 0);
+    REQUIRE( b(0,0) == 5 );
+    REQUIRE( b(0,1) == 6 );
+    REQUIRE( b(1,0) == 0 );
+    REQUIRE( b(1,1) == 1 );
+
+    auto c = roll(reshape<2>(range(10), {2,5}), 1, 1);
+    REQUIRE( c(0,0) == 4 );
+    REQUIRE( c(0,1) == 0 );
+    REQUIRE( c(1,0) == 9 );
+    REQUIRE( c(1,1) == 5 );
+  }
 }

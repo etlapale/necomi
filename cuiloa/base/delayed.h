@@ -423,6 +423,32 @@ namespace delayed
       return max(abs(a));
     }
   }
+
+  /**
+   * Shift elements on a given axis.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto roll(const AbstractArray<Concrete,T,N>&a,
+	    ArrayIndex shift, ArrayIndex dim)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    if (dim >= a.dimensions().size())
+      throw std::out_of_range("invalid rolling dimension");
+#endif
+    auto sz = a.dimensions()[dim];
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(),sz,dim,shift]
+			     (auto path) {
+			       path[dim] = (path[dim] + sz - shift) % sz;
+			       return a(path);
+			     });
+  }
+
+  template <typename Concrete, typename T>
+  auto roll(const AbstractArray<Concrete,T,1>&a, ArrayIndex shift)
+  {
+    return roll<Concrete,T,1>(a, shift, 0);
+  }
 } // namespace delayed
 } // namespace cuiloa
 

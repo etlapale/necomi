@@ -81,6 +81,13 @@ Array<T,N> normal(const T& mean, const T& deviation,
   return a;
 }
 
+template <typename T, ArrayIndex N, typename PRNG>
+Array<T,N> normal(const std::array<ArrayIndex,N>& dims, PRNG& prng)
+{
+  return normal<T,N,PRNG>(0, 1, dims, prng);
+}
+
+
 /**
  * Generate a one dimensional array filled with random numbers
  * following a normal distribution.
