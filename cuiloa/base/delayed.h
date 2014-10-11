@@ -402,6 +402,17 @@ namespace delayed
   };
 
   /**
+   * Element-wise absolute value.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto abs(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()]
+      (auto& path) { return std::abs(a(path)); });
+  }
+
+  /**
    * Average an array across a given dimension.
    */
   template <typename Concrete, typename T, ArrayIndex N>

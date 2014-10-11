@@ -256,6 +256,21 @@ T sum(const AbstractArray<Concrete,T,N>& a) {
   return total;
 }
 
+  /**
+   * Maximum value in the array.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  T max(const AbstractArray<Concrete,T,N>& a) {
+    Coordinates<N> first;
+    first.fill(0);
+    T res = a(first);
+    a.map([&res,&a](auto& path, auto val) {
+	(void) path;
+	res = val > res ? val : res;
+      });
+    return res;
+  }
+
 /**
  * Check if any element of an array of booleans is false.
  * \see all()
