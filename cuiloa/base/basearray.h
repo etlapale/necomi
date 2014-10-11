@@ -59,25 +59,34 @@ namespace cuiloa
 			     all_indices<Indices...>::value>
   {};
 
-
   /**
-   * The parent class of all array types.
-   * Useful for managing heterogenous set of pointer to arrays.
+   * Checks if a type can be promoted to another type.
    */
-  class BaseArray
-  {
-  };
+  template <typename From, typename To>
+  struct is_promotable
+    : std::integral_constant<bool,
+			     std::is_convertible<From,To>::value
+			     && ! (std::is_floating_point<From>::value
+				   && std::is_integral<To>::value)> {};
+
+/**
+* The parent class of all array types.
+* Useful for managing heterogenous set of pointer to arrays.
+*/
+class BaseArray
+{
+};
 
 
-  template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
+template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
 
 
 #ifndef IN_DOXYGEN
 /**
- * Final case of for loops through template metaprogramming.
- */
+* Final case of for loops through template metaprogramming.
+*/
 template <typename UnaryOperation, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
+typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M==N>
 for_looper(AbstractArray<Concrete,T,N>& a,
            std::array<ArrayIndex,N>& path,

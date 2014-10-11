@@ -12,6 +12,7 @@ static double my_constant_function(const std::array<ArrayIndex,2>& path)
 
 TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "product" ) {
+
     Array<int,1> a3(4);
     a3.map([](auto& path, auto& val) {
 	val = path[0];
@@ -316,5 +317,13 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(0,1) == 0 );
     REQUIRE( c(1,0) == 9 );
     REQUIRE( c(1,1) == 5 );
+  }
+
+  SECTION( "avoiding demotions" ) {
+    Array<int,1> a = range(10);
+    auto b = 2.3 * a;
+
+    REQUIRE( std::fabs(b(1) - 2.3) < float_tol );
+    REQUIRE( std::fabs(b(8) - 18.4) < float_tol );
   }
 }
