@@ -136,19 +136,21 @@ namespace delayed
 			     (auto& path) { return a(path) * b(path); });
   }
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto operator*(T value, const AbstractArray<Concrete,T,N>& a)
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator*(U value, const AbstractArray<Concrete,T,N>& a)
   {
     return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value]
+			     [a=a.shallow_copy(), value=static_cast<T>(value)]
 			     (auto& path) { return value*a(path); });
   }
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto operator*(const AbstractArray<Concrete,T,N>& a, T value)
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
   {
     return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value]
+			     [a=a.shallow_copy(), value=static_cast<T>(value)]
 			     (auto& path) { return a(path)*value; });
   }
 
@@ -167,20 +169,55 @@ namespace delayed
 			     (auto& path) { return a(path) / b(path); });
   }
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto operator/(T value, const AbstractArray<Concrete,T,N>& a)
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator/(U value, const AbstractArray<Concrete,T,N>& a)
   {
     return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value]
+			     [a=a.shallow_copy(), value=static_cast<U>(value)]
 			     (auto& path) { return value/a(path); });
   }
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto operator/(const AbstractArray<Concrete,T,N>& a, T value)
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator/(const AbstractArray<Concrete,T,N>& a, U value)
   {
     return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value]
+			     [a=a.shallow_copy(), value=static_cast<T>(value)]
 			     (auto& path) { return a(path)/value; });
+  }
+
+  template <typename Concrete1, typename T, ArrayIndex N,
+	    typename Concrete2>
+  auto operator-(const AbstractArray<Concrete1,T,N>& a,
+		 const AbstractArray<Concrete2,T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot multiply arrays of different dimensions");
+#endif
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(),b=b.shallow_copy()]
+			     (auto& path) { return a(path) - b(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator-(U value, const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value=static_cast<U>(value)]
+			     (auto& path) { return value-a(path); });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  auto operator-(const AbstractArray<Concrete,T,N>& a, U value)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value=static_cast<T>(value)]
+			     (auto& path) { return a(path)-value; });
   }
 
   template <typename Concrete1, typename T, ArrayIndex N,
@@ -358,6 +395,22 @@ namespace delayed
   auto average(const AbstractArray<Concrete,T,N>&a, ArrayIndex dim)
   {
     return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
+  }
+
+  enum Norm {
+    InfinityNorm
+  };
+
+  /**
+   * Average an array across a given dimension.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto norm(const AbstractArray<Concrete,T,N>&a, Norm norm)
+  {
+    switch (norm) {
+    case InfinityNorm:
+      return max(abs(a));
+    }
   }
 } // namespace delayed
 } // namespace cuiloa
