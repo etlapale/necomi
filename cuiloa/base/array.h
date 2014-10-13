@@ -210,7 +210,7 @@ namespace cuiloa
     /**
      * Return a restricted view on the array.
      */
-    Array<T,N> slice(const Slice<N>& s) 
+    Array<T,N> slice(const Slice<N>& s)  const
     {
       Array<T,N> a(*this);
 #ifndef CUILOA_NO_BOUND_CHECKS
@@ -233,6 +233,11 @@ namespace cuiloa
 		     m_strides.cbegin(), a.m_strides.begin(), 
 		     [](auto a, auto b) { return a * b; });
       return a;
+    }
+
+    Array<T,N> operator()(const Slice<N>& s) const
+    {
+      return this->slice(s);
     }
 
     /**
