@@ -89,7 +89,7 @@ template <typename UnaryOperation, ArrayIndex M,
 typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M==N>
 for_looper(AbstractArray<Concrete,T,N>& a,
-           std::array<ArrayIndex,N>& path,
+           Coordinates<N>& path,
            UnaryOperation f)
 {
   f(path, static_cast<Concrete&>(a)(path));
@@ -102,7 +102,7 @@ template <typename UnaryOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M<N>
 for_looper(AbstractArray<Concrete,T,N>& a,
-           std::array<ArrayIndex,N>& path,
+           Coordinates<N>& path,
            UnaryOperation f)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
@@ -119,7 +119,7 @@ template <typename ConstMapOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M==N>
 const_for_looper(const AbstractArray<Concrete,T,N>& a,
-		 std::array<ArrayIndex,N>& path,
+		 Coordinates<N>& path,
 		 ConstMapOperation f)
 {
   f(path, static_cast<const Concrete&>(a)(path));
@@ -133,7 +133,7 @@ template <typename ConstMapOperation, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M<N>
 const_for_looper(const AbstractArray<Concrete,T,N>& a,
-		 std::array<ArrayIndex,N>& path,
+		 Coordinates<N>& path,
 		 ConstMapOperation f)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
@@ -150,7 +150,7 @@ template <typename Predicate, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<M==N,bool>
 breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
-		     std::array<ArrayIndex,N>& path,
+		     Coordinates<N>& path,
 		     Predicate p)
 {
   return p(static_cast<const Concrete&>(a)(path));
@@ -167,7 +167,7 @@ template <typename Predicate, ArrayIndex M,
 	  typename Concrete, typename T, ArrayIndex N>
 std::enable_if_t<(M<N),bool>
 breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
-		     std::array<ArrayIndex,N>& path,
+		     Coordinates<N>& path,
 		     Predicate p)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
@@ -230,7 +230,7 @@ public:
   template <typename UnaryOperation>
   void map(UnaryOperation f)
   {
-    std::array<ArrayIndex,N> path;
+    Coordinates<N> path;
     for_looper<UnaryOperation,0,Concrete,T,N>(*this, path, f);
   }
 
@@ -242,7 +242,7 @@ public:
   template <typename ConstMapOperation>
   void map(ConstMapOperation f) const
   {
-    std::array<ArrayIndex,N> path;
+    Coordinates<N> path;
     const_for_looper<ConstMapOperation,0,Concrete,T,N>(*this, path, f);
   }
 

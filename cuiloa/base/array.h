@@ -42,11 +42,6 @@ namespace cuiloa
     /// Short name for the parent class
     typedef AbstractArray<Array<T,N>,T,N> Parent;
 
-    /**
-     * Represent the coordinates to an element.
-     */
-    typedef std::array<ArrayIndex,N> Path;
-
   public:
     /**
      * Create a new multi-dimensional array with uninitialized elements.
@@ -161,7 +156,7 @@ namespace cuiloa
      * Convert a multi-dimensional position into an offset from
      * the beginning of the data (m_data).
      */
-    ArrayIndex index(const Path& path) const
+    ArrayIndex index(const Coordinates<N>& path) const
     {
       return std::inner_product(path.cbegin(), path.cend(),
 				m_strides.cbegin(), 0);
@@ -172,30 +167,41 @@ namespace cuiloa
      * the beginning of the data (m_data).
      */
     template <typename ...Indices>
-    ArrayIndex index(Indices... indices) const
+    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
+                     ArrayIndex>
+    index(Indices... indices) const
     {
-      static_assert(sizeof...(Indices) == N, "improper indices arity");
-      static_assert(all_indices<Indices...>(), "invalid indices type");
-
       std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
       return index(idx);
+    }
+
+    T& operator()(const Coordinates<N>& path) {
+      return m_data[index(path)];
     }
 
     /**
      * Return a reference to a single element.
      */
     template <typename ...Indices>
-    T& operator()(Indices... indices)
+    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
+                     T&>
+    operator()(Indices... indices)
     {
       // TODO check indices for out of bounds
       return m_data[index(indices...)];
+    }
+
+    T operator()(const Coordinates<N>& path) const {
+      return m_data[index(path)];
     }
 
     /**
      * Return the value of a single element.
      */
     template <typename ...Indices>
-    T operator()(Indices... indices) const
+    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
+                     T>
+    operator()(Indices... indices) const
     {
       // TODO check indices for out of bounds
       return m_data[index(indices...)];
