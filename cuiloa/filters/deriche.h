@@ -34,14 +34,12 @@ namespace cuiloa
  *
  * \ingroup filters
  */
-typedef enum {/** Approximate a Gaussian convolution. */
-              DERICHE_BLUR,
-              /** Approximate a convolution with the derivative of a Gaussian. */
-              DERICHE_FIRST_DERIVATIVE,
-              /** Approximate a convolution with the second derivative of a Gaussian. */
-              DERICHE_SECOND_DERIVATIVE
-             } DericheFilteringType;
-
+  enum class DericheOrder
+  {
+    BLUR,
+    FIRST_DERIVATIVE,
+    SECOND_DERIVATIVE,
+  };
   
 #ifndef IN_DOXYGEN
 template <typename T, ArrayIndex N, ArrayIndex K>
@@ -133,13 +131,13 @@ inner_loop(std::array<ArrayIndex,N>& path,
 template <typename T, ArrayIndex N>
 Array<T,N>&
 deriche(Array<T,N>& a, ArrayIndex dim, double sigma,
-        DericheFilteringType order=DERICHE_BLUR,
+        DericheOrder order=DericheOrder::BLUR,
         bool cond=true);
 #else
 template <typename T, ArrayIndex N>
 std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
 deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
-        DericheFilteringType order=DERICHE_BLUR,
+        DericheOrder order=DericheOrder::BLUR,
         bool cond=true)
 {
   // σ=0 is a nop
@@ -160,20 +158,20 @@ deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
 
   T k;
   switch (order) {
-  case DERICHE_BLUR:
+  case DericheOrder::BLUR:
     k = (1-ena) * (1-ena) / (1 + 2*alpha*ena - ens);
     a0 =  k;
     a1 =  k * ena * (alpha - 1);
     a2 =  k * ena * (alpha + 1);
     a3 = -k * ens;
     break;
-  case DERICHE_FIRST_DERIVATIVE:
+  case DericheOrder::FIRST_DERIVATIVE:
     k = -(1-ena) * (1-ena) * (1-ena) / (2*(ena+1)*ena);
     a0 = a3 = 0;
     a1 = k*ena;
     a2 = -a1;
     break;
-  case DERICHE_SECOND_DERIVATIVE: {
+  case DericheOrder::SECOND_DERIVATIVE: {
     const T ea = std::exp(-alpha);
     const T k = -(ens-1)/(2*alpha*ena);
     const T kn = -2*(-1 + 3*ea - 3*ea*ea + ea*ea*ea)
@@ -199,20 +197,19 @@ deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
 #ifdef IN_DOXYGEN
 /**
  * Filter an array using Canny-Deriche along all its dimensions.
- * \see deriche(Array<T,N>&, ArrayIndex, double, DericheFilteringType, bool) for description.
  * \ingroup filters
  */
 template <typename T, ArrayIndex N>
 Array<T,N>&
-deriche(Array<T,N>& a, T sigma, DericheFilteringType order=DERICHE_BLUR);
+deriche(Array<T,N>& a, T sigma, DericheOrder order=DericheOrder::BLUR);
 #else
 template <typename T, ArrayIndex N>
 std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
-deriche(Array<T,N>& a, double sigma, DericheFilteringType order=DERICHE_BLUR)
+deriche(Array<T,N>& a, double sigma, DericheOrder order=DericheOrder::BLUR)
 {
-  for (ArrayIndex i = 0; i < N; i++)
-    deriche<T,N>(a, i, sigma,order);
-  return a;
+for (ArrayIndex i = 0; i < N; i++)
+deriche<T,N>(a, i, sigma,order);
+return a;
 }
 #endif // IN_DOXYGEN
 

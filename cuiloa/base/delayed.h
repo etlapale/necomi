@@ -450,10 +450,6 @@ namespace delayed
     return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
   }
 
-  enum Norm {
-    InfinityNorm
-  };
-
   /**
    * Element-wise absolute value.
    */
@@ -465,6 +461,10 @@ namespace delayed
       (auto& path) { return std::abs(a(path)); });
   }
 
+  enum class Norm {
+    Infinity
+  };
+
   /**
    * Average an array across a given dimension.
    */
@@ -472,7 +472,7 @@ namespace delayed
   auto norm(const AbstractArray<Concrete,T,N>&a, Norm norm)
   {
     switch (norm) {
-    case InfinityNorm:
+    case Norm::Infinity:
       return max(abs(a));
     }
   }

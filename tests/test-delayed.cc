@@ -297,7 +297,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "norms" ) {
     auto a = range(-4.7, 3.2, 0.43) * range(19.0);
-    REQUIRE( std::fabs(norm(a, InfinityNorm) - 54.72) < float_tol );
+    REQUIRE( std::fabs(norm(a, Norm::Infinity) - 54.72) < float_tol );
   }
 
   SECTION( "roll" ) {
