@@ -373,7 +373,7 @@ namespace delayed
   auto range(T start, T stop, T step)
   {
     auto size = static_cast<ArrayIndex>(std::ceil(static_cast<double>(stop-start)/step));
-    return make_delayed<T,1>({{size}},
+    return make_delayed<T,1>({size},
 			     [start,step](auto& path)
 			     { return start+step*path[0]; });
   }
