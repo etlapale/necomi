@@ -48,11 +48,10 @@ public:
    * Return the value of a single element.
    */
   template <typename ...Indices>
-  T operator()(Indices... indices) const
+  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(),
+                   T>
+  operator()(Indices... indices) const
   {
-    static_assert(sizeof...(Indices) == N, "improper indices arity");
-    static_assert(all_indices<Indices...>(), "invalid indices type");
-
     std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
     return this->operator()(idx);
   }
