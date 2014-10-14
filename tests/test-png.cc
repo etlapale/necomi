@@ -7,40 +7,40 @@ using namespace std;
 #include <cuiloa/cuiloa.h>
 using namespace cuiloa;
 
-static const std::string lena_path = "share/bitmaps/lena.png";
+static const std::string baboon_path = "share/bitmaps/baboon.png";
 
 
 TEST_CASE( "PNG storage", "[codecs]" ) {
-  SECTION( "load lena image" ) {
+  SECTION( "load baboon PNG image" ) {
     // Open the image
-    auto lena = png_load(lena_path);
+    auto img = png_load(baboon_path);
 
     // Check dimensions
-    auto& dims = lena.dimensions();
+    auto& dims = img.dimensions();
     REQUIRE( dims[0] == 512 );
     REQUIRE( dims[1] == 512 );
     REQUIRE( dims[2] == 3 );
 
     // Check pixel values
-    REQUIRE( lena(305,122,0) == 0x4d );
-    REQUIRE( lena(305,122,1) == 0x42 );
-    REQUIRE( lena(305,122,2) == 0x63 );
+    REQUIRE( img(305,122,0) == 0x2e );
+    REQUIRE( img(305,122,1) == 0x3f );
+    REQUIRE( img(305,122,2) == 0x4b );
 
-    REQUIRE( lena(354,300,0) == 0x9a );
-    REQUIRE( lena(354,300,1) == 0x56 );
-    REQUIRE( lena(354,300,2) == 0x4d );
+    REQUIRE( img(354,300,0) == 0xfa );
+    REQUIRE( img(354,300,1) == 0x44 );
+    REQUIRE( img(354,300,2) == 0x26 );
   }
 
   SECTION( "save PNG image" ) {
     // Open the image
-    auto lena = png_load(lena_path);
+    auto img = png_load(baboon_path);
 
     // Rotate the image
-    auto new_lena =
-      make_delayed<unsigned char>(lena.dimensions(), [&lena](auto& path) {
-	  return lena(path[1], path[0], path[2]);
+    auto new_img =
+      make_delayed<unsigned char>(img.dimensions(), [&img](auto& path) {
+	  return img(path[1], path[0], path[2]);
 	});
     // Save a copy
-    png_save(new_lena, "rotated-lena.png");
+    png_save(new_img, "rotated-baboon.png");
   }
 }

@@ -18,37 +18,11 @@ std::cout << a(0,0,1) << std::endl;
 auto b = a[1];
 ~~~
 
-While having compile-time defined dimensionality take away some
-flexibility, it ensures dimensionality safety without run-time checks
+More information is available of the project webpage at
+http://emilien.tlapale.com/code/cuiloa.
 
-~~~
-// Both are rejected by the compiler
-cuiloa::Array<int,4> c = a[1];
-std::cout << a(0,1) << std::endl;
-~~~
 
-and allows efficient traversal of non-contiguous memory
-
-~~~
-// Increment each element by a position-dependent value
-b.map([](auto& path, auto& val) { val += path[0]; });
-~~~
-
-The dimension values are not template parameters, so the usual run-time
-checks, with their associated cost, apply here. The library provides
-unsafe methods to bypass them when performance is required.
-
-Additionally, the library defines several [codecs](@ref Codecs) offering
-input/ouput functionality to formats such as HDF5 or INR, and a few
-[filtering algorithms](@ref filters) defined on the arrays, in particular
-recursive ones such as Canny-Deriche or Gamma filters.
-
-~~~
-// Blur the 2D image `b`
-deriche(b, 2.0);
-~~~
-
-## Downloads
+## Download
 
 Tarballs containing the source code are available in the
 [releases](http://emilien.tlapale.com/data/cuiloa) web directory.
