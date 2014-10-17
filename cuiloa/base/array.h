@@ -343,6 +343,17 @@ namespace cuiloa
     return res;
   }
 
+  template <typename T, ArrayIndex N, typename Concrete>
+  Array<T,N>& operator+=(Array<T,N>& a, const AbstractArray<Concrete,T,N>& b)
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot increment with array of different dimensions");
+#endif
+    a.map([&b](auto& path, auto& val) {val += b(path);});
+    return a;
+  }
 }
 
 // Local Variables:

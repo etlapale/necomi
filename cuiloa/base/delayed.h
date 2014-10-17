@@ -502,6 +502,9 @@ namespace delayed
     return roll<Concrete,T,1>(a, shift, 0);
   }
 
+  /**
+   * Create an identity matrix.
+   */
   template <typename T=double>
   auto identity(ArrayDimension dim)
   {

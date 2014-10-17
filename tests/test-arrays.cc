@@ -270,4 +270,21 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( path[0] == 3 );
     REQUIRE( path[1] == 2 );
   }
+
+  SECTION( "increment operator" ) {
+    using namespace cuiloa::delayed;
+    
+    Array<int,2> a = reshape<2>(range(20), {4, 5});
+    Array<int,2> b = 3 * reshape<2>(range(20), {4, 5});
+    
+    a += b;
+    REQUIRE( a(0,0) == 0 );
+    REQUIRE( a(1,0) == 20 );
+    REQUIRE( a(3,4) == 76 );
+
+    b += b;
+    REQUIRE( b(0,0) == 0 );
+    REQUIRE( b(2,4) == 84 );
+    REQUIRE( b(3,1) == 96 );
+  }
 }
