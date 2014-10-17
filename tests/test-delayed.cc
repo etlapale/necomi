@@ -333,4 +333,18 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( std::fabs(b(1) - 2.3) < float_tol );
     REQUIRE( std::fabs(b(8) - 18.4) < float_tol );
   }
+
+  SECTION( "identity" ) {
+    auto a = identity(2);
+    REQUIRE( a(0,0) == 1 );
+    REQUIRE( a(1,1) == 1 );
+    REQUIRE( a(0,1) == 0 );
+    REQUIRE( a(1,0) == 0 );
+
+    auto b = identity(3);
+    REQUIRE( a(0,0) == 1 );
+    REQUIRE( a(3,3) == 1 );
+    REQUIRE( a(1,2) == 0 );
+    REQUIRE( a(2,0) == 0 );
+  }
 }

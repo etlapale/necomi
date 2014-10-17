@@ -25,6 +25,8 @@
 #include "base/delayed.h"
 #include "base/random.h"
 
+#include "integrate/sde.h"
+
 /**
  * \defgroup Codecs Input/output functions
  *

@@ -501,6 +501,14 @@ namespace delayed
   {
     return roll<Concrete,T,1>(a, shift, 0);
   }
+
+  template <typename T=double>
+  auto identity(ArrayDimension dim)
+  {
+    return make_delayed<T,2>({dim,dim}, [](auto path) {
+	return path[0] == path[1];
+      });
+  }
 } // namespace delayed
 } // namespace cuiloa
 
