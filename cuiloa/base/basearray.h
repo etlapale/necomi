@@ -233,9 +233,17 @@ public:
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
   }
 
-  T operator()(const std::array<ArrayIndex,N>& path) const
+  template <typename ...Indices>
+  std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
+                   T>
+  operator()(Indices... indices)
   {
-    return static_cast<const Concrete*>(this)->operator()(path);
+    return static_cast<const Concrete*>(this)->operator()(indices...);
+  }
+
+  T operator()(const Coordinates<N>& coords) const
+  {
+    return static_cast<const Concrete*>(this)->operator()(coords);
   }
 
   /**

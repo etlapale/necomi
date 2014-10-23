@@ -512,6 +512,33 @@ namespace delayed
 	return path[0] == path[1];
       });
   }
+
+  template <typename To, typename ...From>
+  struct all_convertible;
+
+  template <typename To>
+  struct all_convertible<To> : std::true_type
+  {};
+
+  template <typename To, typename From, typename ...Froms>
+  struct all_convertible<To, From, Froms...>
+    : std::integral_constant<bool,
+			     std::is_convertible<From, To>::value &&
+			     all_convertible<To, Froms...>::value>
+  {};
+
+  template <typename T=double,
+	    typename ...Values,
+            typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
+  auto litarray(Values... values)
+  {
+    //std::vector<Values> vals = indices...;
+    std::vector<T> vals = {static_cast<T>(values)...};
+    return make_delayed<T,1>({sizeof...(Values)},
+			     [vals=std::move(vals)](auto& path) {
+			       return vals[path[0]];
+			     });
+  }
 } // namespace delayed
 } // namespace cuiloa
 

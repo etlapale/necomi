@@ -347,4 +347,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(1,2) == 0 );
     REQUIRE( a(2,0) == 0 );
   }
+  
+  SECTION( "literal construction" ) {
+    auto b = litarray<int>(12);
+    REQUIRE( b.dim(0) == 1 );
+    REQUIRE( b(0) == 12 );
+    
+    auto c = litarray(12, 35, 19, 2, 982, 32, 56);
+    REQUIRE( c.dim(0) == 7 );
+    REQUIRE( c(4) == 982 );
+  }
 }

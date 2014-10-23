@@ -47,7 +47,7 @@ namespace cuiloa
      * Create a new multi-dimensional array with uninitialized elements.
      */
     template <typename ...Dim,
-	      typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),void>::type* = nullptr>
+	      typename std::enable_if_t<sizeof...(Dim) == N && all_indices<Dim...>()>* = nullptr>
       Array(Dim ...dims)
       : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
     {}
@@ -191,8 +191,8 @@ namespace cuiloa
       return m_data[index(indices...)];
     }
 
-    T operator()(const Coordinates<N>& path) const {
-      return m_data[index(path)];
+    T operator()(const Coordinates<N>& coords) const {
+      return m_data[index(coords)];
     }
 
     /**
