@@ -357,4 +357,12 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c.dim(0) == 7 );
     REQUIRE( c(4) == 982 );
   }
+  
+  SECTION( "1D delayed array function" ) {
+    auto a = make_delayed(13, [](auto& coords){ return coords[0]; });
+    REQUIRE( a.dim(0) == 13 );
+    REQUIRE( a(0) == 0 );
+    REQUIRE( a(3) == 3 );
+    REQUIRE( a(12) == 12 );
+  }
 }

@@ -105,6 +105,35 @@ Array<T,1> normal(ArrayIndex size, PRNG& prng)
   return normal<T,1>(0, 1, {size}, prng);
 }
 
+/**
+ * Generate a one dimensional array filled with random floating point
+ * numbers following a uniform distribution.
+ */
+template <typename T, ArrayIndex N, typename PRNG>
+std::enable_if_t<std::is_floating_point<T>::value,Array<T,N>>
+uniform(const T& min, const T& max,
+	const std::array<ArrayIndex,N>& dims,
+	PRNG& prng)
+{
+  std::uniform_real_distribution<T> dist(min, max);
+  Array<T,N> a(dims);
+
+  a.map([&dist,&prng](auto& path, auto& val) {
+      (void) path;
+      val = dist(prng);
+    });
+
+  return a;
+}
+
+template <typename T, typename PRNG>
+std::enable_if_t<std::is_floating_point<T>::value,Array<T,1>>
+uniform(const T& min, const T& max,
+	ArrayDimension size, PRNG& prng)
+{
+  return uniform<T,1>(min, max, {size}, prng);
+}
+
 } // namespace cuiloa
 
 // Local Variables:

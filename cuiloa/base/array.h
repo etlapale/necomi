@@ -274,8 +274,8 @@ namespace cuiloa
     /**
      * Fill an array with a delayed array.
      */
-    template <typename Expr>
-    void operator=(const DelayedArray<T,N,Expr>& a)
+    template <typename Concrete>
+    void operator=(const AbstractArray<Concrete,T,N>& a)
     {
 #ifndef CUILOA_NO_BOUND_CHECKS
       // Make sure the dimensions of a and b are the same
@@ -353,6 +353,13 @@ namespace cuiloa
 #endif
     a.map([&b](auto& path, auto& val) {val += b(path);});
     return a;
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N>
+  Array<T,N> immediate(const AbstractArray<Concrete,T,N>& a) {
+    Array<T,N> res(a.dimensions());
+    res = a;
+    return res;
   }
 }
 

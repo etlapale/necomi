@@ -22,8 +22,26 @@
 
 namespace cuiloa
 {
-
   template <typename T, ArrayIndex N> class Array;
+
+
+  /**
+   * Check if a function can be called with the given arguments.
+   */
+  template <typename Func, typename... Args>
+  struct is_callable
+  {
+    template <typename T> struct dummy;
+
+    template <typename CheckType>
+    static void* check(dummy<decltype(std::declval<CheckType>()(std::declval<Args>()...))> *);
+
+    template <typename CheckType>
+    static void check(...);
+
+    enum { value = std::is_pointer<decltype(check<Func>(nullptr))>::value };
+  };
+
 
 /**
  * Represent an array expression.
@@ -63,15 +81,31 @@ public:
   {
     return m_e(path);
   }
+
 protected:
   Expr m_e;
 };
 
-  template <typename T, size_t N, typename Expr>
+  template <typename T=double, ArrayDimension N=1, typename Expr>
   DelayedArray<T,N,Expr>
-  make_delayed(const std::array<ArrayIndex,N>& dimensions, Expr fun)
+  make_delayed(const Dimensions<N>& dimensions, Expr fun)
   {
     return DelayedArray<T,N,Expr>(dimensions, fun);
+  }
+
+  /*
+  template <typename T=double, typename Expr,
+            typename std::enable_if_t<is_callable<Expr,ArrayIndex>::value>* = nullptr>
+  auto make_delayed(ArrayDimension size, Expr fun)
+  {
+    return make_delayed<T,1>({size}, [fun](auto& coords) { return fun(coords[0]); });
+  }*/
+
+  template <typename T=double, typename Expr,
+            typename std::enable_if_t<is_callable<Expr,const Coordinates<1>&>::value>* = nullptr>
+  auto make_delayed(ArrayDimension size, Expr fun)
+  {
+    return DelayedArray<T,1,Expr>({size}, fun);
   }
 
   /// Converts any array into a delayed one.
