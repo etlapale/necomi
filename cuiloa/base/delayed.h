@@ -230,6 +230,26 @@ namespace delayed
 			    );
   }
 
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<U,T>::value>* = nullptr>
+  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value=static_cast<T>(value)]
+			     (auto& path) { return a(path)*value; });
+  }
+
+  template <typename Concrete, typename T, ArrayIndex N, typename U,
+	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<T,U>::value>* = nullptr>
+  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
+  {
+    return make_delayed<U,N>(a.dimensions(),
+			     [a=a.shallow_copy(), value=value]
+			     (auto& path)
+			     { return static_cast<U>(a(path))*value; }
+			    );
+  }
+
   /*template <typename Concrete, typename T, ArrayIndex N, typename U,
 	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
   auto operator*(const AbstractArray<Concrete,T,N>& a, U value)

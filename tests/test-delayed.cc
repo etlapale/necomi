@@ -365,4 +365,17 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(3) == 3 );
     REQUIRE( a(12) == 12 );
   }
+  
+  SECTION( "convertible product" ) {
+    auto sz = 100;
+    auto a = range(sz)*180./sz;
+    REQUIRE( a(0) == 0 );
+    REQUIRE( a(1) == 1.8 );
+    REQUIRE( a(10) == 18 );
+
+    auto b = 180.*range(sz)/sz;
+    REQUIRE( b(0) == 0 );
+    REQUIRE( b(1) == 1.8 );
+    REQUIRE( b(10) == 18 );
+  }
 }
