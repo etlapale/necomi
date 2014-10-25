@@ -406,5 +406,21 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( fabs(b(1) - 3) < float_tol );
     REQUIRE( fabs(b(7) - 21) < float_tol );
     REQUIRE( fabs(b(9) - 27) < float_tol );
+    
+    bool exception_thrown = false;
+    try {
+      auto c = range<double>(10, 3, 1);
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
+    
+    exception_thrown = false;
+    try {
+      auto c = range<double>(3, 10, 0);
+    } catch (std::out_of_range& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
   }
 }

@@ -407,15 +407,14 @@ namespace delayed
   }
 
   template <typename T>
-  auto range(T start, T stop)
+  auto range(T start, T stop, T step=1)
   {
-    return make_delayed<T,1>({{static_cast<ArrayIndex>(stop-start)}},
-			     [start](auto& path){ return start+path[0]; });
-  }
-
-  template <typename T>
-  auto range(T start, T stop, T step)
-  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    if (stop <= start)
+      throw std::out_of_range("stop must be greater than start for ranges");
+    if (step <= 0)
+      throw std::out_of_range("step must be positive for ranges");
+#endif
     auto size = static_cast<ArrayIndex>(std::ceil(static_cast<double>(stop-start)/step));
     return make_delayed<T,1>({size},
 			     [start,step](auto& coords)
