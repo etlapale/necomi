@@ -250,16 +250,6 @@ namespace delayed
 			    );
   }
 
-  /*template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<T>(value)]
-			     (auto& path) { return a(path)*value; });
-			     }
-  */
-
   template <typename Concrete1, typename T, ArrayIndex N,
 	    typename Concrete2>
   auto operator/(const AbstractArray<Concrete1,T,N>& a,
@@ -592,6 +582,42 @@ namespace delayed
 			     [vals=std::move(vals)](auto& path) {
 			       return vals[path[0]];
 			     });
+  }
+
+  template <unsigned N, typename T>
+  std::enable_if_t<N==0,T>
+  power(T)
+  {
+    return 1;
+  }
+
+  template <unsigned N, typename T>
+  std::enable_if_t<N==1,T>
+  power(T val)
+  {
+    return val;
+  }
+  
+  template <unsigned N, typename T>
+  std::enable_if_t<1<N,T>
+  power(T val)
+  {
+    return val * power<N-1>(val);
+  }
+  
+  /**
+   * Non-normalized generalized Gaussian function with integral beta.
+   */
+  template <unsigned beta, typename T, typename Concrete,
+	    typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+  auto ggd(const AbstractArray<Concrete,T,1>& a, T alpha, T mu=0)
+  {
+    return make_delayed<T,1>(a.dimensions(),
+			     [a=a.shallow_copy(),alpha,mu]
+			     (auto& coords) {
+			       return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
+			     });
+
   }
 } // namespace delayed
 } // namespace cuiloa

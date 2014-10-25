@@ -4,6 +4,8 @@
 using namespace cuiloa;
 using namespace cuiloa::delayed;
 
+const double float_tol = 1e-2;
+
 static double my_constant_function(const std::array<ArrayIndex,2>& path)
 {
   (void) path;
@@ -286,8 +288,6 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( sum(a2) == 276 );
   }
 
-  const double float_tol = 1e-2;
-
   SECTION( "absolute value" ) {
     auto a = abs(range(5) - 2);
     REQUIRE( a(0) == 2 );
@@ -377,5 +377,21 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( b(0) == 0 );
     REQUIRE( b(1) == 1.8 );
     REQUIRE( b(10) == 18 );
+  }
+  
+  SECTION( "power" ) {
+    REQUIRE( power<2>(3) == 9 );
+    REQUIRE( power<3>(2) == 8 );
+    REQUIRE( power<7>(2) == 128 );
+    REQUIRE( power<1>(392) == 392 );
+    REQUIRE( power<0>(-219) == 1 );
+  }
+  
+  SECTION( "ggd" ) {
+    auto a = ggd<2>(range(100.), 7.);
+    
+    REQUIRE( fabs(a(0) - 1) < float_tol );
+    std::cout << a(13) << ' ' << range(100.)(13) << std::endl;
+    REQUIRE( fabs(a(13) - 0.03177804641749838) < float_tol );
   }
 }
