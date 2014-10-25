@@ -425,7 +425,9 @@ namespace delayed
   auto linspace(T start, T stop, ArrayDimension size=50, bool endpoint=true)
   {
     auto step = (stop - start)/(endpoint ? size - 1 : size);
-    return range<T>(start, stop, step);
+    return make_delayed<T,1>({size},
+			     [start,step](auto& coords)
+			     { return start+step*coords[0]; });
   }
 
   template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N>

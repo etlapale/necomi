@@ -41,8 +41,8 @@ namespace cuiloa {
 
     void step(T dt)
     {
-      using namespace cuiloa::delayed;
-      using namespace cuiloa::delayed::broadcasting;
+      using namespace delayed;
+      using namespace delayed::broadcasting;
 
       auto Winc = sqrt(dt)*normal(m_num_noises, m_prng);
       m_X += dt*m_drift(m_X) + sum(m_diffusion(m_X)*Winc, 1);

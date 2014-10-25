@@ -23,6 +23,7 @@
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
+#include "base/numerics.h"
 #include "base/random.h"
 
 #include "integrate/sde.h"
