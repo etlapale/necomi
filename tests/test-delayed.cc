@@ -4,7 +4,7 @@
 using namespace cuiloa;
 using namespace cuiloa::delayed;
 
-const double float_tol = 1e-2;
+static constexpr double float_tol = 1e-2;
 
 static double my_constant_function(const std::array<ArrayIndex,2>& path)
 {

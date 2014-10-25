@@ -612,6 +612,26 @@ namespace delayed
   {
     return val * power<N-1>(val);
   }
+
+  template <typename T, ArrayDimension N, typename Concrete,
+	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+  auto cos(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()] (auto& coords) {
+			       return std::cos(a(coords));
+			     });
+  }
+
+  template <typename T, ArrayDimension N, typename Concrete,
+	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+  auto radians(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()] (auto& coords) {
+			       return a(coords) * M_PI / 180.;
+			     });
+  }
   
   /**
    * Non-normalized generalized Gaussian function with integral beta.
