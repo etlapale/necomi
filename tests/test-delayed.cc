@@ -391,7 +391,20 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = ggd<2>(range(100.), 7.);
     
     REQUIRE( fabs(a(0) - 1) < float_tol );
-    std::cout << a(13) << ' ' << range(100.)(13) << std::endl;
     REQUIRE( fabs(a(13) - 0.03177804641749838) < float_tol );
+  }
+  
+  SECTION( "linspace" ) {
+    auto a = linspace<double>(0, 30, 10);
+    REQUIRE( fabs(a(0) - 0) < float_tol );
+    REQUIRE( fabs(a(1) - 3.3333333) < float_tol );
+    REQUIRE( fabs(a(7) - 23.3333333) < float_tol );
+    REQUIRE( fabs(a(9) - 30) < float_tol );
+
+    auto b = linspace<double>(0, 30, 10, false);
+    REQUIRE( fabs(b(0) - 0) < float_tol );
+    REQUIRE( fabs(b(1) - 3) < float_tol );
+    REQUIRE( fabs(b(7) - 21) < float_tol );
+    REQUIRE( fabs(b(9) - 27) < float_tol );
   }
 }
