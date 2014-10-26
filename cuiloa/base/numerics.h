@@ -57,6 +57,53 @@ namespace cuiloa
   {
     return discretization(min, max, size, [](auto&& a){ return a; });
   }
+  
+  enum class InterpolationMethod
+  {
+    NearestNeighbor,
+    Linear
+  };
+  
+  
+  template <InterpolationMethod method, typename T, typename Concrete>
+  class Interpolation
+  {
+  public:
+    Interpolation(const AbstractArray<Concrete,T,1>& a)
+      : m_array(a.shallow_copy())
+    {
+    }
+
+    template <typename U>
+    std::enable_if_t<method == InterpolationMethod::NearestNeighbor
+		     && std::is_arithmetic<U>::value, T>
+    operator()(U coord) const
+    {
+      auto idx = static_cast<cuiloa::ArrayIndex>(0.5 + coord);
+      return m_array(idx);
+    }
+
+    template <typename U>
+    std::enable_if_t<method == InterpolationMethod::Linear
+		     && std::is_arithmetic<U>::value, T>
+    operator()(U x) const
+    {
+      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto y0 = m_array(x0);
+      auto y1 = m_array(x0 + 1);
+
+      return y0 + (y1 - y0)*(x - x0);
+    }
+
+  protected:
+    Concrete m_array;
+  };
+  
+  template <InterpolationMethod method, typename T, typename Concrete>
+  auto interpolation(cuiloa::AbstractArray<Concrete,T,1>& a)
+  {
+    return Interpolation<method,T,Concrete>(a);
+  }
 }
 
 // Local Variables:
