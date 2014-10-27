@@ -98,6 +98,18 @@ namespace cuiloa
       return y0 + (y1 - y0)*(x - x0);
     };
   }
+ 
+  /**
+   * Return a rescaling function mapping values in [imin,imax]
+   * into values in [omin,omax].
+   */
+  template <typename T>
+  auto rescale(T imin, T imax, T omin, T omax)
+  {
+    return [imin,imax,omin,omax](T x) {
+      return (x - imin)*(omax-omin)/(imax-imin)+omin;
+    };
+  }
 }
 
 // Local Variables:

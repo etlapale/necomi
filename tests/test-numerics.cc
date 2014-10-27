@@ -41,4 +41,18 @@ TEST_CASE( "basic numerics", "[base]" ) {
     REQUIRE( i(6.2) == 6.2 );
     REQUIRE( i(6.9) == 6.9 );
   }
+  
+  SECTION( "rescaling" ) {
+    auto r1 = rescale<double>(0, 1, 0, 100);
+    REQUIRE( r1(0) == 0 );
+    REQUIRE( r1(0.25) == 25 );
+    REQUIRE( r1(0.5) == 50 );
+    REQUIRE( r1(1) == 100 );
+
+    auto r2 = rescale<double>(1, 3, 10, 20);
+    REQUIRE( r2(1) == 10 );
+    REQUIRE( r2(1.5) == 12.5 );
+    REQUIRE( r2(2) == 15 );
+    REQUIRE( r2(3) == 20 );
+  }
 }
