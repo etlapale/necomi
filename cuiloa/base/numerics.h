@@ -110,6 +110,13 @@ namespace cuiloa
       return (x - imin)*(omax-omin)/(imax-imin)+omin;
     };
   }
+  
+  template <typename T, typename F1, typename F2>
+  auto compose(F1&& f1, F2&& f2) {
+    return [f1,f2](T x) {
+      return f1(f2(x));
+    };
+  }
 }
 
 // Local Variables:

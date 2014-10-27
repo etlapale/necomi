@@ -55,4 +55,17 @@ TEST_CASE( "basic numerics", "[base]" ) {
     REQUIRE( r2(2) == 15 );
     REQUIRE( r2(3) == 20 );
   }
+  
+  SECTION( "composing functions" ) {
+    auto f1 = [](double x) { return 2*x; };
+    auto f2 = [](double x) { return x*x; };
+    
+    auto c1 = compose<double>(f1, f2);
+    REQUIRE( c1(3.0) == 18 );
+    REQUIRE( c1(7.0) == 98 );
+    
+    auto c2 = compose<double>(f2, f1);
+    REQUIRE( c2(3.0) == 36 );
+    REQUIRE( c2(7.0) == 196 );
+  }
 }
