@@ -20,10 +20,14 @@
 
 namespace cuiloa {
 
+  /**
+   * Prepend extra dimensions to an array.
+   */
   template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N,
 	    typename std::enable_if<(M>N)>::type* = nullptr>
-  auto widen(const AbstractArray<Concrete,T,N>& a,
-	     const Dimensions<M>& dims)
+  auto widen(const Dimensions<M>& dims,
+	     const AbstractArray<Concrete,T,N>& a)
+	     
   {
 #ifndef CUILOA_NO_BOUND_CHECKS
     // Make sure the dimensions are matching
@@ -39,6 +43,28 @@ namespace cuiloa {
 			       return a(old_path); });
   }
 
+  /**
+   * Append extra dimensions to an array.
+   */
+  template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N,
+	    typename std::enable_if<(M>N)>::type* = nullptr>
+  auto widen_right(const Dimensions<M>& dims,
+		   const AbstractArray<Concrete,T,N>& a)
+	     
+  {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions are matching
+    for (ArrayIndex i = 0; i < N; i++)
+      if (a.dimensions()[i] != dims[i])
+	throw std::length_error("cannot right-broadcast arrays to different dimensions");
+#endif
+    return make_delayed<T,M>(dims,
+			     [a=a.shallow_copy()](const auto& coords)
+			     { Coordinates<N> coords_a;
+			       std::copy_n(coords.cbegin(), N, coords_a.begin());
+			       return a(coords_a); });
+  }
+
   namespace delayed {
     namespace broadcasting {
 
@@ -49,7 +75,7 @@ namespace cuiloa {
       auto operator*(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator*(widen<M>(a, b.dimensions()), b);
+	return cuiloa::delayed::operator*(widen<M>(b.dimensions(), a), b);
       }
 
       template <typename Concrete1, typename T, ArrayIndex N,
@@ -59,7 +85,7 @@ namespace cuiloa {
       auto operator*(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator*(a, widen<N>(b, a.dimensions()));
+	return cuiloa::delayed::operator*(a, widen<N>(a.dimensions(), b));
       }
 
       template <typename Concrete1, typename T, ArrayIndex N,
@@ -69,7 +95,7 @@ namespace cuiloa {
       auto operator/(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator/(widen<M>(a, b.dimensions()), b);
+	return cuiloa::delayed::operator/(widen<M>(b.dimensions(), a), b);
       }
 
       template <typename Concrete1, typename T, ArrayIndex N,
@@ -79,7 +105,7 @@ namespace cuiloa {
       auto operator/(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator/(a, widen<N>(b, a.dimensions()));
+	return cuiloa::delayed::operator/(a, widen<N>(a.dimensions(), b));
       }
 
       template <typename Concrete1, typename T, ArrayIndex N,
@@ -89,7 +115,7 @@ namespace cuiloa {
       auto operator+(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator+(widen<M>(a, b.dimensions()), b);
+	return cuiloa::delayed::operator+(widen<M>(b.dimensions(), a), b);
       }
 
       template <typename Concrete1, typename T, ArrayIndex N,
@@ -99,7 +125,7 @@ namespace cuiloa {
       auto operator+(const AbstractArray<Concrete1,T,N>& a,
 		     const AbstractArray<Concrete2,T,M>& b)
       {
-	return cuiloa::delayed::operator+(a, widen<N>(b, a.dimensions()));
+	return cuiloa::delayed::operator+(a, widen<N>(a.dimensions(), b));
       }
     } // namespace broadcasting
   } // namespace delayed

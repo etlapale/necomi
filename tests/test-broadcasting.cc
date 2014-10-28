@@ -9,13 +9,28 @@ TEST_CASE( "broadcasting", "[core]" ) {
   SECTION( "widen" ) {
     auto a = reshape<2>(range(20), {4,5});
     Dimensions<3> dims{3,4,5};
-    auto b = widen(a, dims);
+    auto b = widen(dims, a);
 
     REQUIRE( b.dimensions() == dims );
     REQUIRE( b(0,3,2) == 17 );
     REQUIRE( b(2,3,2) == 17 );
     REQUIRE( b(0,1,2) == 7 );
     REQUIRE( b(1,1,2) == 7 );
+  }
+
+  SECTION( "right widening" ) {
+    auto a = range(3);
+    Dimensions<2> dims{3,4};
+    auto b = widen_right(dims, a);
+
+    REQUIRE( b.dimensions() == dims );
+    REQUIRE( b(0,0) == 0 );
+    REQUIRE( b(0,1) == 0 );
+    REQUIRE( b(0,2) == 0 );
+    REQUIRE( b(1,0) == 1 );
+    REQUIRE( b(1,1) == 1 );
+    REQUIRE( b(2,0) == 2 );
+    REQUIRE( b(2,1) == 2 );
   }
 
   SECTION( "broadcasting products" ) {
