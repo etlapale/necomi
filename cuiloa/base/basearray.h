@@ -236,7 +236,7 @@ public:
   template <typename ...Indices>
   std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
                    T>
-  operator()(Indices... indices)
+  operator()(Indices... indices) const
   {
     return static_cast<const Concrete*>(this)->operator()(indices...);
   }
