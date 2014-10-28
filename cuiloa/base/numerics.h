@@ -72,7 +72,21 @@ namespace cuiloa
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::NearestNeighbor>* = nullptr>
-  auto interpolation(cuiloa::AbstractArray<Concrete,T,1>& a)
+  U interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a, U x)
+  {
+    auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
+    return a(x0);
+  }
+  
+  /**
+   * Nearest-neighbor interpolation.
+   */
+  template <InterpolationMethod method, typename U=double,
+            typename T, typename Concrete,
+	    typename std::enable_if_t<
+	      std::is_arithmetic<U>::value &&
+	      method==InterpolationMethod::NearestNeighbor>* = nullptr>
+  auto interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a)
   {
     return [a=a.shallow_copy()](U x) {
       auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
@@ -83,12 +97,49 @@ namespace cuiloa
   /**
    * Linear interpolation.
    */
+  template <InterpolationMethod method,
+            typename T, ArrayIndex N, typename Concrete1, typename Concrete2,
+	    typename std::enable_if_t<method==InterpolationMethod::Linear>* = nullptr>
+  auto interpolation(const cuiloa::AbstractArray<Concrete1,T,1>& a,
+                     const cuiloa::AbstractArray<Concrete2,T,N>& xvals)
+  {
+  return make_delayed<T,N>(xvals.dimensions(),
+    [a=a.shallow_copy(),xvals=xvals.shallow_copy()](const auto& coords) {
+      T x = xvals(coords);
+      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto y0 = a(x0);
+      auto y1 = a(x0 + 1);
+
+      return y0 + (y1 - y0)*(x - x0);
+    });
+  }
+  
+  /**
+   * Linear interpolation.
+   */
   template <InterpolationMethod method, typename U=double,
             typename T, typename Concrete,
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::Linear>* = nullptr>
-  auto interpolation(cuiloa::AbstractArray<Concrete,T,1>& a)
+  U interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a, U x)
+  {
+    auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+    auto y0 = a(x0);
+    auto y1 = a(x0 + 1);
+
+    return y0 + (y1 - y0)*(x - x0);
+  }
+  
+  /**
+   * Linear interpolation.
+   */
+  template <InterpolationMethod method, typename U=double,
+            typename T, typename Concrete,
+	    typename std::enable_if_t<
+	      std::is_arithmetic<U>::value &&
+	      method==InterpolationMethod::Linear>* = nullptr>
+  auto interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a)
   {
     return [a=a.shallow_copy()](U x) {
       auto x0 = static_cast<cuiloa::ArrayIndex>(x);
@@ -98,12 +149,28 @@ namespace cuiloa
       return y0 + (y1 - y0)*(x - x0);
     };
   }
+
+  template <typename T=double>
+  T rescale(T imin, T imax, T omin, T omax, T x)
+  {
+    return (x - imin)*(omax-omin)/(imax-imin)+omin;
+  }
+
+  template <typename T, ArrayDimension N, typename Concrete>
+  auto rescale(T imin, T imax, T omin, T omax,
+               const cuiloa::AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+    [imin,imax,omin,omax,a=a.shallow_copy()](const auto& coords) {
+      return rescale<T>(imin, imax, omin, omax, a(coords));
+    });
+  }
  
   /**
    * Return a rescaling function mapping values in [imin,imax]
    * into values in [omin,omax].
    */
-  template <typename T>
+  template <typename T=double>
   auto rescale(T imin, T imax, T omin, T omax)
   {
     return [imin,imax,omin,omax](T x) {
@@ -111,10 +178,17 @@ namespace cuiloa
     };
   }
   
-  template <typename T, typename F1, typename F2>
-  auto compose(F1&& f1, F2&& f2) {
+  template <typename T=double, typename F1, typename F2>
+  auto compose(F1 f1, F2 f2) {
     return [f1,f2](T x) {
       return f1(f2(x));
+    };
+  }
+
+  template <typename T=double, typename F1, typename F2, typename F3>
+  auto compose(F1 f1, F2 f2, F3 f3) {
+    return [f1,f2,f3](T x) {
+      return f1(f2(f3(x)));
     };
   }
 }
