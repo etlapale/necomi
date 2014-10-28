@@ -647,6 +647,21 @@ namespace delayed
 			     });
 
   }
+
+  template <typename T, ArrayDimension N, typename Concrete>
+  auto norm_angle_diff(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()](auto& coords) {
+			       T x = a(coords);
+			       if (x >= -180 && x <= 180)
+				 return x;
+			       if (x > 180)
+				 return 360 - x;
+			       else // x < -180
+				 return -x-360;
+			     });
+  }
 } // namespace delayed
 } // namespace cuiloa
 
