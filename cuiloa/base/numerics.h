@@ -165,6 +165,28 @@ namespace cuiloa
       return rescale<T>(imin, imax, omin, omax, a(coords));
     });
   }
+  
+  /**
+   * Linear interpolation.
+   */
+  template <InterpolationMethod method,
+            typename T, ArrayIndex N, typename Concrete1, typename Concrete2,
+	    typename std::enable_if_t<method==InterpolationMethod::Linear>* = nullptr>
+  auto scaled_interpolation(const cuiloa::AbstractArray<Concrete1,T,1>& a,
+                            T xmin, T xmax,
+                            const cuiloa::AbstractArray<Concrete2,T,N>& xvals)
+  {
+  return make_delayed<T,N>(xvals.dimensions(),
+    [xmin,xmax,a=a.shallow_copy(),xvals=xvals.shallow_copy()]
+    (const auto& coords) {
+      T x = rescale<T>(xmin, xmax, 0, a.size(), xvals(coords));
+      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto y0 = a(x0);
+      auto y1 = a(x0 + 1);
+
+      return y0 + (y1 - y0)*(x - x0);
+    });
+  }
  
   /**
    * Return a rescaling function mapping values in [imin,imax]
