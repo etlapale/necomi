@@ -26,6 +26,8 @@
 #include "base/numerics.h"
 #include "base/random.h"
 
+#include "funcs/trigonometrics.h"
+
 #include "integrate/sde.h"
 
 /**
