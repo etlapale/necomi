@@ -5,6 +5,38 @@ using namespace cuiloa;
 
 
 TEST_CASE( "basic array operations", "[base]" ) {
+  SECTION( "remove coordinates" ) {
+    Coordinates<4> c = {1, 2, 3, 4};
+
+    auto c1 = remove_coordinate(c, 2);
+    Coordinates<3> d1 = {1, 2, 4};
+    REQUIRE( c1 == d1 );
+
+    auto c2 = remove_coordinate(c, 0);
+    Coordinates<3> d2 = {2, 3, 4};
+    REQUIRE( c2 == d2 );
+
+    auto c3 = remove_coordinate(c, 3);
+    Coordinates<3> d3 = {1, 2, 3};
+    REQUIRE( c3 == d3 );
+  }
+
+  SECTION( "add coordinates" ) {
+    Coordinates<3> c = {1, 2, 3};
+
+    auto c1 = add_coordinate(c, 2);
+    Coordinates<4> d1 = {1, 2, 0, 3};
+    REQUIRE( c1 == d1 );
+
+    auto c2 = add_coordinate(c, 0);
+    Coordinates<4> d2 = {0, 1, 2, 3};
+    REQUIRE( c2 == d2 );
+
+    auto c3 = add_coordinate(c, 3);
+    Coordinates<4> d3 = {1, 2, 3, 0};
+    REQUIRE( c3 == d3 );
+  }
+
   SECTION( "array sizes" ) {
     Array<double,0> a0;
     REQUIRE( a0.size() == 1 );
@@ -286,5 +318,15 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( b(0,0) == 0 );
     REQUIRE( b(2,4) == 84 );
     REQUIRE( b(3,1) == 96 );
+  }
+  
+  SECTION( "literal construction" ) {
+    auto b = litarray<int>(12);
+    REQUIRE( b.dim(0) == 1 );
+    REQUIRE( b(0) == 12 );
+    
+    auto c = litarray(12, 35, 19, 2, 982, 32, 56);
+    REQUIRE( c.dim(0) == 7 );
+    REQUIRE( c(4) == 982 );
   }
 }

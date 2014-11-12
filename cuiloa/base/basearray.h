@@ -19,56 +19,10 @@
 #include <array>
 #include <numeric>
 
+#include "traits.h"
+
 namespace cuiloa
 {
-
-  /**
-   * Single coordinate component.
-   */
-  using ArrayIndex = std::size_t;
-
-  /**
-   * Single dimension component.
-   */
-  using ArrayDimension = std::size_t;
-
-  /**
-   * Coordinates to access an element in an array.
-   */
-  template <ArrayIndex N> using Coordinates = std::array<ArrayIndex,N>;
-
-  /**
-   * Dimensions on a multidimensional array.
-   */
-  template <ArrayDimension N> using Dimensions = std::array<ArrayDimension,N>;
-
-  /**
-   * Checks if a pack of types are all valid array indexes.
-   */
-  template <typename ...Indices>
-  struct all_indices;
-
-  template <>
-  struct all_indices<> : std::true_type
-  {};
-
-  template <typename Index, typename ...Indices>
-  struct all_indices<Index, Indices...>
-    : std::integral_constant<bool,
-			     std::is_convertible<Index, ArrayIndex>::value &&
-			     all_indices<Indices...>::value>
-  {};
-
-  /**
-   * Checks if a type can be promoted to another type.
-   */
-  template <typename From, typename To>
-  struct is_promotable
-    : std::integral_constant<bool,
-			     std::is_convertible<From,To>::value
-			     && ! (std::is_floating_point<From>::value
-				   && std::is_integral<To>::value)> {};
-
 /**
 * The parent class of all array types.
 * Useful for managing heterogenous set of pointer to arrays.
@@ -76,6 +30,38 @@ namespace cuiloa
 class BaseArray
 {
 };
+  
+  /**
+   * Remove a dimension or coordinate.
+   */
+  template <ArrayIndex N, typename std::enable_if_t<N!=0>* = nullptr>
+  Coordinates<N-1> remove_coordinate(const Coordinates<N>& coords,
+				     ArrayIndex dim)
+  {
+    Coordinates<N-1> c;
+    
+    auto oit = std::copy_n(coords.cbegin(), dim, c.begin());
+    if (dim != N-1)
+      std::copy(coords.cbegin()+dim+1, coords.cend(), oit);
+    
+    return c;
+  }
+
+  /**
+   * Add a dimension or coordinate.
+   */
+  template <ArrayIndex N>
+  Coordinates<N+1> add_coordinate(const Coordinates<N>& coords,
+				  ArrayIndex dim)
+  {
+    Coordinates<N+1> c;
+    
+    auto oit = std::copy_n(coords.cbegin(), dim, c.begin());
+    if (dim != N)
+      std::copy(coords.cbegin()+dim, coords.cend(), oit+1);
+    
+    return c;
+  }
 
 
 template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
