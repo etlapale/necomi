@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include "time.h"
+
 #include <cuiloa/cuiloa.h>
 using namespace cuiloa;
 using namespace cuiloa::delayed;
@@ -348,16 +350,6 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(2,0) == 0 );
   }
   
-  SECTION( "literal construction" ) {
-    auto b = litarray<int>(12);
-    REQUIRE( b.dim(0) == 1 );
-    REQUIRE( b(0) == 12 );
-    
-    auto c = litarray(12, 35, 19, 2, 982, 32, 56);
-    REQUIRE( c.dim(0) == 7 );
-    REQUIRE( c(4) == 982 );
-  }
-  
   SECTION( "1D delayed array function" ) {
     auto a = make_delayed(13, [](auto& coords){ return coords[0]; });
     REQUIRE( a.dim(0) == 13 );
@@ -430,4 +422,22 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( fabs(d(0) - 0) < float_tol );
     REQUIRE( fabs(d(9) - 1) < float_tol );
   }
+  
+  SECTION( "delayed constant arrays" ) {
+    auto a = constants({5}, 13);
+    REQUIRE( a.ndim() == 1 );
+    REQUIRE( a.dim(0) == 5 );
+    REQUIRE( a(0) == 13 );
+    REQUIRE( a(2) == 13 );
+  }
+  
+  /*SECTION( "constexpr delayed arrays" ) {
+    auto a = constants({5}, 7);
+    Array<double,a(2)> b;
+    //REQUIRE( sizeof(b) == sizeof(int)*13 );
+    REQUIRE( b.ndim() == 7 );
+
+    //auto func = [](){ return static_cast<int>(time(0)); };
+    //int c[func()];
+    }*/
 }
