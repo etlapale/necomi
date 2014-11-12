@@ -90,6 +90,7 @@ protected:
   DelayedArray<T,N,Expr>
   make_delayed(const Dimensions<N>& dimensions, Expr fun)
   {
+    // TODO: pass dimensions by value since we copy them in the constructor
     return DelayedArray<T,N,Expr>(dimensions, fun);
   }
 
@@ -379,12 +380,39 @@ namespace delayed
   }
 
   /**
+   * Create an array filled with a constant value.
+   */
+  template <typename T=double, ArrayIndex N=1>
+  auto constants(const Dimensions<N>& dims, const T&& value)
+  {
+    return make_delayed<T>(dims, [value](auto&){ return value; });
+  }
+  
+  template <typename T=double, ArrayIndex N=1>
+  auto zeros(const Dimensions<N>& dims)
+  {
+    return constants<T,N>(dims,0);
+  }
+  
+
+  /**
    * Create an array with the same dimensions filled with a constant
    * value.
    * \see zeros_like
    */
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto constants_like(const AbstractArray<Concrete,T,N>& a, const T& value)
+  template <typename T, typename U, ArrayIndex N, typename Concrete>
+  auto constants_like(const AbstractArray<Concrete,U,N>& a, const T&& value)
+  {
+    return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
+  }
+
+  /**
+   * Create an array with the same dimensions filled with a constant
+   * value.
+   * \see zeros_like
+   */
+  template <typename T, ArrayIndex N, typename Concrete>
+  auto constants_like(const AbstractArray<Concrete,T,N>& a, const T&& value)
   {
     return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
   }
@@ -396,7 +424,17 @@ namespace delayed
   template <typename Concrete, typename T, ArrayIndex N>
   auto zeros_like(const AbstractArray<Concrete,T,N>& a)
   {
-    return constants_like<Concrete,T,N>(a, 0);
+    return constants_like<T,N,Concrete>(a, 0);
+  }
+
+  /**
+   * Create an array with the same dimensions filled with zero values.
+   * \see constants_like
+   */
+  template <typename T, typename U, ArrayIndex N, typename Concrete>
+  auto zeros_like(const AbstractArray<Concrete,U,N>& a)
+  {
+    return constants_like<T,U,N,Concrete>(a, 0);
   }
 
   template <typename T>
@@ -468,19 +506,10 @@ namespace delayed
 	    typename std::enable_if<N!=0>::type* = nullptr>
   auto sum(const AbstractArray<Concrete,T,N>&a, ArrayIndex dim)
   {
-    // Compute the dimensions of the new array
-    std::array<ArrayIndex,N-1> dims;
-    auto oit = std::copy_n(a.dimensions().cbegin(), dim, dims.begin());
-    if (dim != N-1)
-      std::copy(a.dimensions().cbegin()+dim+1, a.dimensions().cend(), oit);
-
-    return make_delayed<T,N-1>(dims,
+    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
       [a=a.shallow_copy(),dim] (auto& path) {
         // Path in the original array
-        Coordinates<N> orig_path;
-	auto oit = std::copy_n(path.cbegin(), dim, orig_path.begin());
-	if (dim != N-1)
-	  std::copy(path.cbegin()+dim, path.cend(), oit+1);
+	auto orig_path = add_coordinate(path, dim);
 	// Sum all the elements in the dimension
 	T val = 0;
 	for (ArrayIndex i = 0; i < a.dimensions()[dim]; i++) {
@@ -495,10 +524,28 @@ namespace delayed
    * Average an array across a given dimension.
    */
   template <typename Concrete, typename T, ArrayIndex N,
-	    typename std::enable_if<N!=0>::type* = nullptr>
-  auto average(const AbstractArray<Concrete,T,N>&a, ArrayIndex dim)
+	    typename std::enable_if_t<N!=0>* = nullptr>
+  auto average(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim)
   {
     return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
+  }
+  
+  /**
+   * Compute a sample standard deviation with a two-pass formula.
+   *
+   * When the function is called, the average along the given dimension
+   * is computed and stored.
+   */
+  template <typename Concrete, typename T, ArrayIndex N,
+	    typename std::enable_if_t<N!=0>* = nullptr>
+  auto deviation(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim)
+  {
+    auto avg = immediate(average(a, dim));
+    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
+		[a=a.shallow_copy(),dim,avg=avg.shallow_copy()] (auto& path)
+		{
+
+		});
   }
 
   /**
@@ -565,33 +612,6 @@ namespace delayed
       });
   }
 
-  template <typename To, typename ...From>
-  struct all_convertible;
-
-  template <typename To>
-  struct all_convertible<To> : std::true_type
-  {};
-
-  template <typename To, typename From, typename ...Froms>
-  struct all_convertible<To, From, Froms...>
-    : std::integral_constant<bool,
-			     std::is_convertible<From, To>::value &&
-			     all_convertible<To, Froms...>::value>
-  {};
-
-  template <typename T=double,
-	    typename ...Values,
-            typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
-  auto litarray(Values... values)
-  {
-    //std::vector<Values> vals = indices...;
-    std::vector<T> vals = {static_cast<T>(values)...};
-    return make_delayed<T,1>({sizeof...(Values)},
-			     [vals=std::move(vals)](auto& path) {
-			       return vals[path[0]];
-			     });
-  }
-
   template <unsigned N, typename T>
   std::enable_if_t<N==0,T>
   power(T)
@@ -611,26 +631,6 @@ namespace delayed
   power(T val)
   {
     return val * power<N-1>(val);
-  }
-
-  template <typename T, ArrayDimension N, typename Concrete,
-	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
-  auto cos(const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy()] (auto& coords) {
-			       return std::cos(a(coords));
-			     });
-  }
-
-  template <typename T, ArrayDimension N, typename Concrete,
-	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
-  auto radians(const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy()] (auto& coords) {
-			       return a(coords) * M_PI / 180.;
-			     });
   }
   
   /**
