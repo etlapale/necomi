@@ -25,24 +25,6 @@ namespace cuiloa
   template <typename T, ArrayIndex N> class Array;
 
 
-  /**
-   * Check if a function can be called with the given arguments.
-   */
-  template <typename Func, typename... Args>
-  struct is_callable
-  {
-    template <typename T> struct dummy;
-
-    template <typename CheckType>
-    static void* check(dummy<decltype(std::declval<CheckType>()(std::declval<Args>()...))> *);
-
-    template <typename CheckType>
-    static void check(...);
-
-    enum { value = std::is_pointer<decltype(check<Func>(nullptr))>::value };
-  };
-
-
 /**
  * Represent an array expression.
  * Make sure to register each dependency with add_reference.
@@ -60,6 +42,10 @@ public:
     : Parent(dims)
     , m_e(e)
   {
+    static_assert(is_callable<Expr,const Coordinates<N>&>::value,
+		  "function wrapped in delayed array has invalid arguments");
+    static_assert(std::is_convertible<typename std::result_of<Expr(const Coordinates<N>&)>::type,T>::value,
+		  "function wrapped in delayed array has invalid return type");
   }
 
   /**
@@ -530,22 +516,76 @@ namespace delayed
     return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
   }
   
+  template <unsigned N, typename T>
+  std::enable_if_t<N==0,T>
+  power(T)
+  {
+    return 1;
+  }
+
+  template <unsigned N, typename T>
+  std::enable_if_t<N==1,T>
+  power(T val)
+  {
+    return val;
+  }
+  
+  template <unsigned N, typename T>
+  std::enable_if_t<1<N,T>
+  power(T val)
+  {
+    return val * power<N-1>(val);
+  }
+
   /**
-   * Compute a sample standard deviation with a two-pass formula.
+   * Square root.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  auto sqrt(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()]
+      (auto& path) { return std::sqrt(a(path)); });
+  }
+
+  /**
+   * Compute a sample variance with a two-pass formula.
    *
    * When the function is called, the average along the given dimension
-   * is computed and stored.
+   * is computed and stored in an immediate array.
+   *
+   * When the Bessel correction is enabled, an N-1 divider is used
+   * (default here and in Matlab), otherwise a N divider is used (default
+   * in NumPy).
    */
   template <typename Concrete, typename T, ArrayIndex N,
 	    typename std::enable_if_t<N!=0>* = nullptr>
-  auto deviation(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim)
+  auto variance(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim,
+		bool bessel_correction=true)
   {
     auto avg = immediate(average(a, dim));
     return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
-		[a=a.shallow_copy(),dim,avg=avg.shallow_copy()] (auto& path)
-		{
+      [a=a.shallow_copy(),dim,avg=avg.shallow_copy(),bessel_correction]
+      (auto& path)
+      {
+        // Path in the original array
+	auto orig_path = add_coordinate(path, dim);
+	// Sum the squared deviations to the mean
+	T val = 0;
+	for (ArrayIndex i = 0; i < a.dimensions()[dim]; i++) {
+          orig_path[dim] = i;
+	  val += power<2>(a(orig_path) - avg(path));
+        }
+	return val / (bessel_correction ? a.dim(dim) - 1 : a.dim(dim));
+      });
+  }
 
-		});
+  template <typename Concrete, typename T, ArrayIndex N,
+	    typename std::enable_if_t<N!=0>* = nullptr>
+  auto deviation(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim,
+		 bool bessel_correction=true)
+  {
+    return sqrt(variance(a, dim, bessel_correction));
   }
 
   /**
@@ -610,27 +650,6 @@ namespace delayed
     return make_delayed<T,2>({dim,dim}, [](auto path) {
 	return path[0] == path[1];
       });
-  }
-
-  template <unsigned N, typename T>
-  std::enable_if_t<N==0,T>
-  power(T)
-  {
-    return 1;
-  }
-
-  template <unsigned N, typename T>
-  std::enable_if_t<N==1,T>
-  power(T val)
-  {
-    return val;
-  }
-  
-  template <unsigned N, typename T>
-  std::enable_if_t<1<N,T>
-  power(T val)
-  {
-    return val * power<N-1>(val);
   }
   
   /**

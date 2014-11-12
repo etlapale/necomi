@@ -82,6 +82,26 @@ namespace cuiloa {
 			     all_convertible<To, Froms...>::value>
   {};
 
+  /**
+   * Check if a function can be called with the given arguments.
+   *
+   * The static boolean field value encodes the callability.
+   */
+  template <typename Func, typename... Args>
+  struct is_callable
+  {
+    template <typename T> struct dummy;
+
+    template <typename CheckType>
+    static std::true_type check(dummy<decltype(std::declval<CheckType>()(std::declval<Args>()...))> *);
+
+    template <typename CheckType>
+    static std::false_type check(...);
+
+    enum { value = decltype(check<Func>(nullptr))::value };
+  };
+
+
 } // namespace cuiloa
 
 // Local variables:

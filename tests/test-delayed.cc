@@ -440,4 +440,23 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     //auto func = [](){ return static_cast<int>(time(0)); };
     //int c[func()];
     }*/
+  
+  SECTION( "average" ) {
+    auto a = range<double>(10);
+    REQUIRE( fabs(average(a, 0)() - 4.5) < float_tol );
+  }
+  
+  SECTION( "variance" ) {
+    auto a = range<double>(17);
+
+    REQUIRE( fabs(variance(a, 0, true)() - 25.5) < float_tol );
+    REQUIRE( fabs(variance(a, 0, false)() - 24) < float_tol );
+  }
+  
+  SECTION( "deviation" ) {
+    auto a = range<double>(10);
+
+    REQUIRE( fabs(deviation(a, 0, true)() - 3.0276503540974917 ) < float_tol );
+    REQUIRE( fabs(deviation(a, 0, false)() - 2.8722813232690143) < float_tol );
+  }
 }
