@@ -191,7 +191,7 @@ namespace cuiloa
       return m_data[index(indices...)];
     }
 
-    T operator()(const Coordinates<N>& coords) const {
+    const T& operator()(const Coordinates<N>& coords) const {
       return m_data[index(coords)];
     }
 
@@ -200,7 +200,7 @@ namespace cuiloa
      */
     template <typename ...Indices>
     std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
-                     T>
+                     const T&>
     operator()(Indices... indices) const
     {
       // TODO check indices for out of bounds
@@ -355,11 +355,40 @@ namespace cuiloa
     return a;
   }
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  Array<T,N> immediate(const AbstractArray<Concrete,T,N>& a) {
-    Array<T,N> res(a.dimensions());
-    res = a;
+  /**
+   * Convert an abstract array to an immediate one with element casting.
+   *
+   * A new array with copied or casted elements is always returned.
+   */
+  template <typename To, typename From, ArrayIndex N, typename Concrete,
+            typename std::enable_if_t<std::is_convertible<From,To>::value>* = nullptr>
+  Array<To,N> immediate(const AbstractArray<Concrete,From,N>& a) {
+    Array<To,N> res(a.dimensions());
+    res.map([&a](auto& coords, auto& val) {
+	val = static_cast<To>(a(coords));
+      });
     return res;
+  }
+
+  /**
+   * Convert an abstract array to an immediate one with same element type.
+   *
+   * A new array with copied or casted elements is always returned.
+   */
+  template <typename From, ArrayIndex N, typename Concrete>
+  Array<From,N> immediate(const AbstractArray<Concrete,From,N>& a) {
+    return immediate<From,From,N,Concrete>(a);
+  }
+  
+  template <typename T=double,
+	    typename ...Values,
+            typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
+  Array<T,1> litarray(Values... values)
+  {
+    Array<T,1> a(sizeof...(Values));
+    std::initializer_list<T> vals = {static_cast<T>(values)...};
+    std::copy_n(vals.begin(), sizeof...(Values), a.data());
+    return a;
   }
 }
 
