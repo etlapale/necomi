@@ -31,10 +31,12 @@ TEST_CASE( "basic array operations", "[base]" ) {
     auto c2 = add_coordinate(c, 0);
     Coordinates<4> d2 = {0, 1, 2, 3};
     REQUIRE( c2 == d2 );
+    REQUIRE( c2 != d1 );
 
     auto c3 = add_coordinate(c, 3);
     Coordinates<4> d3 = {1, 2, 3, 0};
     REQUIRE( c3 == d3 );
+    REQUIRE( c3 != d2 );
   }
 
   SECTION( "array sizes" ) {
