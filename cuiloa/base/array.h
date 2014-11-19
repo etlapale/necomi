@@ -78,20 +78,33 @@ namespace cuiloa
      * Construct an array from already existing data.
      * The given data is never destroyed.
      */
-    template <typename ...Dim,
+    template <typename ...Dim, typename Deleter,
 	      typename std::enable_if<sizeof...(Dim) == N && all_indices<Dim...>(),int>::type = 0>
-      Array(T* data, Dim ...dims)
-      : Array(data, std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
+      Array(T* data, Deleter deleter, Dim ...dims)
+      : Array(data, std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}), deleter)
     {}
 
     /**
      * Construct an array from already existing data.
-     * The given data is never destroyed.
      */
-    Array(T* data, const std::array<ArrayIndex,N>& dims)
+    template <typename Deleter>
+    Array(T* data,
+	  const std::array<ArrayIndex,N>& dims,
+	  Deleter deleter)
       : Parent(dims)
       , m_strides(default_strides(dims))
-      , m_shared_data(data, [](T* p){(void) p;})
+      , m_shared_data(data, deleter)
+      , m_data(data)
+    {
+    }
+
+    Array(std::shared_ptr<T> shared_data,
+	  T* data,
+	  std::array<ArrayIndex,N> strides,
+	  const std::array<ArrayIndex,N>& dims)
+      : Parent(dims)
+      , m_strides(std::move(strides))
+      , m_shared_data(std::move(shared_data))
       , m_data(data)
     {
     }
@@ -131,23 +144,30 @@ namespace cuiloa
      * Template argument DepN is a trick to allow std::enable_if_t and
      * disable the function for N=0. You should ignore it.
      */
-    template <ArrayIndex DepN = N>
-    std::enable_if_t<DepN!=0,Array<T,DepN-1>>
-      operator[](ArrayIndex index) const
+    template <ArrayIndex DepN = N,
+	      typename std::enable_if_t<DepN!=0>* = nullptr>
+    Array<T,DepN-1> operator[](ArrayIndex index) const
     {
 #ifndef CUILOA_NO_BOUND_CHECKS
       // Check slicing index
       if (index > this->m_dims[0])
 	throw std::out_of_range("invalid slicing index");
 #endif
-      std::array<ArrayIndex,N-1> dims;
-      std::copy(std::next(this->m_dims.cbegin()),
-		this->m_dims.cend(), dims.begin());
 
-      Array<T,N-1> a(dims);
-      a.m_data = &(m_data[index * m_strides[0]]);
+      // New dimensions
+      std::array<ArrayIndex,N-1> dims;
+      std::copy(std::next(this->m_dims.cbegin()), this->m_dims.cend(),
+		dims.begin());
+      // New strides
+      std::array<ArrayIndex,N-1> strides;
       std::copy(std::next(m_strides.cbegin()), m_strides.cend(),
-		a.m_strides.begin());
+		strides.begin());
+
+      Array<T,N-1> a(m_shared_data, &(m_data[index * m_strides[0]]),
+		     strides, dims);
+      //a.m_data = &(m_data[index * m_strides[0]]);
+      //std::copy(std::next(m_strides.cbegin()), m_strides.cend(),
+      //	a.m_strides.begin());
     
       return a;
     }
@@ -270,9 +290,14 @@ namespace cuiloa
 	  old = val;
 	});
     }
+    
+    void operator=(const Array<T,N>& a)
+    {
+      this->operator=(static_cast<const AbstractArray<Array<T,N>,T,N>&>(a));
+    }
 
     /**
-     * Fill an array with a delayed array.
+     * Fill an array with an abstract array.
      */
     template <typename Concrete>
     void operator=(const AbstractArray<Concrete,T,N>& a)

@@ -133,14 +133,14 @@ TEST_CASE( "basic array operations", "[base]" ) {
       for (unsigned int j = 0; j < width; j++)
         data[j+i*width] = j+i*width;
 
-    Array<double,2> a(data, height, width);
+    Array<double,2> a(data, [](double*){}, height, width);
     REQUIRE( a(3,2) == 2+3*width );
     REQUIRE( a(5,7) == 7+5*width );
 
     delete [] data;
 
     const char* str = "Hello world!";
-    Array<char,1> b(const_cast<char*>(str), 12);
+    Array<char,1> b(const_cast<char*>(str), [](char*){}, 12);
     REQUIRE( b(0) == 'H' );
     REQUIRE( b(6) == 'w' );
   }
@@ -328,5 +328,26 @@ TEST_CASE( "basic array operations", "[base]" ) {
     auto c = litarray(12, 35, 19, 2, 982, 32, 56);
     REQUIRE( c.dim(0) == 7 );
     REQUIRE( c(4) == 982 );
+  }
+  
+  SECTION( "copy to a slice" ) {
+    using namespace cuiloa::delayed;
+
+    auto a = immediate(reshape<2>(range(24), {6,4}));
+    auto a0 = a[0];
+    REQUIRE( a0(0) == 0 );
+    REQUIRE( a0(1) == 1 );
+    REQUIRE( a0(2) == 2 );
+    
+    auto b = immediate(range(8,12));
+    a[0] = b;
+
+    REQUIRE( a0(1) == 9 );
+    REQUIRE( a0(2) == 10 );
+    REQUIRE( a0(3) == 11 );
+
+    REQUIRE( a(0,0) == 8 );
+    REQUIRE( a(0,1) == 9 );
+    REQUIRE( a(0,2) == 10 );
   }
 }
