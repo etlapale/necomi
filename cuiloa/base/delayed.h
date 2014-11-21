@@ -681,6 +681,17 @@ namespace delayed
 				 return -x-360;
 			     });
   }
+  
+  template <typename T, ArrayDimension N, typename C1, typename C2>
+  auto zip(const AbstractArray<C1,T,N>& a, const AbstractArray<C2,T,N>& b)
+  {
+    return make_delayed<T,N+1>(append_coordinate(a.dimensions(), 2),
+	[a=a.shallow_copy(), b=b.shallow_copy()]
+	(auto& coords) {
+          auto c = remove_coordinate(coords, N);
+	  return coords[N] == 0 ? a(c) : b(c);
+	});
+  }
 } // namespace delayed
 } // namespace cuiloa
 

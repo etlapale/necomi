@@ -459,4 +459,19 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( fabs(deviation(a, 0, true)() - 3.0276503540974917 ) < float_tol );
     REQUIRE( fabs(deviation(a, 0, false)() - 2.8722813232690143) < float_tol );
   }
+  
+  SECTION( "zip" ) {
+    auto a = range<int>(7);
+    auto b = 3 * range<int>(7);
+    
+    auto c = zip(a,b);
+    REQUIRE( c.ndim() == 2);
+    REQUIRE( c.dim(0) == 7 );
+    REQUIRE( c.dim(1) == 2 );
+
+    REQUIRE( c(4,0) == 4 );
+    REQUIRE( c(4,1) == 12 );
+    REQUIRE( c(5,0) == 5 );
+    REQUIRE( c(5,1) == 15 );
+  }
 }
