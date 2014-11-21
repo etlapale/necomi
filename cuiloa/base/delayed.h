@@ -705,6 +705,15 @@ namespace delayed
 	  return coords[N] == 0 ? a(c) : b(c);
 	});
   }
+
+  template <typename T, ArrayDimension N, typename Concrete>
+  auto round(const AbstractArray<Concrete,T,N>& a)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy()](auto& coords) {
+			       return std::round(a(coords));
+			     });
+  }
 } // namespace delayed
 } // namespace cuiloa
 

@@ -1,3 +1,5 @@
+#include <limits>
+
 #include "catch.hpp"
 
 #include "time.h"
@@ -473,5 +475,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(4,1) == 12 );
     REQUIRE( c(5,0) == 5 );
     REQUIRE( c(5,1) == 15 );
+  }
+  
+  SECTION( "round" ) {
+    auto a = round(linspace(0, 90, 8));
+    auto b = litarray(0, 13, 26, 39, 51, 64, 77, 90);
+
+    REQUIRE( fabs(a(0) - b(0)) < std::numeric_limits<double>::epsilon() );
+    REQUIRE( fabs(a(3) - b(3)) < std::numeric_limits<double>::epsilon() );
+    REQUIRE( fabs(a(7) - b(7)) < std::numeric_limits<double>::epsilon() );
   }
 }
