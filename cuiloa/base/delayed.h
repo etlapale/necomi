@@ -685,6 +685,11 @@ namespace delayed
   template <typename T, ArrayDimension N, typename C1, typename C2>
   auto zip(const AbstractArray<C1,T,N>& a, const AbstractArray<C2,T,N>& b)
   {
+#ifndef CUILOA_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (a.dimensions() != b.dimensions())
+      throw std::length_error("cannot zip arrays of different dimensions");
+#endif
     return make_delayed<T,N+1>(append_coordinate(a.dimensions(), 2),
 	[a=a.shallow_copy(), b=b.shallow_copy()]
 	(auto& coords) {
