@@ -445,11 +445,19 @@ namespace delayed
 			     { return start+step*coords[0]; });
   }
   
-  template <typename T>
-  auto linspace(T start, T stop, ArrayDimension size=50, bool endpoint=true)
+  /**
+   * Return an array of evenly spaced floating point numbers.
+   * If the type of the boundaries is floating, the resulting array elements
+   * will be of that type. Otherwise, they will be double values.
+   */
+  template <typename T,
+	    typename U=typename std::conditional<std::is_floating_point<T>::value,
+						 T,double>::type,
+	    std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
+  auto linspace(T start, T stop, ArrayDimension size, bool endpoint=true)
   {
-    auto step = (stop - start)/(endpoint ? size - 1 : size);
-    return make_delayed<T,1>({size},
+    auto step = static_cast<U>(stop - start)/(endpoint ? size - 1 : size);
+    return make_delayed<U,1>({size},
 			     [start,step](auto& coords)
 			     { return start+step*coords[0]; });
   }
