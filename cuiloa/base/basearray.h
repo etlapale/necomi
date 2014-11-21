@@ -62,8 +62,23 @@ class BaseArray
     
     return c;
   }
-
-
+  
+  template <ArrayIndex N>
+  Coordinates<N+1> add_coordinate(const Coordinates<N>& coords,
+				  ArrayIndex dim, ArrayDimension value)
+  {
+    auto c = add_coordinate(coords, dim);
+    c[dim] = value;
+    return c;
+  }
+  
+  template <ArrayIndex N>
+  Coordinates<N+1> append_coordinate(const Coordinates<N>& coords,
+				     ArrayDimension value)
+  {
+    return add_coordinate(coords, N, value);
+  }
+  
 template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
 
 

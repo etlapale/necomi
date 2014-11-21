@@ -38,6 +38,14 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( c3 == d3 );
     REQUIRE( c3 != d2 );
   }
+  
+  SECTION( "append coordinate" ) {
+    Coordinates<3> c = {1, 2, 3};
+
+    auto c1 = append_coordinate(c, 7);
+    Coordinates<4> d1 = {1, 2, 3, 7};
+    REQUIRE( c1 == d1 );
+  }
 
   SECTION( "array sizes" ) {
     Array<double,0> a0;
