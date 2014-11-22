@@ -401,7 +401,8 @@ namespace cuiloa
    * A new array with copied or casted elements is always returned.
    */
   template <typename From, ArrayIndex N, typename Concrete>
-  Array<From,N> immediate(const AbstractArray<Concrete,From,N>& a) {
+  Array<From,N> immediate(const AbstractArray<Concrete,From,N>& a)
+  {
     return immediate<From,From,N,Concrete>(a);
   }
   

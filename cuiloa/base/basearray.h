@@ -298,10 +298,19 @@ T sum(const AbstractArray<Concrete,T,N>& a) {
     Coordinates<N> first;
     first.fill(0);
     T res = a(first);
-    a.map([&res,&a](auto& path, auto val) {
-	(void) path;
-	res = val > res ? val : res;
-      });
+    a.map([&res,&a](auto&, auto val) { res = val > res ? val : res; });
+    return res;
+  }
+
+  /**
+   * Minimum value in the array.
+   */
+  template <typename Concrete, typename T, ArrayIndex N>
+  T min(const AbstractArray<Concrete,T,N>& a) {
+    Coordinates<N> first;
+    first.fill(0);
+    T res = a(first);
+    a.map([&res,&a](auto&, auto val) { res = val < res ? val : res; });
     return res;
   }
 

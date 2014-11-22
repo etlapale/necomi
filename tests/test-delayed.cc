@@ -485,4 +485,11 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( fabs(a(3) - b(3)) < std::numeric_limits<double>::epsilon() );
     REQUIRE( fabs(a(7) - b(7)) < std::numeric_limits<double>::epsilon() );
   }
+  
+  SECTION( "min/max" ) {
+    auto a = litarray(90, 99, 88, 25, 4, 67, 17, 7, 18, 32);
+
+    REQUIRE( min(a) == 4 );
+    REQUIRE( max(a) == 99 );
+  }
 }
