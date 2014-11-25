@@ -198,18 +198,28 @@ deriche(Array<T,N>&& a, ArrayIndex dim, T sigma,
 }
  
   
-/**
- * Filter an array using Canny-Deriche along all its dimensions.
- * \ingroup filters
- */
-template <typename T, ArrayIndex N>
-std::enable_if_t<0<N && std::is_floating_point<T>::value,Array<T,N>&>
-deriche(Array<T,N>& a, double sigma, DericheOrder order=DericheOrder::BLUR)
-{
-for (ArrayIndex i = 0; i < N; i++)
-deriche<T,N>(a, i, sigma,order);
-return a;
-}
+  /**
+   * Filter an array using Canny-Deriche along all its dimensions.
+   * \ingroup filters
+   */
+  template <typename T, ArrayIndex N,
+	    std::enable_if_t<0<N && std::is_floating_point<T>::value>* = nullptr>
+  Array<T,N>& deriche(Array<T,N>& a, double sigma, DericheOrder order=DericheOrder::BLUR)
+  {
+    for (ArrayIndex i = 0; i < N; i++)
+      deriche<T,N>(a, i, sigma,order);
+    return a;
+  }
+    
+  template <typename T, ArrayDimension N, typename Concrete,
+	    std::enable_if_t<0<N && std::is_floating_point<T>::value>* = nullptr>
+  Array<T,N> deriche(const AbstractArray<Concrete,T,N>& a, double sigma,
+		     DericheOrder order=DericheOrder::BLUR)
+  {
+    auto x = immediate(a);
+    return deriche(x, sigma, order);
+  }
+
 
 } // namespace cuiloa
 

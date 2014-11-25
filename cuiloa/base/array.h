@@ -330,7 +330,8 @@ namespace cuiloa
     /**
      * Divide each element of the array by a number.
      */
-    template <typename U>
+    template <typename U,
+	      std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
     Array<T,N>&
     operator/=(const U& div)
     {
@@ -416,6 +417,30 @@ namespace cuiloa
     std::copy_n(vals.begin(), sizeof...(Values), a.data());
     return a;
   }
+  
+  template <typename Concrete, typename T, ArrayDimension N, typename U,
+            std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
+  Array<T,N>& operator/=(Array<T,N>& numerator,
+			 const AbstractArray<Concrete,U,N>& denominator)
+  {
+    numerator.map([&denominator](auto& coords, auto& val) {
+	val /= denominator(coords);
+      });
+    return numerator;
+  }
+  
+  namespace broadcasting
+  {
+    template <typename T, ArrayDimension N,
+	      typename Concrete, typename U, ArrayDimension M,
+	      std::enable_if_t<(N>M) && std::is_convertible<U,T>::value>* = nullptr>
+    Array<T,N>& operator/=(Array<T,N>& numerator,
+			   const AbstractArray<Concrete,U,M>& denominator)
+    {
+      return cuiloa::operator/=(numerator,
+				widen(numerator.dimensions(), denominator));
+    }
+  } // namespace broadcasting
 }
 
 // Local Variables:
