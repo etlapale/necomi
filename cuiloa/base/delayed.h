@@ -714,6 +714,30 @@ namespace delayed
 			       return std::round(a(coords));
 			     });
   }
+  
+  template <typename T, ArrayDimension N, typename Concrete>
+  auto shifted(const AbstractArray<Concrete,T,N>& a,
+	       std::array<T,N> offset,
+	       T default_value = 0)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+	[a=a.shallow_copy(),offset=std::move(offset),
+         default_value=std::move(default_value)]
+	(auto& coords) {
+	  Coordinates<N> cx;
+	  for (ArrayIndex i = 0; i < a.ndim(); i++) {
+	    // Check for negative resulting coordinates
+	    if (offset[i] < 0
+		&& static_cast<ArrayDimension>(-offset[i]) > coords[i])
+	      return default_value;
+	    cx[i] = coords[i] + offset[i];
+	    // Check for out of range resulting coordinates
+	    if (cx[i] >= a.dim(i))
+	      return default_value;
+	  }
+	  return a(cx);
+	});
+  }
 } // namespace delayed
 } // namespace cuiloa
 

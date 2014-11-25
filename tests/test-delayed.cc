@@ -492,4 +492,41 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( min(a) == 4 );
     REQUIRE( max(a) == 99 );
   }
+  
+  SECTION( "shifted" ) {
+    auto a = reshape<2>(range(24), {4,6});
+    
+    // Positive 2D shift
+    auto b = shifted(a, {1,2});
+    REQUIRE( b(0,0) == 8 );
+    REQUIRE( b(1,0) == 14 );
+    REQUIRE( b(4,1) == 0 );
+    REQUIRE( b(2,2) == 22 );
+    REQUIRE( b(2,4) == 0 );
+    
+    // Specific out of bounds value
+    auto c = shifted(a, {1,2}, 42);
+    REQUIRE( c(1,0) == 14 );
+    REQUIRE( c(4,1) == 42 );
+    REQUIRE( c(2,4) == 42 );
+    
+    // Pos/neg 2D shift
+    auto d = shifted(a, {-1, 2});
+    REQUIRE( d(0,0) == 0 );
+    REQUIRE( d(1,0) == 2 );
+    REQUIRE( d(3,2) == 16 );
+    REQUIRE( d(2,5) == 0 );
+    
+    auto e = range(6);
+    
+    // 1D positive shifts
+    auto f = shifted(e, {-2});
+    REQUIRE( f(0) == 0 );
+    REQUIRE( f(3) == 1 );
+    
+    auto g = shifted(e, {7}, 84);
+    REQUIRE( g(0) == 84 );
+    REQUIRE( g(2) == 84 );
+    REQUIRE( g(3) == 84 );
+  }
 }
