@@ -191,6 +191,8 @@ template <typename Concrete, typename T, ArrayIndex N>
 class AbstractArray : public BaseArray
 {
 public:
+  typedef T dtype;
+
   AbstractArray(const std::array<ArrayIndex,N>& dimensions)
     : m_dims(dimensions)
   {

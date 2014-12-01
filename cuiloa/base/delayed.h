@@ -47,23 +47,34 @@ public:
     static_assert(std::is_convertible<typename std::result_of<Expr(const Coordinates<N>&)>::type,T>::value,
 		  "function wrapped in delayed array has invalid return type");
   }
+  
+  /**
+   * Indicates whether the wrapped function returns references.
+   */
+  static constexpr bool is_modifiable()
+  {
+    return std::is_convertible<
+      typename std::result_of<Expr(const Coordinates<N>&)>::type,
+                              T&>::value;
+  }
 
   /**
    * Return the value of a single element.
    */
   template <typename ...Indices>
   std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(),
-                   T>
+    typename std::conditional<is_modifiable(), T&, T>::type>
   operator()(Indices... indices) const
   {
-    std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
+    std::array<ArrayIndex,N> idx{static_cast<ArrayIndex>(indices)...};
     return this->operator()(idx);
   }
 
   /**
    * Return the value of a single element.
    */
-  T operator()(const std::array<ArrayIndex,N>& path) const
+  typename std::conditional<is_modifiable(), T&, T>::type
+  operator()(const std::array<ArrayIndex,N>& path) const
   {
     return m_e(path);
   }
@@ -759,8 +770,8 @@ namespace delayed
 			       });
   }
 } // namespace delayed
-} // namespace cuiloa
 
+} // namespace cuiloa
 // Local Variables:
 // mode: c++
 // End:

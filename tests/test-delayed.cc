@@ -552,4 +552,17 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( d(0) == 15 );
     REQUIRE( d(2) == 17 );
   }
+  
+  SECTION( "modifiable delayed arrays" ) {
+    
+    auto a = range<int>(24);
+    REQUIRE( !a.is_modifiable() );
+    
+    auto b = immediate(a);
+    auto c = make_delayed<int>(b.dimensions(),
+			       [&b](auto& coords) -> int& {
+	return b(coords);
+      });
+    REQUIRE( c.is_modifiable() );
+  }
 }
