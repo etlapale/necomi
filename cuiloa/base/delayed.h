@@ -57,14 +57,23 @@ public:
       typename std::result_of<Expr(const Coordinates<N>&)>::type,
                               T&>::value;
   }
+  
+  typedef typename std::conditional<is_modifiable(), T&, T>::type ReturnType;
 
   /**
    * Return the value of a single element.
    */
   template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(),
-    typename std::conditional<is_modifiable(), T&, T>::type>
+  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(), T>
   operator()(Indices... indices) const
+  {
+    std::array<ArrayIndex,N> idx{static_cast<ArrayIndex>(indices)...};
+    return this->operator()(idx);
+  }
+
+  template <typename ...Indices>
+  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(), ReturnType>
+  operator()(Indices... indices)
   {
     std::array<ArrayIndex,N> idx{static_cast<ArrayIndex>(indices)...};
     return this->operator()(idx);
@@ -73,8 +82,12 @@ public:
   /**
    * Return the value of a single element.
    */
-  typename std::conditional<is_modifiable(), T&, T>::type
-  operator()(const std::array<ArrayIndex,N>& path) const
+  T operator()(const std::array<ArrayIndex,N>& path) const
+  {
+    return m_e(path);
+  }
+
+  ReturnType operator()(const std::array<ArrayIndex,N>& path)
   {
     return m_e(path);
   }

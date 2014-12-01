@@ -555,14 +555,23 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   SECTION( "modifiable delayed arrays" ) {
     
+    // some delayed arrays are immutable
     auto a = range<int>(24);
     REQUIRE( !a.is_modifiable() );
     
+    // modifiable delayed arrays are constructible
     auto b = immediate(a);
     auto c = make_delayed<int>(b.dimensions(),
 			       [&b](auto& coords) -> int& {
 	return b(coords);
       });
     REQUIRE( c.is_modifiable() );
+    
+    // change modifiable delayed array
+    REQUIRE( b(3) == 3 );
+    REQUIRE( c(3) == 3 );
+    c(3) = 42;
+    REQUIRE( b(3) == 42 );
+    REQUIRE( c(3) == 42 );
   }
 }
