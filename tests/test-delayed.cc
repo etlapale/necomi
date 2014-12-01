@@ -529,4 +529,27 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( g(2) == 84 );
     REQUIRE( g(3) == 84 );
   }
+  
+  SECTION( "fix dimension") {
+    auto a = reshape<3>(range(24), {4, 2, 3});
+
+    auto b = fix_dimension(a, 1, 1);
+    Coordinates<2> dims_b{4, 3};
+    REQUIRE( b.dimensions() == dims_b );
+    REQUIRE( b(0,0) == 3 );
+    REQUIRE( b(1,2) == 11 );
+    REQUIRE( b(3,1) == 22 );
+    
+    auto c = fix_dimension(a, 2, 2);
+    REQUIRE( c(0,0) == 2 );
+    REQUIRE( c(0,1) == 5 );
+    REQUIRE( c(2,0) == 14 );
+    REQUIRE( c(3,1) == 23 );
+    
+    auto d = fix_dimension(b, 0, 2);
+    REQUIRE( d.ndim() == 1 );
+    REQUIRE( d.dim(0) == 3 );
+    REQUIRE( d(0) == 15 );
+    REQUIRE( d(2) == 17 );
+  }
 }

@@ -606,6 +606,15 @@ namespace delayed
 			     [a=a.shallow_copy()]
       (auto& path) { return std::abs(a(path)); });
   }
+  
+  template <typename Concrete, typename T, ArrayDimension N, typename U,
+	    typename std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
+  auto max(const AbstractArray<Concrete,T,N>& a, U value)
+  {
+    return make_delayed<T,N>(a.dimensions(),
+			     [a=a.shallow_copy(),value=static_cast<T>(value)]
+			     (auto& coords) { return std::max(a(coords), value); });
+  }
 
   enum class Norm {
     Infinity
@@ -737,6 +746,17 @@ namespace delayed
 	  }
 	  return a(cx);
 	});
+  }
+  
+  template <typename T, ArrayDimension N, typename Concrete>
+  auto fix_dimension(const AbstractArray<Concrete,T,N>& a,
+		     ArrayIndex dim, ArrayIndex val)
+  {
+    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
+			       [a=a.shallow_copy(),dim,val]
+			       (auto& coords) {
+				 return a(add_coordinate(coords, dim, val));
+			       });
   }
 } // namespace delayed
 } // namespace cuiloa

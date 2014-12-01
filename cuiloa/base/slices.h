@@ -24,6 +24,15 @@ namespace cuiloa
   class Slice
   {
   public:
+    Slice(std::array<ArrayIndex,N> start,
+	  std::array<ArrayIndex,N> size,
+	  std::array<ArrayIndex,N> strides)
+      : m_start(std::move(start))
+      , m_size(std::move(size))
+      , m_strides(std::move(strides))
+    {
+    }
+
     template <ArrayIndex DepN=N,
 	      typename std::enable_if<DepN==1>::type* = nullptr>
     Slice(ArrayIndex start, ArrayIndex size, ArrayIndex strides=1)
@@ -74,6 +83,7 @@ namespace cuiloa
   {
     return Slice<1>(start, size, stride);
   }
+  
 } // namespace cuiloa
 
 // Local Variables:
