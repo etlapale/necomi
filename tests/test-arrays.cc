@@ -360,4 +360,17 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a(0,1) == 9 );
     REQUIRE( a(0,2) == 10 );
   }
+  
+  SECTION( "immediate behavior" ) {
+    using namespace cuiloa::delayed;
+
+    auto a = immediate(range(24));
+
+    // Ensure that immediate always returns a copy
+    auto b = immediate(a);
+    REQUIRE( a(2) == b(2) );
+    b(2) = 42;
+    REQUIRE( a(2) == 2 );
+    REQUIRE( b(2) == 42 );
+  }
 }

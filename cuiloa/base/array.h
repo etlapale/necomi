@@ -384,7 +384,9 @@ namespace cuiloa
   /**
    * Convert an abstract array to an immediate one with element casting.
    *
-   * A new array with copied or casted elements is always returned.
+   * A new array with copied or casted elements is returned,
+   * even if the original array already was an immediate with same
+   * element type.
    */
   template <typename To, typename From, ArrayIndex N, typename Concrete,
             typename std::enable_if_t<std::is_convertible<From,To>::value>* = nullptr>
