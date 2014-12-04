@@ -100,7 +100,7 @@ namespace cuiloa {
 
     enum { value = decltype(check<Func>(nullptr))::value };
   };
-
+  
 
 } // namespace cuiloa
 

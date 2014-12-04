@@ -551,6 +551,16 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( d.dim(0) == 3 );
     REQUIRE( d(0) == 15 );
     REQUIRE( d(2) == 17 );
+
+    /*
+    auto e = immediate(a);
+    auto f = fix_dimension(e, 1, 1);
+    REQUIRE( f(1,2) == 11 );
+    REQUIRE( e(1,1,2) == 11 );
+    f(1,2) = 37;
+    REQUIRE( f(1,2) == 37 );
+    REQUIRE( e(1,1,2) == 37 );
+    */
   }
   
   SECTION( "modifiable delayed arrays" ) {

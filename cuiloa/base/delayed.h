@@ -40,7 +40,7 @@ public:
 
   DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
     : Parent(dims)
-    , m_e(e)
+    , m_e(std::move(e))
   {
     static_assert(is_callable<Expr,const Coordinates<N>&>::value,
 		  "function wrapped in delayed array has invalid arguments");
@@ -101,7 +101,7 @@ protected:
   make_delayed(const Dimensions<N>& dimensions, Expr fun)
   {
     // TODO: pass dimensions by value since we copy them in the constructor
-    return DelayedArray<T,N,Expr>(dimensions, fun);
+    return DelayedArray<T,N,Expr>(dimensions, std::move(fun));
   }
 
   /*
@@ -116,7 +116,7 @@ protected:
             typename std::enable_if_t<is_callable<Expr,const Coordinates<1>&>::value>* = nullptr>
   auto make_delayed(ArrayDimension size, Expr fun)
   {
-    return DelayedArray<T,1,Expr>({size}, fun);
+    return DelayedArray<T,1,Expr>({size}, std::move(fun));
   }
 
   /// Converts any array into a delayed one.
@@ -124,7 +124,7 @@ protected:
   auto delay(const AbstractArray<Concrete,T,N>& a)
   {
     auto fun = [b=a.shallow_copy()](auto& path) {return b(path);};
-    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), fun);
+    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), std::move(fun));
   }
 
 
@@ -771,6 +771,9 @@ namespace delayed
 	  return a(cx);
 	});
   }
+} // namespace delayed
+
+  //////////////////////////////////////////////////////////////////////////
   
   template <typename T, ArrayDimension N, typename Concrete>
   auto fix_dimension(const AbstractArray<Concrete,T,N>& a,
@@ -782,7 +785,23 @@ namespace delayed
 				 return a(add_coordinate(coords, dim, val));
 			       });
   }
-} // namespace delayed
+  
+  /*template <typename T, ArrayDimension N, typename Concrete,
+	    typename std::enable_if_t<AbstractArray<Concrete,T,N>::is_modifiable()>* = nullptr>
+  auto fix_dimension(AbstractArray<Concrete,T,N>& a,
+		     ArrayIndex dim, ArrayIndex val)
+  {
+    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
+			       [a=a.shallow_copy(),dim,val]
+			       (auto& coords) -> T& {
+				 //return a(add_coordinate(coords, dim, val));
+				 auto c = add_coordinate(coords, dim, val);
+				 T& t = a(c);
+				 return t;
+			       });
+			       }*/
+
+
 
 } // namespace cuiloa
 // Local Variables:

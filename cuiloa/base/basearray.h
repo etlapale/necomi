@@ -193,6 +193,13 @@ class AbstractArray : public BaseArray
 public:
   typedef T dtype;
 
+  static constexpr bool is_modifiable()
+  {
+    return std::is_convertible<
+      typename std::result_of<Concrete(const Coordinates<N>&)>::type,
+                              T&>::value;
+  }
+
   AbstractArray(const std::array<ArrayIndex,N>& dimensions)
     : m_dims(dimensions)
   {
