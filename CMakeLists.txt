@@ -42,12 +42,12 @@ add_dependencies (check cuiloa-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-catch-test)
 
 # Documentation
-#find_package (Doxygen)
-#if (DOXYGEN_FOUND)
-#  add_custom_target (doc)
-#  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
-#  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
-#endif ()
+find_package (Doxygen)
+if (DOXYGEN_FOUND)
+  add_custom_target (doc)
+  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
+  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
+endif ()
 
 # pkg-config support
 configure_file (cuiloa.pc.in cuiloa.pc @ONLY)
