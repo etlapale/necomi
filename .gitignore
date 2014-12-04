@@ -19,3 +19,4 @@ cuiloa-catch-test
 a.out
 bla.*
 *.dat
+tests/catch.hpp
