@@ -49,6 +49,8 @@ class BaseArray
 
   /**
    * Add a dimension or coordinate.
+   * \note The added coordinate as an unspecified initial value. To
+   *       set one, use the three arguments version.
    */
   template <ArrayIndex N>
   Coordinates<N+1> add_coordinate(const Coordinates<N>& coords,
