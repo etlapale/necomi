@@ -102,6 +102,17 @@ namespace cuiloa {
   };
   
 
+  template <typename, class R = void>
+  struct enable_if_type { typedef R type; };
+  
+#define CUILOA_MAKE_HAS_FIELD(field)					\
+  template <typename T, typename = void>				\
+  struct has_dtype : std::false_type {};				\
+									\
+  template <typename T>							\
+  struct has_dtype<T, typename enable_if_type<typename T::field>::type>	\
+    : std::true_type {};
+  
 } // namespace cuiloa
 
 // Local variables:
