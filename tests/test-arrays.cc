@@ -25,15 +25,18 @@ TEST_CASE( "basic array operations", "[base]" ) {
     Coordinates<3> c = {1, 2, 3};
 
     auto c1 = add_coordinate(c, 2);
+    c1[2] = 0;
     Coordinates<4> d1 = {1, 2, 0, 3};
     REQUIRE( c1 == d1 );
 
     auto c2 = add_coordinate(c, 0);
+    c2[0] = 0;
     Coordinates<4> d2 = {0, 1, 2, 3};
     REQUIRE( c2 == d2 );
     REQUIRE( c2 != d1 );
 
     auto c3 = add_coordinate(c, 3);
+    c3[3] = 0;
     Coordinates<4> d3 = {1, 2, 3, 0};
     REQUIRE( c3 == d3 );
     REQUIRE( c3 != d2 );
