@@ -19,7 +19,8 @@
 #include "traits.h"
 
 /**
- * \defgroup Concepts Abstract library interfaces.
+ * \defgroup Concepts Abstract library interfaces
+ * Define checkers for the concepts used throughout the library.
  * @{
  */
 
@@ -27,7 +28,13 @@ namespace cuiloa
 {
   // Define had_dtype and has_ndim
   CUILOA_MAKE_HAS_TYPE_FIELD(dtype)
-  CUILOA_MAKE_HAS_TYPE_FIELD(ndim)
+  
+  template <typename T, typename = void>
+  struct has_ndim : std::false_type {};
+  
+  template <typename T>
+  struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim>>::type>
+    : std::true_type {};
   
   /**
    * Check if a given type is a cuiloa array.
@@ -47,7 +54,7 @@ namespace cuiloa
   template <typename T>
   struct is_array
     : std::integral_constant<bool,
-			     has_dtype<T>::value && has_ndim<T>::value>
+          has_dtype<T>::value && has_ndim<T>::value>
   {
   };
   

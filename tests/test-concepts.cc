@@ -1,23 +1,51 @@
+#include <iostream>
 #include "catch.hpp"
 
 #include <cuiloa/base/concepts.h>
 using namespace cuiloa;
 
 
-TEST_CASE( "concepts", "[base]" ) {
-  SECTION( "is_array" ) {
-    // Arrays have some requirements
-    class NotArray1
-    {};
-    REQUIRE( ! is_array<NotArray1>::value );
+// Arrays have some requirements
+class NotArray1
+{};
 
-    // Minimal array definition
-    struct Array1
-    {
-      using dtype = double;
-      typedef int ndim;
-    };
+// Missing ndim
+struct NotArray2
+{
+  using dtype = double;
+};
+
+// Minimal array definition
+struct Array1
+{
+  using dtype = double;
+  static constexpr ArrayDimension ndim = 0;
+};
+
+// Array definition
+struct Array2
+{
+  using dtype = char;
+  static constexpr ArrayDimension ndim = 0;
+  double value;
+};
+
+// Missing element type
+struct NotArray3
+{
+  static constexpr ArrayDimension ndim = 0;
+};
+
+
+TEST_CASE( "concepts", "[base]" ) {
+
+  SECTION( "is_array" ) {
+    std::array<double,NotArray3::ndim> a;
+    REQUIRE( ! is_array<NotArray1>::value );
+    REQUIRE( ! is_array<NotArray2>::value );
+
     REQUIRE( is_array<Array1>::value );
+    REQUIRE( is_array<Array2>::value );
   }
 }
 

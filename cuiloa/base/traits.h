@@ -100,10 +100,12 @@ namespace cuiloa {
 
     enum { value = decltype(check<Func>(nullptr))::value };
   };
-  
 
   template <typename, class R = void>
   struct enable_if_type { typedef R type; };
+  
+  template <ArrayDimension N>
+  struct enable_if_dimension {};
   
   /**
    * Check that a type has a scoped type with a given name.
