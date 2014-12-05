@@ -19,9 +19,11 @@
 #include <random>
 
 #include "array.h"
+#include "concepts.h"
 
 namespace cuiloa
 {
+
   template <typename T, ArrayIndex N> class Array;
 
 
@@ -29,10 +31,14 @@ namespace cuiloa
  * Represent an array expression.
  * Make sure to register each dependency with add_reference.
  */
-template <typename T, ArrayIndex N, typename Expr>
+template <typename T, ArrayDimension N, typename Expr>
 class DelayedArray : public AbstractArray<DelayedArray<T,N,Expr>,T,N>
 {
 public:
+  using dtype = T;
+  //static constexpr ArrayDimension ndim = N;
+  enum { ndim = N };
+
   template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
 
   /// Short name for the parent class
@@ -127,6 +133,61 @@ protected:
     return DelayedArray<T,N,decltype(fun)>(a.dimensions(), std::move(fun));
   }
 
+  /**
+   * \defgroup Delayed Delayed arrays.
+   * Define delayed arrays from functions and their utilities.
+   * @{
+   */
+  
+  /**
+   * Create a delayed array from an indexable one.
+   * The created array will have the same element type and array dimensions
+   * as the one in first argument, and will have its element values
+   * defined by the second argument.
+   */
+  template <typename Array, typename Expr,
+	    typename std::enable_if_t<is_array<Array>::value>* = nullptr>
+  auto make_delayed(const Array& a, Expr&& e)
+  {
+    return DelayedArray<typename Array::dtype, Array::ndim, Expr>
+      (a.dimensions(), std::forward<Expr>(e));
+  }
+
+  namespace delayed
+  {
+    /**
+     * Create a delayed array from the absolute values of another.
+     * \param a	An \ref IndexableArray "indexable array".
+     */
+    template <typename IndexableArray>
+    auto abs(const IndexableArray& a)
+    {
+      return make_delayed(a, [a](auto& path){ return std::abs(a(path)); });
+    }
+
+    /**
+     * Norms available to function \ref norm.
+     */
+    enum class Norm {
+      /** Maximum of the absolute values. */
+      Infinity
+    };
+
+    /**
+     * Average an array across a given dimension.
+     * \param a	An \ref IndexableArray "indexable array".
+     */
+    template <typename IndexableArray>
+    auto norm(const IndexableArray& a, Norm norm)
+    {
+      switch (norm) {
+      case Norm::Infinity:
+	return max(abs(a));
+      }
+    }
+  }
+
+  /**@}*/
 
 /**
  * Namespace to work with DelayedArrays.
@@ -620,17 +681,6 @@ namespace delayed
     return sqrt(variance(a, dim, bessel_correction));
   }
 
-  /**
-   * Element-wise absolute value.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto abs(const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy()]
-      (auto& path) { return std::abs(a(path)); });
-  }
-  
   template <typename Concrete, typename T, ArrayDimension N, typename U,
 	    typename std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
   auto max(const AbstractArray<Concrete,T,N>& a, U value)
@@ -638,22 +688,6 @@ namespace delayed
     return make_delayed<T,N>(a.dimensions(),
 			     [a=a.shallow_copy(),value=static_cast<T>(value)]
 			     (auto& coords) { return std::max(a(coords), value); });
-  }
-
-  enum class Norm {
-    Infinity
-  };
-
-  /**
-   * Average an array across a given dimension.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto norm(const AbstractArray<Concrete,T,N>&a, Norm norm)
-  {
-    switch (norm) {
-    case Norm::Infinity:
-      return max(abs(a));
-    }
   }
 
   /**
@@ -758,7 +792,7 @@ namespace delayed
          default_value=std::move(default_value)]
 	(auto& coords) {
 	  Coordinates<N> cx;
-	  for (ArrayIndex i = 0; i < a.ndim(); i++) {
+	  for (ArrayIndex i = 0; i < a.ndim; i++) {
 	    // Check for negative resulting coordinates
 	    if (offset[i] < 0
 		&& static_cast<ArrayDimension>(-offset[i]) > coords[i])
@@ -772,7 +806,7 @@ namespace delayed
 	});
   }
 } // namespace delayed
-
+  
   //////////////////////////////////////////////////////////////////////////
   
   template <typename T, ArrayDimension N, typename Concrete>

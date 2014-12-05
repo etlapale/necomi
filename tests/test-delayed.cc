@@ -17,6 +17,27 @@ static double my_constant_function(const std::array<ArrayIndex,2>& path)
 }
 
 TEST_CASE( "delayed arrays", "[core]" ) {
+
+  SECTION( "concepts" ) {
+    auto a = linspace(0, 42, 10);
+    REQUIRE( is_array<decltype(a)>::value );
+    REQUIRE( is_indexable<decltype(a)>::value );
+  }
+  
+  SECTION( "from indexable array") {
+    // Minimal array definition
+    struct IdxArray
+    {
+      using dtype = double;
+      enum { ndim = 1 };
+      Dimensions<ndim> dimensions() const { return Dimensions<ndim>(); }
+      dtype operator()(const Coordinates<ndim>&) const { return 42; };
+    } a;
+    auto b = abs(a);
+    Coordinates<1> x{37};
+    REQUIRE( b(x) == 42 );
+  }
+  
   SECTION( "product" ) {
 
     Array<int,1> a3(4);
@@ -427,7 +448,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   SECTION( "delayed constant arrays" ) {
     auto a = constants({5}, 13);
-    REQUIRE( a.ndim() == 1 );
+    REQUIRE( decltype(a)::ndim == 1 );
     REQUIRE( a.dim(0) == 5 );
     REQUIRE( a(0) == 13 );
     REQUIRE( a(2) == 13 );
@@ -467,7 +488,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto b = 3 * range<int>(7);
     
     auto c = zip(a,b);
-    REQUIRE( c.ndim() == 2);
+    REQUIRE( c.ndim == 2);
     REQUIRE( c.dim(0) == 7 );
     REQUIRE( c.dim(1) == 2 );
 
@@ -547,7 +568,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(3,1) == 23 );
     
     auto d = fix_dimension(b, 0, 2);
-    REQUIRE( d.ndim() == 1 );
+    REQUIRE( d.ndim == 1 );
     REQUIRE( d.dim(0) == 3 );
     REQUIRE( d(0) == 15 );
     REQUIRE( d(2) == 17 );

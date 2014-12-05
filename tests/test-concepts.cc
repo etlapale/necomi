@@ -32,19 +32,14 @@ struct NotArray4
 struct Array1
 {
   using dtype = double;
-  static constexpr ArrayDimension ndim = 1;
-  Dimensions<ndim> dimensions;
+  enum { ndim = 1 };
+  Dimensions<ndim> dimensions() const { return Dimensions<ndim>(); };
 };
 
 // Minimal indexable array definition
-struct IndexableArray1
+struct IndexableArray1 : Array1
 {
-  using dtype = double;
-  static constexpr ArrayDimension ndim = 1;
-  Dimensions<ndim> dimensions;
-
-  dtype operator()(const Coordinates<ndim>&)
-  { return 42; };
+  dtype operator()(const Coordinates<ndim>&) const { return 42; };
 };
 
 TEST_CASE( "concepts", "[base]" ) {
