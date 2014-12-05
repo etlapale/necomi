@@ -34,8 +34,8 @@ foreach (dep IN LISTS ext_deps)
 endforeach ()
 
 # Unit tests
-file (GLOB CATCH_SRC tests/*.cc)
-add_executable (cuiloa-catch-test EXCLUDE_FROM_ALL ${CATCH_SRC})
+file (GLOB CATCH_SRC tests/test-*.cc)
+add_executable (cuiloa-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
 target_link_libraries (cuiloa-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES})
 add_custom_target (check)
 add_dependencies (check cuiloa-catch-test)
