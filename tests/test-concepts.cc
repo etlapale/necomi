@@ -15,6 +15,7 @@ TEST_CASE( "concepts", "[base]" ) {
     struct Array1
     {
       typedef double dtype;
+      typedef int ndim;
     };
     REQUIRE( is_array<Array1>::value );
   }

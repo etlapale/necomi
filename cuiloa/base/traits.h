@@ -105,12 +105,26 @@ namespace cuiloa {
   template <typename, class R = void>
   struct enable_if_type { typedef R type; };
   
-#define CUILOA_MAKE_HAS_FIELD(field)					\
+  /**
+   * Check that a type has a scoped type with a given name.
+   *
+   * You could write:
+   * \code{.cpp}
+   * CUILOA_MAKE_HAS_TYPE_FIELD(iterator)
+   * \endcode
+   *
+   * And then test for the existence of the scoped type:
+   * \code{.cpp}
+   * constexpr bool b = has_iterator<std::vector>::value;
+   * \endcode
+   */
+#define CUILOA_MAKE_HAS_TYPE_FIELD(field)				\
   template <typename T, typename = void>				\
-  struct has_dtype : std::false_type {};				\
+  struct has_##field : std::false_type {};				\
 									\
   template <typename T>							\
-  struct has_dtype<T, typename enable_if_type<typename T::field>::type>	\
+  struct has_##field<T,							\
+		     typename enable_if_type<typename T::field>::type>	\
     : std::true_type {};
   
 } // namespace cuiloa
