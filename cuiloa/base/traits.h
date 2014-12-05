@@ -100,8 +100,35 @@ namespace cuiloa {
 
     enum { value = decltype(check<Func>(nullptr))::value };
   };
-  
 
+  template <typename, class R = void>
+  struct enable_if_type { typedef R type; };
+  
+  template <ArrayDimension N>
+  struct enable_if_dimension {};
+  
+  /**
+   * Check that a type has a scoped type with a given name.
+   *
+   * You could write:
+   * \code{.cpp}
+   * CUILOA_MAKE_HAS_TYPE_FIELD(iterator)
+   * \endcode
+   *
+   * And then test for the existence of the scoped type:
+   * \code{.cpp}
+   * constexpr bool b = has_iterator<std::vector>::value;
+   * \endcode
+   */
+#define CUILOA_MAKE_HAS_TYPE_FIELD(field)				\
+  template <typename T, typename = void>				\
+  struct has_##field : std::false_type {};				\
+									\
+  template <typename T>							\
+  struct has_##field<T,							\
+		     typename enable_if_type<typename T::field>::type>	\
+    : std::true_type {};
+  
 } // namespace cuiloa
 
 // Local variables:

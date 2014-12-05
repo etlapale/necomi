@@ -42,6 +42,9 @@ namespace cuiloa
     /// Short name for the parent class
     typedef AbstractArray<Array<T,N>,T,N> Parent;
 
+    using dtype = T;
+    enum { ndim = N };
+
   public:
     /**
      * Create a new multi-dimensional array with uninitialized elements.
