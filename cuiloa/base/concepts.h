@@ -56,7 +56,7 @@ namespace cuiloa
    * \code{.cpp}
    * struct MyArray {
    *   using dtype = double;
-   *   static constexpr ArrayDimension ndim = 1;
+   *   enum { ndim = 1 };
    *   Dimensions<ndim> dimensions;
    * };
    * \endcode
@@ -70,17 +70,34 @@ namespace cuiloa
 			     has_dtype<T>::value
 			     && has_ndim<T>::value
 			     && has_dimensions<T>::value>
+                             // TODO: check dimensions type
   {
   };
   
   /**
+   * \struct cuiloa::is_indexable<T>
+   * \anchor IndexableArray
+   *
    * Check if individual array elements are accessible.
    *
    * An indexable array provides a Coordinates-based access to its
    * elements. It must also be an array satisfying the conditions of
-   * \ref is_array. Elements are accessed through an \c operator()
-   * taking a constant \c Coordinates<ndim> parameter and returning a
-   * value of the array element type (castable to \c dtype).
+   * \ref is_array. Elements are accessed through an <tt>operator()
+   * const</tt> taking a constant \c Coordinates<ndim> parameter and
+   * returning a value of the array element type (castable to \c
+   * dtype).
+   *
+   * A minimal array class \c MyArray might be extended to an indexable
+   * one by adding the adequate operator:
+   * \code{.cpp}
+   * struct MyIndexableArray : MyArray {
+   *   dtype operator()(const Coordinates<ndim>&) const
+   *   { return 42; };
+   * };
+   * \endcode
+   * \ingroup Concepts
+   *
+   * \see is_array
    */
   template <typename T, typename = void>
   struct is_indexable : std::false_type {};
@@ -88,7 +105,9 @@ namespace cuiloa
   template <typename T>
   struct is_indexable<T, std::enable_if_t<is_array<T>::value,void>>
     : std::integral_constant<bool,
-			     is_callable<T,const Coordinates<T::ndim>&>::value> {};
+			     is_callable<const T,const Coordinates<T::ndim>&>::value
+			     // TODO: add a test for (x_1,x_2,…,x_ndim)
+			     > {};
 
 } // namespace cuiloa
 
