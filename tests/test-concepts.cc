@@ -14,7 +14,7 @@ TEST_CASE( "concepts", "[base]" ) {
     // Minimal array definition
     struct Array1
     {
-      typedef double dtype;
+      using dtype = double;
       typedef int ndim;
     };
     REQUIRE( is_array<Array1>::value );
