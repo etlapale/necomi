@@ -219,14 +219,6 @@ public:
   }
 
   /**
-   * Return the number of dimensions in the array.
-   */
-  constexpr ArrayDimension ndim() const
-  {
-    return N;
-  }
-
-  /**
    * Return a given dimension.
    */
   ArrayDimension dim(ArrayIndex i) const
