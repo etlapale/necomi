@@ -47,6 +47,11 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( c1 == d1 );
   }
 
+  SECTION( "concepts" ) {
+    Array<double,0> a0;
+    REQUIRE( is_array<decltype(a0)>::value );
+  }
+
   SECTION( "array sizes" ) {
     Array<double,0> a0;
     REQUIRE( a0.size() == 1 );

@@ -42,6 +42,8 @@ namespace cuiloa
   template <typename T> struct has_dimensions<T, decltype(&T::dimensions, void())> : std::true_type {};
   
   /**
+   * \anchor Array
+   *
    * Check if a given type is a cuiloa array.
    * A cuiloa array must define the following types:
    * - \c dtype	Type of the elements.
@@ -71,9 +73,19 @@ namespace cuiloa
 			     && has_ndim<T>::value
 			     && has_dimensions<T>::value>
                              // TODO: check dimensions type
-  {
-  };
+  {};
   
+  /**
+   * Test whether two \ref Array arrays have matching dtype and ndim.
+   */
+  template <typename Array1, typename Array2>
+  struct is_same_ndim_dtype
+    : std::integral_constant<bool,
+			     std::is_same<typename Array1::dtype,
+					  typename Array2::dtype>::value
+			     && Array1::ndim == Array2::ndim>
+  {};
+
   /**
    * \struct cuiloa::is_indexable<T>
    * \anchor IndexableArray

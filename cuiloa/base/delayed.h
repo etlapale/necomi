@@ -36,7 +36,6 @@ class DelayedArray : public AbstractArray<DelayedArray<T,N,Expr>,T,N>
 {
 public:
   using dtype = T;
-  //static constexpr ArrayDimension ndim = N;
   enum { ndim = N };
 
   template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
