@@ -46,6 +46,13 @@ namespace cuiloa
 			     });
   }
 
+  template <typename T,
+	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+  constexpr T radians(T angle)
+  {
+    return angle *  M_PI / 180.;
+  }
+
   /**
    * Convert each element interpreted as a angle in degrees into radians.
    */
@@ -55,11 +62,12 @@ namespace cuiloa
   {
     return make_delayed<T,N>(a.dimensions(),
 			     [a=a.shallow_copy()] (auto& coords) {
-			       return a(coords) * M_PI / 180.;
+			       return radians(a(coords));
 			     });
   }
   
-  template <typename T>
+  template <typename T,
+	    std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
   constexpr T degrees(T angle)
   {
     return angle * 180. / M_PI;
