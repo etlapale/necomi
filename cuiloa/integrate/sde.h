@@ -44,7 +44,7 @@ namespace cuiloa {
       using namespace delayed;
       using namespace delayed::broadcasting;
 
-      auto Winc = sqrt(dt)*normal(m_num_noises, m_prng);
+      auto Winc = std::sqrt(dt)*normal(m_num_noises, m_prng);
       m_X += dt*m_drift(m_X) + sum(m_diffusion(m_X)*Winc, 1);
 
       m_t += dt;
