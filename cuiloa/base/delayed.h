@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 University of California, Irvine
+ * Copyright © 2014–2015 University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,10 +158,13 @@ protected:
      * Create a delayed array from the absolute values of another.
      * \param a	An \ref IndexableArray "indexable array".
      */
-    template <typename IndexableArray>
+    template <typename IndexableArray,
+	      typename std::enable_if_t<is_indexable<IndexableArray>::value>* = nullptr>
     auto abs(const IndexableArray& a)
     {
-      return make_delayed(a, [a](auto& path){ return std::abs(a(path)); });
+      return make_delayed(a.dimensions(),
+			  [a](const Coordinates<IndexableArray::ndim>& path)
+			  { return std::abs(a(path)); });
     }
 
     /**
