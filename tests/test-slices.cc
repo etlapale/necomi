@@ -137,4 +137,28 @@ TEST_CASE( "slices", "[base]" ) {
     }
     REQUIRE( exception_thrown );
   }
+  
+  SECTION(" slice for dimension" ) {
+    using namespace cuiloa::delayed;
+    
+    auto a = immediate(reshape<3>(range(24), {2,4,3}));
+    REQUIRE( a(0,2,1) == 7 );
+    REQUIRE( a(1,2,2) == 20 );
+    
+    auto b = a.slice_for_dim(1, 2);
+
+    // Make sure we have the right dimensions
+    REQUIRE( b.ndim == 3 );
+    REQUIRE( b.dim(0) == 2 );
+    REQUIRE( b.dim(1) == 1 );
+    REQUIRE( b.dim(2) == 3 );
+    
+    // Make sure elements are ok
+    REQUIRE( b(0,0,0) == 6 );
+    REQUIRE( b(0,0,1) == 7 );
+    REQUIRE( b(0,0,2) == 8 );
+    REQUIRE( b(1,0,0) == 18 );
+    REQUIRE( b(1,0,1) == 19 );
+    REQUIRE( b(1,0,2) == 20 );
+  }
 }

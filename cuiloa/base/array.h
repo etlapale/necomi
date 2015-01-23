@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014	University of California, Irvine
+ * Copyright © 2014–2015	University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ namespace cuiloa
     /**
      * Return a restricted view on the array.
      */
-    Array<T,N> slice(const Slice<N>& s)  const
+    Array<T,N> slice(const Slice<N>& s) const
     {
       Array<T,N> a(*this);
 #ifndef CUILOA_NO_BOUND_CHECKS
@@ -256,6 +256,27 @@ namespace cuiloa
 		     m_strides.cbegin(), a.m_strides.begin(), 
 		     [](auto a, auto b) { return a * b; });
       return a;
+    }
+    
+    /**
+     * Fix a dimension in the array.
+     * Returns a new array sharing the same elements but with one
+     * dimension fixed, with its size set to 1. When
+     * \c a is an array of size [D0,…,DN], then
+     * \c slice_for_dim(a,i,x) will be of size [D0,…,D(i-1),1,…DN].
+     */
+    Array<T,N> slice_for_dim(ArrayIndex dim, ArrayIndex val) const
+    {
+      std::array<ArrayIndex,N> start, size, strides;
+
+      start.fill(0);
+      std::copy(this->m_dims.cbegin(), this->m_dims.cend(), size.begin());
+      strides.fill(1);
+      
+      start[dim] = val;
+      size[dim] = 1;
+      
+      return this->slice(Slice<N>(start, size, strides));
     }
 
     Array<T,N> operator()(const Slice<N>& s) const
