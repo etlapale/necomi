@@ -53,7 +53,8 @@ public:
     using namespace delayed::broadcasting;
 
     auto Winc = std::sqrt(dt)*normal(m_num_noises, m_prng);
-    m_X += dt*m_drift(m_X) + sum(m_diffusion(m_X)*Winc, N-1);
+    const Array<T,N>& X = m_X;
+    m_X += dt*m_drift(X) + sum(m_diffusion(X)*Winc, N-1);
 
     m_t += dt;
   }
