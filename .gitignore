@@ -20,3 +20,4 @@ a.out
 bla.*
 *.dat
 tests/catch.hpp
+.emacs.desktop*
