@@ -28,6 +28,11 @@ template <typename T, ArrayDimension N,
 	  typename Drift, typename Diffusion, typename PRNG>
 class EulerMaruyama
 {
+  // Make sure Drift and Diffusion objects have the correct return type.
+  static_assert(std::is_convertible<decltype((std::declval<Drift>())(std::declval<cuiloa::Array<T,N>>())),cuiloa::Array<T,N>>::value,
+		"invalid Drift type for the EM SDE solver");
+  static_assert(std::is_convertible<decltype((std::declval<Diffusion>())(std::declval<cuiloa::Array<T,N>>())),cuiloa::Array<T,N+1>>::value,
+		"invalid Diffusion type for the EM SDE solver");
 public:
   /**
    * Both drift and diffusion must be function objects taking the
