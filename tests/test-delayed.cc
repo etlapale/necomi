@@ -226,12 +226,12 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(88) == 42 );
   }
 
-  /*SECTION( "constant creation" ) {
-    auto a = zeros(5, 4);
-    REQUIRE( a.ndim() == 2 );
+  SECTION( "constant creation" ) {
+    auto a = zeros(5,4);
+    REQUIRE( a.ndim == 2 );
     REQUIRE( a.dim(0) == 5 );
-    REQUIRE( a.dim(1) == 5 );
-    }*/
+    REQUIRE( a.dim(1) == 4 );
+  }
 
   SECTION( "range creation" ) {
     auto a = range(8);

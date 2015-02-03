@@ -461,12 +461,20 @@ namespace delayed
     return make_delayed<T>(dims, [value](auto&){ return value; });
   }
   
-  template <typename T=double, ArrayIndex N=1>
-  auto zeros(const Dimensions<N>& dims)
-  {
-    return constants<T,N>(dims,0);
-  }
-  
+template <ArrayIndex N=1, typename T=double>
+auto zeros(const Dimensions<N>& dims)
+{
+  return constants<T,N>(dims,0);
+}
+
+template <typename ...Dims,
+	  typename T=double,
+	  typename std::enable_if<all_indices<Dims...>::value>* = nullptr>
+auto zeros(Dims... dims)
+{
+  return constants<T,sizeof...(Dims)>({static_cast<std::size_t>(dims)...}, 0);
+}
+
 
   /**
    * Create an array with the same dimensions filled with a constant
