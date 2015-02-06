@@ -668,13 +668,13 @@ auto average(const AbstractArray<Concrete,T,N>& a)
    * is computed and stored in an immediate array.
    *
    * When the Bessel correction is enabled, an N-1 divider is used
-   * (default here and in Matlab), otherwise a N divider is used (default
+   * (default in Matlab), otherwise a N divider is used (default
    * in NumPy).
    */
   template <typename Concrete, typename T, ArrayIndex N,
 	    typename std::enable_if_t<N!=0>* = nullptr>
   auto variance(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim,
-		bool bessel_correction=true)
+		bool bessel_correction)
   {
     auto avg = immediate(average(a, dim));
     return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
@@ -696,7 +696,7 @@ auto average(const AbstractArray<Concrete,T,N>& a)
   template <typename Concrete, typename T, ArrayIndex N,
 	    typename std::enable_if_t<N!=0>* = nullptr>
   auto deviation(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim,
-		 bool bessel_correction=true)
+		 bool bessel_correction)
   {
     return sqrt(variance(a, dim, bessel_correction));
   }
