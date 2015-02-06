@@ -479,6 +479,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     REQUIRE( fabs(variance(a, 0, true)() - 25.5) < float_tol );
     REQUIRE( fabs(variance(a, 0, false)() - 24) < float_tol );
+
+    REQUIRE( fabs(variance(a, true) - 25.5) < float_tol );
+    REQUIRE( fabs(variance(a, false) - 24) < float_tol );
   }
   
   SECTION( "deviation" ) {
@@ -486,6 +489,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     REQUIRE( fabs(deviation(a, 0, true)() - 3.0276503540974917 ) < float_tol );
     REQUIRE( fabs(deviation(a, 0, false)() - 2.8722813232690143) < float_tol );
+    
+    REQUIRE( fabs(deviation(a, true) - 3.0276503540974917 ) < float_tol );
+    REQUIRE( fabs(deviation(a, false) - 2.8722813232690143) < float_tol );
   }
   
   SECTION( "zip" ) {

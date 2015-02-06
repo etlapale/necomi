@@ -693,6 +693,21 @@ auto average(const AbstractArray<Concrete,T,N>& a)
       });
   }
 
+template <typename Concrete, typename T, ArrayIndex N,
+	  typename std::enable_if_t<N!=0>* = nullptr>
+auto variance(const AbstractArray<Concrete,T,N>& a,
+	      bool bessel_correction)
+{
+  static_assert(std::is_floating_point<T>::value,
+		"statistics on arrays require floating elements");
+  auto avg = average(a);
+  T res = 0;
+  a.map([avg,&res](auto&, auto val) {
+      res += power<2>(val - avg);
+    });
+  return res / (bessel_correction ? a.size() - 1 : a.size());
+}
+
   template <typename Concrete, typename T, ArrayIndex N,
 	    typename std::enable_if_t<N!=0>* = nullptr>
   auto deviation(const AbstractArray<Concrete,T,N>& a, ArrayIndex dim,
@@ -700,6 +715,15 @@ auto average(const AbstractArray<Concrete,T,N>& a)
   {
     return sqrt(variance(a, dim, bessel_correction));
   }
+
+template <typename Concrete, typename T, ArrayIndex N,
+	  typename std::enable_if_t<N!=0>* = nullptr>
+auto deviation(const AbstractArray<Concrete,T,N>& a,
+	       bool bessel_correction)
+{
+  return std::sqrt(variance(a, bessel_correction));
+}
+
 
   template <typename Concrete, typename T, ArrayDimension N, typename U,
 	    typename std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
