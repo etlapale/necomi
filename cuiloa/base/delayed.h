@@ -618,6 +618,16 @@ auto zeros(Dims... dims)
   {
     return sum(a,dim) / static_cast<T>(a.dimensions()[dim]);
   }
+
+/**
+ * Average across all dimensions.
+ */
+template <typename Concrete, typename T, ArrayIndex N,
+	  typename std::enable_if_t<N!=0>* = nullptr>
+auto average(const AbstractArray<Concrete,T,N>& a)
+{
+  return sum(a) / static_cast<T>(a.size());
+}
   
   template <unsigned N, typename T>
   std::enable_if_t<N==0,T>

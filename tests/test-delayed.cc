@@ -467,6 +467,11 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "average" ) {
     auto a = range<double>(10);
     REQUIRE( fabs(average(a, 0)() - 4.5) < float_tol );
+
+    REQUIRE( fabs(average(a) - 4.5) < float_tol );
+
+    auto b = reshape<2>(range<double>(24), {4,6});
+    REQUIRE( fabs(average(b) - 11.5) < float_tol );
   }
   
   SECTION( "variance" ) {
