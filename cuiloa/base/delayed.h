@@ -456,7 +456,7 @@ namespace delayed
    * Create an array filled with a constant value.
    */
   template <typename T=double, ArrayIndex N=1>
-  auto constants(const Dimensions<N>& dims, const T&& value)
+  auto constants(const Dimensions<N>& dims, T value)
   {
     return make_delayed<T>(dims, [value](auto&){ return value; });
   }
