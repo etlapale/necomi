@@ -270,12 +270,20 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "reshaping" ) {
     auto a = range(20);
-    std::array<ArrayIndex,2> dims{{4,5}};
+    std::array<ArrayIndex,2> dims{4,5};
     auto b = reshape(a, dims);
     REQUIRE( b.dimensions() == dims );
     REQUIRE( b(0,0) == 0);
     REQUIRE( b(1,1) == 6 );
     REQUIRE( b(3,2) == 17 );
+    
+    bool exception_thrown = false;
+    try {
+      auto c = reshape(a, 4, 3);
+    } catch (std::length_error& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
   }
 
   SECTION( "sums" ) {
@@ -338,13 +346,13 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(1) == 0 );
     REQUIRE( a(9) == 8 );
 
-    auto b = roll(reshape<2>(range(10), {2,5}), 1, 0);
+    auto b = roll(reshape(range(10), 2, 5), 1, 0);
     REQUIRE( b(0,0) == 5 );
     REQUIRE( b(0,1) == 6 );
     REQUIRE( b(1,0) == 0 );
     REQUIRE( b(1,1) == 1 );
 
-    auto c = roll(reshape<2>(range(10), {2,5}), 1, 1);
+    auto c = roll(reshape(range(10), 2, 5), 1, 1);
     REQUIRE( c(0,0) == 4 );
     REQUIRE( c(0,1) == 0 );
     REQUIRE( c(1,0) == 9 );
@@ -470,7 +478,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     REQUIRE( fabs(average(a) - 4.5) < float_tol );
 
-    auto b = reshape<2>(range<double>(24), {4,6});
+    auto b = reshape(range<double>(24),  4, 6);
     REQUIRE( fabs(average(b) - 11.5) < float_tol );
   }
   
@@ -526,7 +534,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
   
   SECTION( "shifted" ) {
-    auto a = reshape<2>(range(24), {4,6});
+    auto a = reshape(range(24), 4, 6);
     
     // Positive 2D shift
     auto b = shifted(a, {1,2});
@@ -563,7 +571,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
   
   SECTION( "fix dimension") {
-    auto a = reshape<3>(range(24), {4, 2, 3});
+    auto a = reshape(range(24), 4, 2, 3);
 
     auto b = fix_dimension(a, 1, 1);
     Coordinates<2> dims_b{4, 3};
@@ -645,8 +653,8 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( f(1,4) == 4 );
     REQUIRE( f(2,4) == 7 );
 
-    auto g = reshape<2>(range<int>(12), {4,3});
-    auto h = reshape<2>(range<int>(4,16), {4,3});
+    auto g = reshape(range<int>(12), 4, 3);
+    auto h = reshape(range<int>(4,16), 4, 3);
     auto i = stack(g,h);
     REQUIRE( i.ndim == 3 );
     REQUIRE( i.dim(0) == 2 );

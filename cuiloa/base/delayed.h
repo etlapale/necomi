@@ -556,28 +556,37 @@ auto zeros(Dims... dims)
 			     { return start+step*coords[0]; });
   }
 
-  template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N>
-  auto reshape(const AbstractArray<Concrete,T,N>& a,
-	       const std::array<ArrayIndex,M>& dims)
-  {
+
+template <std::size_t M, typename Array>
+auto reshape(const Array& a, const Dimensions<M>& d)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
     // Make sure the input and output array sizes are the same
-    auto out_size = std::accumulate(dims.cbegin(), dims.cend(),
-				    static_cast<ArrayIndex>(1),
+    auto out_size = std::accumulate(d.cbegin(), d.cend(),
+				    static_cast<ArrayDimension>(1),
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
     if (out_size != a.size())
-      throw std::length_error("invalid size for reshaped array");
+      throw std::length_error("invalid dimensions for reshaped array");
 #endif
     auto old_strides = default_strides(a.dimensions());
-    auto new_strides = default_strides(dims);
-    return make_delayed<T,M>(dims,
+    auto new_strides = default_strides(d);
+    return make_delayed<typename Array::dtype,M>(d,
 			     [a=a.shallow_copy(),old_strides,new_strides]
 			     (auto& path)
 	       { auto idx = std::inner_product(path.cbegin(), path.cend(),
 					       new_strides.cbegin(), 0);
 		 auto old_path = index_to_path(idx, old_strides);
 		 return a(old_path); });
-  }
+}
+
+template <typename Array, typename ...Dimensions,
+	  typename std::enable_if_t<all_indices<Dimensions...>::value>* = nullptr>
+auto reshape(const Array& a, Dimensions... dims)
+{
+  cuiloa::Dimensions<sizeof...(Dimensions)> d =
+    {static_cast<std::size_t>(dims)...};
+  return reshape(a, d);
+}
 
   template <typename Concrete, typename T, ArrayIndex N>
   auto exp(const AbstractArray<Concrete,T,N>& a)

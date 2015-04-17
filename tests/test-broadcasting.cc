@@ -7,7 +7,7 @@ using namespace cuiloa::delayed;
 
 TEST_CASE( "broadcasting", "[core]" ) {
   SECTION( "widen" ) {
-    auto a = reshape<2>(range(20), {4,5});
+    auto a = reshape(range(20), 4, 5);
     Dimensions<3> dims{3,4,5};
     auto b = widen(dims, a);
 
@@ -37,7 +37,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
     using namespace cuiloa::delayed::broadcasting;
 
     auto a = range(4);
-    auto b = reshape<2>(range(8), {2,4});
+    auto b = reshape(range(8), 2, 4);
 
     auto c = a * b;
     REQUIRE( c.dimensions() == b.dimensions() );

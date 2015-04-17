@@ -293,7 +293,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( b(4) == 15 );
     REQUIRE( b(5) == 21 );
 
-    auto c = reshape<2>(range(56), {{7,8}});
+    auto c = reshape(range(56), 7, 8);
     auto c0a = cumsum(c);
     REQUIRE( c0a(0,0) == 0 );
     REQUIRE( c0a(3,5) == 68 );
@@ -324,8 +324,8 @@ TEST_CASE( "basic array operations", "[base]" ) {
   SECTION( "increment operator" ) {
     using namespace cuiloa::delayed;
     
-    Array<int,2> a = reshape<2>(range(20), {4, 5});
-    Array<int,2> b = 3 * reshape<2>(range(20), {4, 5});
+    Array<int,2> a = reshape(range(20), 4, 5);
+    Array<int,2> b = 3 * reshape(range(20), 4, 5);
     
     a += b;
     REQUIRE( a(0,0) == 0 );
@@ -351,7 +351,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   SECTION( "copy to a slice" ) {
     using namespace cuiloa::delayed;
 
-    auto a = immediate(reshape<2>(range(24), {6,4}));
+    auto a = immediate(reshape(range(24), 6,4));
     auto a0 = a[0];
     REQUIRE( a0(0) == 0 );
     REQUIRE( a0(1) == 1 );
