@@ -1,5 +1,4 @@
-/*
- * Copyright © 2014–2015 University of California, Irvine
+/* Copyright © 2014–2015 University of California, Irvine
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -849,6 +848,55 @@ auto deviation(const AbstractArray<Concrete,T,N>& a,
 	  return a(cx);
 	});
   }
+
+/**
+ * Utility class to get an element amongst heterogeneous arrays.  Used
+ * to get the element at coordinates c of the i-th array, you can use
+ * \c choose_array<0,Array,Arrays...>::at(i, c, a, as), where the
+ * arrays are denoted by a, as..., with respective types Array,
+ * Arrays.... The 0 is the mandatory index to start the search.  A
+ * simpler interface is provided by stack() which creates a delayed
+ * array from a list of arrays.
+ */
+template <std::size_t, typename...>
+struct choose_array;
+
+template <std::size_t I, typename Array, typename... Arrays>
+struct choose_array<I, Array, Arrays...>
+{
+  static double at(std::size_t n, const Coordinates<Array::ndim>& coords,
+		   const Array& a, const Arrays&... as)
+  {
+    if (n == I)
+      return a(coords);
+    else
+      return choose_array<I+1, Arrays...>::at(n, coords, as...);
+  }
+};
+
+template <std::size_t I>
+struct choose_array<I>
+{
+  template <ArrayDimension N>
+  static double at(std::size_t, const Coordinates<N>&)
+  { throw std::range_error("invalid array chosen"); }
+};
+
+
+/**
+ * Stack several indexable arrays into a single delayed one.  The
+ * first dimension of the returned array will select one of the
+ * orginal arrays, and the rest of the coordinates will index into them.
+ */
+template <typename Array, typename ...Arrays>
+auto stack(Array a, Arrays... as)
+{
+  return make_delayed<double,Array::ndim+1>(prepend_coordinate(a.dimensions(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
+      auto c = remove_coordinate(coords, 0);
+      return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
+    });							   
+}
+
 } // namespace delayed
   
   //////////////////////////////////////////////////////////////////////////

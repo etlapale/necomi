@@ -616,4 +616,25 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( b(3) == 42 );
     REQUIRE( c(3) == 42 );
   }
+
+  SECTION( "stacking" ) {
+
+    auto a = range<int>(24);
+    auto b = range<int>(24);
+
+    auto d = stack(a,b);
+    REQUIRE( d.ndim == 2 );
+    REQUIRE( d.dim(0) == 2 );
+    REQUIRE( d(0,3) == 3 );
+    REQUIRE( d(1,3) == 3 );
+    REQUIRE( d(0,12) == d(1,12) );
+
+    auto e = stack(a,b,a);
+    REQUIRE( e.ndim == 2 );
+    REQUIRE( e.dim(0) == 3 );
+    REQUIRE( e(0,3) == 3 );
+    REQUIRE( e(1,3) == 3 );
+    REQUIRE( e(2,3) == 3 );
+    REQUIRE( e(0,12) == e(1,12) );
+  }
 }

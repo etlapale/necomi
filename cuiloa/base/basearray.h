@@ -81,6 +81,13 @@ class BaseArray
     return add_coordinate(coords, N, value);
   }
   
+  template <ArrayIndex N>
+  Coordinates<N+1> prepend_coordinate(const Coordinates<N>& coords,
+				      ArrayDimension value)
+  {
+    return add_coordinate(coords, 0, value);
+  }
+  
 template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
 
 
