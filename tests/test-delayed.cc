@@ -621,6 +621,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     auto a = range<int>(24);
     auto b = range<int>(24);
+    auto c = range<int>(3, 27);
 
     auto d = stack(a,b);
     REQUIRE( d.ndim == 2 );
@@ -636,5 +637,21 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( e(1,3) == 3 );
     REQUIRE( e(2,3) == 3 );
     REQUIRE( e(0,12) == e(1,12) );
+
+    auto f = stack(a,b,c);
+    REQUIRE( f.ndim == 2 );
+    REQUIRE( f.dim(0) == 3 );
+    REQUIRE( f(0,4) == 4 );
+    REQUIRE( f(1,4) == 4 );
+    REQUIRE( f(2,4) == 7 );
+
+    auto g = reshape<2>(range<int>(12), {4,3});
+    auto h = reshape<2>(range<int>(4,16), {4,3});
+    auto i = stack(g,h);
+    REQUIRE( i.ndim == 3 );
+    REQUIRE( i.dim(0) == 2 );
+    REQUIRE( i(0,2,1) == 7 );
+    REQUIRE( i(1,2,1) == 11 );
+    REQUIRE( i(1,3,0) == 13 );
   }
 }
