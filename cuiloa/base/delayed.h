@@ -906,6 +906,22 @@ auto stack(Array a, Arrays... as)
     });							   
 }
 
+template <typename Array>
+auto slice(Array a, std::size_t i)
+{
+  static_assert(Array::ndim >= 1,
+		"only arrays with more than one dimension are sliceable");
+#ifndef CUILOA_NO_BOUND_CHECKS
+  // Make sure the dimensions of a and b are the same
+  if (i >= a.dim(0))
+    throw std::range_error("slice index is too large");
+#endif
+  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dimensions(), 0), [a,i] (const auto& coords) {
+      auto c = prepend_coordinate(coords, i);
+      return a(c);
+    });
+}
+
 } // namespace delayed
   
   //////////////////////////////////////////////////////////////////////////
@@ -938,7 +954,9 @@ auto stack(Array a, Arrays... as)
 
 
 
-} // namespace cuiloa
+}
+
+// namespace cuiloa
 // Local Variables:
 // mode: c++
 // End:

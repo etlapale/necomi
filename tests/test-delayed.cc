@@ -662,4 +662,32 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( i(1,2,1) == 11 );
     REQUIRE( i(1,3,0) == 13 );
   }
+
+  SECTION( "slicing" ) {
+
+    auto a = reshape(range<int>(24), 2, 4, 3);
+    
+    auto a0 = slice(a, 0);
+    REQUIRE( a0.ndim == 2 );
+    REQUIRE( a0.dim(0) == 4 );
+    REQUIRE( a0.dim(1) == 3 );
+    REQUIRE( a0(2,1) == 7 );
+    REQUIRE( a0(1,2) == 5 );
+    
+    auto a1 = slice(a, 1);
+    REQUIRE( a1.ndim == 2 );
+    REQUIRE( a1.dim(0) == 4 );
+    REQUIRE( a1.dim(1) == 3 );
+    REQUIRE( a1(2,1) == 19 );
+    REQUIRE( a1(3,0) == 21 );
+
+    auto c = a0 + a1;
+    REQUIRE( c(3,2) == 34 );
+    REQUIRE( c(1,0) == 18 );
+
+    auto d = stack(a0,a1);
+    REQUIRE( a.dimensions() == d.dimensions() );
+    REQUIRE( a(0,0,0) == d(0,0,0) );
+    REQUIRE( a(1,2,1) == d(1,2,1) );
+  }
 }
