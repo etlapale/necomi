@@ -128,7 +128,13 @@ namespace cuiloa {
   struct has_##field<T,							\
 		     typename enable_if_type<typename T::field>::type>	\
     : std::true_type {};
-  
+
+
+/**
+ * Undefined template to elicit an error message to debug types.
+ */
+template <typename T> class DebugType;
+
 } // namespace cuiloa
 
 // Local variables:
