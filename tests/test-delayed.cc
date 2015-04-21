@@ -689,5 +689,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a.dimensions() == d.dimensions() );
     REQUIRE( a(0,0,0) == d(0,0,0) );
     REQUIRE( a(1,2,1) == d(1,2,1) );
+
+    REQUIRE( all(a == d) );
   }
 }

@@ -195,22 +195,26 @@ protected:
  */
 namespace delayed
 {
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2>
-  auto operator==(const AbstractArray<Concrete1,T,N>& a,
-		  const AbstractArray<Concrete2,T,N>& b)
-  {
+
+/**
+ * Compare two arrays element-wise.
+ * This operator is disabled if the shapes do not match, to allow for
+ * shape broadcasting by other operators.
+ */
+template <typename Array1, typename Array2,
+	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+auto operator==(const Array1& a, const Array2& b)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot compare arrays of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot compare arrays of different dimensions");
 #endif
-    return make_delayed<bool,N>(a.dimensions(),
-				[a=a.shallow_copy(),b=b.shallow_copy()]
-				(auto& path) {
-	return a(path) == b(path);
-      });
-  }
+  return make_delayed<bool,Array1::ndim>(a.dimensions(),
+					 [a,b] (const auto& coords) {
+					   return a(coords) == b(coords);
+					 });
+}
 
   template <typename Concrete1, typename T, ArrayIndex N,
 	    typename Concrete2>
