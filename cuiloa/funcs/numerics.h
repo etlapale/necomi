@@ -140,7 +140,7 @@ auto variance(const Array& a, ArrayIndex dim, bool bessel_correction)
 {
   auto avg = immediate(average(a, dim));
   return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dimensions(), dim),
-			     [a,dim,avg=avg.shallow_copy(),bessel_correction]
+			     [a,dim,avg,bessel_correction]
 			     (const auto& x)
 			     {
 			       // Path in the original array
