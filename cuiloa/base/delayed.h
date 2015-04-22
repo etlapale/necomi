@@ -1,17 +1,7 @@
-/* Copyright © 2014–2015 University of California, Irvine
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// cuiloa/base/delayed.h – Delayed arrays
+//
+// Copyright © 2014–2015 University of California, Irvine
+// Licensed under the Simplified BSD License.
 
 #pragma once
 
@@ -22,9 +12,7 @@
 
 namespace cuiloa
 {
-
-  template <typename T, ArrayIndex N> class Array;
-
+template <typename T, ArrayIndex N> class Array;
 
 /**
  * Represent an array expression.
@@ -36,9 +24,9 @@ class DelayedArray : public AbstractArray<DelayedArray<T,N,Expr>,T,N>
 public:
   using dtype = T;
   enum { ndim = N };
-
+  
   template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
-
+  
   /// Short name for the parent class
   typedef AbstractArray<DelayedArray<T,N,Expr>,T,N> Parent;
 
@@ -116,20 +104,21 @@ protected:
     return make_delayed<T,1>({size}, [fun](auto& coords) { return fun(coords[0]); });
   }*/
 
-  template <typename T=double, typename Expr,
+  template <typename T, typename Expr,
             typename std::enable_if_t<is_callable<Expr,const Coordinates<1>&>::value>* = nullptr>
   auto make_delayed(ArrayDimension size, Expr fun)
   {
     return DelayedArray<T,1,Expr>({size}, std::move(fun));
   }
 
-  /// Converts any array into a delayed one.
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto delay(const AbstractArray<Concrete,T,N>& a)
-  {
-    auto fun = [b=a.shallow_copy()](auto& path) {return b(path);};
-    return DelayedArray<T,N,decltype(fun)>(a.dimensions(), std::move(fun));
-  }
+/// Converts any array into a delayed one.
+template <typename Array>
+auto delay(const Array& a)
+{
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+							  [a](const auto& x)
+							  { return a(x); });
+}
 
   /**
    * \defgroup Delayed Delayed arrays.
