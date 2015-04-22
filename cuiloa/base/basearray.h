@@ -1,4 +1,4 @@
-// cuiloa/base/baearray.h – Common array definitions
+// cuiloa/base/basearray.h – Common array definitions
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
