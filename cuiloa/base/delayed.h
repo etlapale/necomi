@@ -360,20 +360,23 @@ auto operator==(const Array1& a, const Array2& b)
 			     (auto& path) { return a(path)/value; });
   }
 
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2>
-  auto operator-(const AbstractArray<Concrete1,T,N>& a,
-		 const AbstractArray<Concrete2,T,N>& b)
-  {
+template <typename Array1, typename Array2,
+	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+auto operator-(const Array1& a, const Array2& b)
+{
+  using C = typename std::common_type<typename Array1::dtype,
+				      typename Array2::dtype>::type;
+  
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot multiply arrays of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(),b=b.shallow_copy()]
-			     (auto& path) { return a(path) - b(path); });
-  }
+  return make_delayed<C, Array1::ndim>(a.dimensions(),
+				       [a,b](const auto& coords) {
+					 return a(coords) - b(coords);
+				       });
+}
 
   template <typename Concrete, typename T, ArrayIndex N, typename U,
 	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
