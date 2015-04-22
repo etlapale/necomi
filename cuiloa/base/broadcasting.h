@@ -31,27 +31,25 @@ auto widen(const Dimensions<M>& dims, const Array& a)
     });
 }
 
-  /**
-   * Append extra dimensions to an array.
-   */
-  template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N,
-	    typename std::enable_if<(M>N)>::type* = nullptr>
-  auto widen_right(const Dimensions<M>& dims,
-		   const AbstractArray<Concrete,T,N>& a)
-	     
-  {
+/**
+ * Append extra dimensions to an array.
+ */
+template <ArrayIndex M, typename Array>
+auto widen_right(const Dimensions<M>& dims, const Array& a)
+{
+  static_assert(M > Array::ndim, "array dimensions cannot be shrinked");
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions are matching
-    for (ArrayIndex i = 0; i < N; i++)
-      if (a.dimensions()[i] != dims[i])
-	throw std::length_error("cannot right-broadcast arrays to different dimensions");
+  // Make sure the dimensions are matching
+  for (ArrayIndex i = 0; i < Array::ndim; i++)
+    if (a.dimensions()[i] != dims[i])
+      throw std::length_error("cannot right-broadcast arrays to different dimensions");
 #endif
-    return make_delayed<T,M>(dims,
-			     [a=a.shallow_copy()](const auto& coords)
-			     { Coordinates<N> coords_a;
-			       std::copy_n(coords.cbegin(), N, coords_a.begin());
-			       return a(coords_a); });
-  }
+  return make_delayed<typename Array::dtype, M>(dims,
+						[a](const auto& coords) {
+      Coordinates<Array::ndim> coords_a;
+      std::copy_n(coords.cbegin(), Array::ndim, coords_a.begin());
+      return a(coords_a); });
+}
 
   namespace delayed {
     namespace broadcasting {
