@@ -70,67 +70,56 @@ auto operator*(const Array1& a, const Array2& b)
   return cuiloa::delayed::operator*(a, widen<Array1::ndim>(a.dimensions(), b));
 }
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(M>N)>::type* = nullptr
-		>
-      auto operator/(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator/(widen<M>(b.dimensions(), a), b);
-      }
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array2::ndim>Array1::ndim)>::type* = nullptr
+  >
+auto operator/(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator/(widen<Array2::ndim>(b.dimensions(), a), b);
+}
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(N>M)>::type* = nullptr
-		>
-      auto operator/(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator/(a, widen<N>(a.dimensions(), b));
-      }
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array1::ndim>Array2::ndim)>::type* = nullptr
+  >
+auto operator/(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator/(a, widen<Array1::ndim>(a.dimensions(), b));
+}
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(M>N)>::type* = nullptr
-		>
-      auto operator+(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator+(widen<M>(b.dimensions(), a), b);
-      }
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array2::ndim>Array1::ndim)>::type* = nullptr
+  >
+auto operator+(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator+(widen<Array2::ndim>(b.dimensions(), a), b);
+}
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(N>M)>::type* = nullptr
-		>
-      auto operator+(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator+(a, widen<N>(a.dimensions(), b));
-      }
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array1::ndim>Array2::ndim)>::type* = nullptr
+  >
+auto operator+(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator+(a, widen<Array1::ndim>(a.dimensions(), b));
+}
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(M>N)>::type* = nullptr
-		>
-      auto operator-(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator-(widen<M>(b.dimensions(), a), b);
-      }
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array2::ndim>Array1::ndim)>::type* = nullptr
+  >
+auto operator-(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator-(widen<Array2::ndim>(b.dimensions(), a), b);
+}
 
-      template <typename Concrete1, typename T, ArrayIndex N,
-		typename Concrete2, ArrayIndex M,
-		typename std::enable_if<(N>M)>::type* = nullptr
-		>
-      auto operator-(const AbstractArray<Concrete1,T,N>& a,
-		     const AbstractArray<Concrete2,T,M>& b)
-      {
-	return cuiloa::delayed::operator-(a, widen<N>(a.dimensions(), b));
-      }
-    } // namespace broadcasting
-  } // namespace delayed
+template <typename Array1, typename Array2,
+	  typename std::enable_if<(Array1::ndim>Array2::ndim)>::type* = nullptr
+  >
+auto operator-(const Array1& a, const Array2& b)
+{
+  return cuiloa::delayed::operator-(a, widen<Array1::ndim>(a.dimensions(), b));
+}
+
+} // namespace broadcasting
+} // namespace delayed
 } // namespace cuiloa
 
 // Local Variables:
