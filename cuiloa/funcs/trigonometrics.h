@@ -1,4 +1,4 @@
-// cuiloa/base/trigonometrics.h – Scalar and delayed trigonometrics
+// cuiloa/funcs/trigonometrics.h – Scalar and delayed trigonometrics
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
