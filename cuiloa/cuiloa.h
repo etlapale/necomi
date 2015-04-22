@@ -13,6 +13,7 @@
 #include "base/broadcasting.h"
 #include "base/delayed.h"
 
+#include "funcs/interpolation.h"
 #include "funcs/numerics.h"
 #include "funcs/random.h"
 #include "funcs/trigonometrics.h"
