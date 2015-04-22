@@ -1,18 +1,7 @@
-/*
- * Copyright © 2014 University of California, Irvine
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// cuiloa/base/broadcasting.h – Shape broadcasting operations.
+//
+// Copyright © 2014–2015 University of California, Irvine
+// Licensed under the Simplified BSD License.
 
 #pragma once
 
@@ -20,28 +9,27 @@
 
 namespace cuiloa {
 
-  /**
-   * Prepend extra dimensions to an array.
-   */
-  template <ArrayIndex M, typename Concrete, typename T, ArrayIndex N,
-	    typename std::enable_if<(M>N)>::type* = nullptr>
-  auto widen(const Dimensions<M>& dims,
-	     const AbstractArray<Concrete,T,N>& a)
-	     
-  {
+/**
+ * Prepend extra dimensions to an array.
+ */
+template <std::size_t M, typename Array>
+auto widen(const Dimensions<M>& dims, const Array& a)
+{
+  static_assert(M > Array::ndim, "array dimensions cannot be shrinked");
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions are matching
-    for (ArrayIndex i = 0; i < N; i++)
-      if (a.dimensions()[i] != dims[i+M-N])
-	throw std::length_error("cannot broadcast arrays to different dimensions");
+  // Make sure the dimensions are matching
+  for (ArrayIndex i = 0; i < Array::ndim; i++)
+    if (a.dimensions()[i] != dims[i+M-Array::ndim])
+      throw std::length_error("cannot broadcast arrays to different dimensions");
 #endif
-    return make_delayed<T,M>(dims,
-			     [a=a.shallow_copy()](auto& path)
-			     { Coordinates<N> old_path;
-			       std::copy(path.cbegin()+(M-N), path.cend(),
-					 old_path.begin());
-			       return a(old_path); });
-  }
+  return make_delayed<typename Array::dtype,M>(dims,
+					       [a](const auto& coords) {
+      Coordinates<Array::ndim> old_coords;
+      std::copy(coords.cbegin()+(M-Array::ndim), coords.cend(),
+		old_coords.begin());
+      return a(old_coords);
+    });
+}
 
   /**
    * Append extra dimensions to an array.
