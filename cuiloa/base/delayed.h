@@ -550,31 +550,31 @@ auto reshape(const Array& a, Dimensions... dims)
   return reshape(a, d);
 }
 
-  /**
-   * Shift elements on a given axis.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto roll(const AbstractArray<Concrete,T,N>&a,
-	    ArrayIndex shift, ArrayIndex dim)
-  {
+/**
+ * Shift elements on a given axis.
+ */
+template <typename Array>
+auto roll(const Array& a, ArrayIndex shift, ArrayIndex dim)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    if (dim >= a.dimensions().size())
-      throw std::out_of_range("invalid rolling dimension");
+  if (dim >= Array::ndim)
+    throw std::out_of_range("invalid rolling dimension");
 #endif
-    auto sz = a.dimensions()[dim];
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(),sz,dim,shift]
-			     (auto path) {
-			       path[dim] = (path[dim] + sz - shift) % sz;
-			       return a(path);
-			     });
-  }
+  auto sz = a.dimensions()[dim];
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+			   [a,sz,dim,shift]
+			   (auto path) {
+			     path[dim] = (path[dim] + sz - shift) % sz;
+			     return a(path);
+			   });
+}
 
-  template <typename Concrete, typename T>
-  auto roll(const AbstractArray<Concrete,T,1>&a, ArrayIndex shift)
-  {
-    return roll<Concrete,T,1>(a, shift, 0);
-  }
+template <typename Array,
+	  std::enable_if_t<Array::ndim==1>* = nullptr>
+auto roll(const Array& a, ArrayIndex shift)
+{
+  return roll<Array>(a, shift, 0);
+}
 
   /**
    * Create an identity matrix.
