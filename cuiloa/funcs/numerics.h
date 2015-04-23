@@ -223,6 +223,16 @@ auto norm_angle_diff(const Array& a)
 			   });
 }
 
+
+template <typename Array>
+auto round(const Array& a)
+{
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+			   [a](const auto& coords) {
+			     return std::round(a(coords));
+			   });
+}
+
 } // namespace delayed
 } // namespace cuiloa
 
