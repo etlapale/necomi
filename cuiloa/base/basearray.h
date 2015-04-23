@@ -76,37 +76,28 @@ class BaseArray
   {
     return add_coordinate(coords, 0, value);
   }
-  
-template <typename Concrete, typename T, ArrayIndex N> class AbstractArray;
-
 
 #ifndef IN_DOXYGEN
 /**
 * Final case of for loops through template metaprogramming.
 */
-template <typename UnaryOperation, ArrayIndex M,
-typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<M==N>
-for_looper(AbstractArray<Concrete,T,N>& a,
-           Coordinates<N>& path,
-           UnaryOperation f)
+template <typename UnaryOperation, ArrayIndex M, typename Array>
+std::enable_if_t<M==Array::ndim>
+for_looper(Array& a, Coordinates<Array::ndim>& path, UnaryOperation f)
 {
-  f(path, static_cast<Concrete&>(a)(path));
+  f(path, a(path));
 }
 
 /**
  * Recursion case of for loops through template metaprogramming.
  */
-template <typename UnaryOperation, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<M<N>
-for_looper(AbstractArray<Concrete,T,N>& a,
-           Coordinates<N>& path,
-           UnaryOperation f)
+template <typename UnaryOperation, ArrayIndex M, typename Array>
+std::enable_if_t<M<Array::ndim>
+for_looper(Array& a, Coordinates<Array::ndim>& path, UnaryOperation f)
 {
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+  for (auto i = 0UL; i < a.dimensions()[M]; i++) {
     path[M] = i;
-    for_looper<UnaryOperation,M+1,Concrete,T,N>(a, path, f);
+    for_looper<UnaryOperation,M+1,Array>(a, path, f);
   }
 }
 
@@ -114,30 +105,28 @@ for_looper(AbstractArray<Concrete,T,N>& a,
  * Final case of for loops through template metaprogramming
  * for constant arrays.
  */
-template <typename ConstMapOperation, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<M==N>
-const_for_looper(const AbstractArray<Concrete,T,N>& a,
-		 Coordinates<N>& path,
+template <typename ConstMapOperation, ArrayIndex M, typename Array>
+std::enable_if_t<M==Array::ndim>
+const_for_looper(const Array& a,
+		 Coordinates<Array::ndim>& path,
 		 ConstMapOperation f)
 {
-  f(path, static_cast<const Concrete&>(a)(path));
+  f(path, a(path));
 }
   
 /**
  * Recursion case of for loops through template metaprogramming.
  * for constant arrays.
  */
-template <typename ConstMapOperation, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<M<N>
-const_for_looper(const AbstractArray<Concrete,T,N>& a,
-		 Coordinates<N>& path,
+template <typename ConstMapOperation, ArrayIndex M, typename Array>
+std::enable_if_t<M<Array::ndim>
+const_for_looper(const Array& a,
+		 Coordinates<Array::ndim>& path,
 		 ConstMapOperation f)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
     path[M] = i;
-    const_for_looper<ConstMapOperation,M+1,Concrete,T,N>(a, path, f);
+    const_for_looper<ConstMapOperation,M+1,Array>(a, path, f);
   }
 }
 
@@ -145,14 +134,13 @@ const_for_looper(const AbstractArray<Concrete,T,N>& a,
  * Final case of breakable for loops through template metaprogramming
  * for constant arrays.
  */
-template <typename Predicate, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<M==N,bool>
-breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
-		     Coordinates<N>& path,
+template <typename Predicate, ArrayIndex M, typename Array>
+std::enable_if_t<M==Array::ndim,bool>
+breakable_for_looper(const Array& a,
+		     Coordinates<Array::ndim>& path,
 		     Predicate p)
 {
-  return p(static_cast<const Concrete&>(a)(path));
+  return p(a(path));
 }
 
 /**
@@ -162,16 +150,15 @@ breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
  * \ingroup core
  * \see Array::map
  */
-template <typename Predicate, ArrayIndex M,
-	  typename Concrete, typename T, ArrayIndex N>
-std::enable_if_t<(M<N),bool>
-breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
-		     Coordinates<N>& path,
+template <typename Predicate, ArrayIndex M, typename Array>
+std::enable_if_t<(M<Array::ndim),bool>
+breakable_for_looper(const Array& a,
+		     Coordinates<Array::ndim>& path,
 		     Predicate p)
 {
   for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
     path[M] = i;
-    bool ret = breakable_for_looper<Predicate,M+1,Concrete,T,N>(a, path, p);
+    bool ret = breakable_for_looper<Predicate,M+1,Array>(a, path, p);
     if (ret) return true;
   }
   return false;
@@ -185,34 +172,19 @@ breakable_for_looper(const AbstractArray<Concrete,T,N>& a,
  * polymorphism to share efficient general array definitions (indexing
  * and data access).
  */
-template <typename Concrete, typename T, ArrayIndex N>
-class AbstractArray : public BaseArray
+template <ArrayIndex N>
+class DimArray : public BaseArray
 {
 public:
-  typedef T dtype;
-  enum { ndim = N };
-
-  static constexpr bool is_modifiable()
-  {
-    return std::is_convertible<
-      typename std::result_of<Concrete(const Coordinates<N>&)>::type,
-                              T&>::value;
-  }
-
-  AbstractArray(const std::array<ArrayIndex,N>& dimensions)
+  DimArray(const Dimensions<N>& dimensions)
     : m_dims(dimensions)
   {
-  }
-
-  Concrete shallow_copy() const
-  {
-    return Concrete(*static_cast<const Concrete*>(this));
   }
 
   /**
    * Dimensions of the array.
    */
-  const std::array<ArrayDimension,N>& dimensions() const
+  const Dimensions<N>& dimensions() const
   {
     return m_dims;
   }
@@ -233,109 +205,73 @@ public:
     return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
   }
-
-  template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
-                   T>
-  operator()(Indices... indices) const
-  {
-    return static_cast<const Concrete*>(this)->operator()(indices...);
-  }
-
-  T operator()(const Coordinates<N>& coords) const
-  {
-    return static_cast<const Concrete*>(this)->operator()(coords);
-  }
-
-  /**
-   * Apply a function to all the elements in the array.
-   * \param f is a callable taking a path and an element, such as
-   *        a std::function<void(Path&,T&)>.
-   */
-  template <typename UnaryOperation>
-  void map(UnaryOperation f)
-  {
-    Coordinates<N> path;
-    for_looper<UnaryOperation,0,Concrete,T,N>(*this, path, f);
-  }
-
-  /**
-   * Apply a function to all the elements in the array.
-   * \param f is a callable taking a path and an element, such as
-   *        a std::function<void(Path&, const& T)>.
-   */
-  template <typename ConstMapOperation>
-  void map(ConstMapOperation f) const
-  {
-    Coordinates<N> path;
-    const_for_looper<ConstMapOperation,0,Concrete,T,N>(*this, path, f);
-  }
-
 protected:
   /// Storage for the array dimensions.
-  std::array<ArrayIndex,N> m_dims;
+  Dimensions<N> m_dims;
 };
 
 /**
  * Sum all the elements of an array.
  * \warning This may overflow.
  */
-template <typename Concrete, typename T, ArrayIndex N>
-T sum(const AbstractArray<Concrete,T,N>& a) {
+template <typename Array, typename T=typename Array::dtype>
+T sum(const Array& a)
+{
   T total = 0;
-  a.map([&](auto& path, auto val) {
-      (void) path;
-      total += val;
-    });
+  a.map([&](auto&, auto val) { total += val; });
   return total;
 }
 
-  /**
-   * Maximum value in the array.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  T max(const AbstractArray<Concrete,T,N>& a) {
-    Coordinates<N> first;
-    first.fill(0);
-    T res = a(first);
-    a.map([&res,&a](auto&, auto val) { res = val > res ? val : res; });
-    return res;
-  }
-
-  /**
-   * Minimum value in the array.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  T min(const AbstractArray<Concrete,T,N>& a) {
-    Coordinates<N> first;
-    first.fill(0);
-    T res = a(first);
-    a.map([&res,&a](auto&, auto val) { res = val < res ? val : res; });
-    return res;
-  }
+/**
+ * Maximum value in the array.
+ */
+template <typename Array, typename T=typename Array::dtype>
+T max(const Array& a)
+{
+  Coordinates<Array::ndim> first;
+  first.fill(0);
+  T res = a(first);
+  a.map([&res,&a](auto&, auto val) { res = val > res ? val : res; });
+  return res;
+}
 
 /**
- * Check if any element of an array of booleans is false.
+ * Minimum value in the array.
+ */
+template <typename Array, typename T=typename Array::dtype>
+T min(const Array& a) {
+  Coordinates<Array::ndim> first;
+  first.fill(0);
+  T res = a(first);
+  a.map([&res,&a](auto&, auto val) { res = val < res ? val : res; });
+  return res;
+}
+
+/**
+ * Check if any element of an array of booleans or convertible to
+ * booleans is false.
  * \see all()
  */
-template <typename Concrete, ArrayIndex N>
-bool any(const AbstractArray<Concrete,bool,N>& a)
+template <typename Array,
+	  typename std::enable_if_t<std::is_convertible<typename Array::dtype, bool>::value>* = nullptr>
+bool any(const Array& a)
 {
-  std::array<ArrayIndex,N> path;
+  std::array<ArrayIndex,Array::ndim> path;
   auto p = [](bool val) { return val; };
-  return breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
+  return breakable_for_looper<decltype(p),0,Array>(a, path, p);
 }
 
 /**
  * Check that all elements of an array of booleans are true.
  * \see any()
  */
-template <typename Concrete, ArrayIndex N>
-bool all(const AbstractArray<Concrete,bool,N>& a)
+template <typename Array,
+	  std::enable_if_t<std::is_convertible<typename Array::dtype, bool>::value>* = nullptr>
+bool all(const Array& a)
 {
-  std::array<ArrayIndex,N> path;
+  std::array<ArrayIndex,Array::ndim> path;
   auto p = [](bool val) { return !val; };
-  return !breakable_for_looper<decltype(p),0,Concrete,bool,N>(a, path, p);
+  return !breakable_for_looper<decltype(p),0,Array>(a, path, p);
 }
 
   /**

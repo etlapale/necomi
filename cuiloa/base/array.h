@@ -23,13 +23,13 @@ namespace cuiloa
    * Multi-dimensional arrays supporting non-contiguous shared data.
    */
   template <typename T, ArrayIndex N>
-  class Array : public AbstractArray<Array<T,N>,T,N>
+  class Array : public DimArray<N>
   {
   public:
     template <typename U, ArrayIndex M> friend class Array;
 
     /// Short name for the parent class
-    typedef AbstractArray<Array<T,N>,T,N> Parent;
+    typedef DimArray<N> Parent;
 
     using dtype = T;
     enum { ndim = N };
@@ -294,6 +294,31 @@ namespace cuiloa
     }
 
     /**
+     * Apply a function to all the elements in the array.
+     * \param f is a callable taking a path and an element, such as
+     *        a std::function<void(Path&,T&)>.
+     */
+    template <typename UnaryOperation>
+    void map(UnaryOperation f)
+    {
+      Coordinates<N> path;
+      for_looper<UnaryOperation,0,Array>(*this, path, f);
+    }
+    
+    /**
+     * Apply a function to all the elements in the array.
+     * \param f is a callable taking a path and an element, such as
+     *        a std::function<void(Path&, const& T)>.
+     */
+    template <typename ConstMapOperation>
+    void map(ConstMapOperation f) const
+    {
+      Coordinates<N> path;
+      const_for_looper<ConstMapOperation,0,Array<T,N>>(*this, path, f);
+    }
+
+
+    /**
      * Fill an entire array with a single value.
      */
     void fill(const T& val)
@@ -372,14 +397,14 @@ template <typename Indexable, typename T=typename Indexable::dtype>
 Array<T,Indexable::ndim> cumsum(const Indexable& a, ArrayIndex dim = 0)
 {
   Array<T,Indexable::ndim> res(a.dimensions());
-  a.map([&res,dim](auto& path, auto val) {
+  res.map([&res,dim,&a](auto& path, auto& valx) {
       if (path[dim] == 0) {
-	res(path) = val;
+	valx = a(path);
       }
       else {
 	auto prev = path;
 	prev[dim]--;
-	res(path) = res(prev) + val;
+	valx = res(prev) + a(path);
       }
     });
   return res;

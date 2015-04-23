@@ -19,7 +19,7 @@ template <typename T, ArrayIndex N> class Array;
  * Make sure to register each dependency with add_reference.
  */
 template <typename T, ArrayDimension N, typename Expr>
-class DelayedArray : public AbstractArray<DelayedArray<T,N,Expr>,T,N>
+class DelayedArray : public DimArray<N>
 {
 public:
   using dtype = T;
@@ -27,11 +27,8 @@ public:
   
   template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
   
-  /// Short name for the parent class
-  typedef AbstractArray<DelayedArray<T,N,Expr>,T,N> Parent;
-
   DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
-    : Parent(dims)
+    : DimArray<N>(dims)
     , m_e(std::move(e))
   {
     static_assert(is_callable<Expr,const Coordinates<N>&>::value,
@@ -82,6 +79,13 @@ public:
   ReturnType operator()(const std::array<ArrayIndex,N>& path)
   {
     return m_e(path);
+  }
+
+  template <typename ConstMapOperation>
+  void map(ConstMapOperation f) const
+  {
+    Coordinates<N> path;
+    const_for_looper<ConstMapOperation,0,Array<T,N>>(*this, path, f);
   }
 
 protected:
@@ -314,7 +318,6 @@ auto operator+(const Array1& a, const Array2& b)
 
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const T& val)
-  //auto operator>(const AbstractArray<Concrete,T,N>& a, const T& val)
   {
     auto fun = [a,val](auto& path) {
         return a(path) > val;
