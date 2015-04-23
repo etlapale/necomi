@@ -1,4 +1,4 @@
-// cuiloa/codecs/inr.h – CImg INR files support
+// necomi/codecs/inr.h – CImg INR files support
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -26,21 +26,21 @@
  * This file defines codecs for INR images.
  * INR images always contains four dimensions, though some can be
  * equals to 1. The codecs define a function to get an array from
- * an INR input file, cuiloa::inr_load(const char*) and a function to save
+ * an INR input file, necomi::inr_load(const char*) and a function to save
  * an entire array to an INR file,
- * cuiloa::inr_save(const cuiloa::Array<T>&, const char*)
+ * necomi::inr_save(const necomi::Array<T>&, const char*)
  * The array to be saved should not contains more than four dimensions.
  * In addition an INR image can be saved frame by frame using an 
- * instance of cuiloa::INRWriter thus saving memory having only one frame
+ * instance of necomi::INRWriter thus saving memory having only one frame
  * at a time loaded.
  */
 
-namespace cuiloa
+namespace necomi
 {
   /**
    * Load an INR image into a multi-dimensional array.
    * The INR image is loaded from the given file.
-   * The resulting cuiloa::Array will always have four dimensions
+   * The resulting necomi::Array will always have four dimensions
    * although some of them can be set to 1.
    * The template parameter determines the type of the resulting
    * array so array type should already be known.

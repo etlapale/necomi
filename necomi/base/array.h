@@ -1,4 +1,4 @@
-// cuiloa/base/array.h – Immediate arrays
+// necomi/base/array.h – Immediate arrays
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -17,7 +17,7 @@
 #include "slices.h"
 
 
-namespace cuiloa
+namespace necomi
 {
   /**
    * Multi-dimensional arrays supporting non-contiguous shared data.
@@ -140,7 +140,7 @@ namespace cuiloa
 	      typename std::enable_if_t<DepN!=0>* = nullptr>
     Array<T,DepN-1> operator[](ArrayIndex index) const
     {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
       // Check slicing index
       if (index > this->m_dims[0])
 	throw std::out_of_range("invalid slicing index");
@@ -225,7 +225,7 @@ namespace cuiloa
     Array<T,N> slice(const Slice<N>& s) const
     {
       Array<T,N> a(*this);
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
       for (ArrayIndex i = 0; i < N; i++) {
 	// Check that starting point is valid
 	if (s.start()[i] >= this->m_dims[i])
@@ -338,7 +338,7 @@ namespace cuiloa
 			       && is_promotable<typename Array::dtype,T>::value>* = nullptr>
     void operator=(const Array& a)
     {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
       // Make sure the dimensions of a and b are the same
       if (this->dimensions() != a.dimensions())
 	throw std::length_error("cannot copy from array with different dimensions");
@@ -414,7 +414,7 @@ template <typename Indexable, typename T=typename Indexable::dtype>
 Array<T,Indexable::ndim>& operator+=(Array<T,Indexable::ndim>& a,
 				     const Indexable& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot increment with array of different dimensions");
@@ -482,12 +482,12 @@ template <typename T, ArrayDimension N,
 	  std::enable_if_t<(N>Indexable::ndim) && is_promotable<U,T>::value>* = nullptr>
 Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
 {
-  return cuiloa::operator/=(numerator,
+  return necomi::operator/=(numerator,
 			    widen(numerator.dimensions(), denominator));
 }
 
 } // namespace broadcasting
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

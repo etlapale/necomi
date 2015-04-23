@@ -1,4 +1,4 @@
-// cuiloa/funcs/random.h – Pseudo random number generation
+// necomi/funcs/random.h – Pseudo random number generation
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -9,7 +9,7 @@
 
 #include "../base/array.h"
 
-namespace cuiloa
+namespace necomi
 {
 
 /**
@@ -123,7 +123,7 @@ uniform(const T& min, const T& max,
   return uniform<T,1>(min, max, {size}, prng);
 }
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

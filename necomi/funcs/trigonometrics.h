@@ -1,4 +1,4 @@
-// cuiloa/funcs/trigonometrics.h – Scalar and delayed trigonometrics
+// necomi/funcs/trigonometrics.h – Scalar and delayed trigonometrics
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include "../base/delayed.h"
 
-namespace cuiloa
+namespace necomi
 {
 
 /**
@@ -76,7 +76,7 @@ auto degrees(const Array& a)
     });
 }
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

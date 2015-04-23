@@ -1,4 +1,4 @@
-// cuiloa/base/basearray.h – Common array definitions
+// necomi/base/basearray.h – Common array definitions
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -10,7 +10,7 @@
 
 #include "traits.h"
 
-namespace cuiloa
+namespace necomi
 {
 /**
 * The parent class of all array types.
@@ -307,7 +307,7 @@ bool all(const Array& a)
     return res;
   }
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

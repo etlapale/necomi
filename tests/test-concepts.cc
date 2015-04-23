@@ -1,8 +1,8 @@
 #include <iostream>
 #include "catch.hpp"
 
-#include <cuiloa/base/concepts.h>
-using namespace cuiloa;
+#include <necomi/base/concepts.h>
+using namespace necomi;
 
 
 // Arrays have some requirements

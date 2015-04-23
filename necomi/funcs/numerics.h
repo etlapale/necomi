@@ -1,4 +1,4 @@
-// cuiloa/funcs/numerics.h – Basic numerical functions
+// necomi/funcs/numerics.h – Basic numerical functions
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include "../base/delayed.h"
 
-namespace cuiloa {
+namespace necomi {
 namespace delayed {
 
 /**
@@ -234,7 +234,7 @@ auto round(const Array& a)
 }
 
 } // namespace delayed
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

@@ -1,4 +1,4 @@
-// cuiloa/funcs/interpolation.h – Discretizations and interpolations
+// necomi/funcs/interpolation.h – Discretizations and interpolations
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -9,7 +9,7 @@
 
 #include "../base/array.h"
 
-namespace cuiloa
+namespace necomi
 {
   /**
    * Discretization as nearest 1D element interpolation.
@@ -18,14 +18,14 @@ namespace cuiloa
   class Discretization
   {
   public:
-    Discretization(T min, T max, cuiloa::ArrayDimension size, Func func)
+    Discretization(T min, T max, necomi::ArrayDimension size, Func func)
       : m_min(min)
       , m_max(max)
-      , m_data(func(cuiloa::delayed::linspace<T>(min, max, size, true)))
+      , m_data(func(necomi::delayed::linspace<T>(min, max, size, true)))
     {}
     T operator()(T val) const
     {
-      auto idx = static_cast<cuiloa::ArrayIndex>(0.5 + (val - m_min)/(m_max - m_min) * (m_data.size() - 1));
+      auto idx = static_cast<necomi::ArrayIndex>(0.5 + (val - m_min)/(m_max - m_min) * (m_data.size() - 1));
       //auto rect = std::max(static_cast<ArrayIndex>(0),
       //std::min(idx, m_data.size()));
       return m_data(idx);
@@ -33,17 +33,17 @@ namespace cuiloa
   protected:
     T m_min;
     T m_max;
-    cuiloa::Array<T,1> m_data;
+    necomi::Array<T,1> m_data;
   };
   
   template <typename T, typename Func>
-  auto discretization(T min, T max, cuiloa::ArrayDimension size, Func func)
+  auto discretization(T min, T max, necomi::ArrayDimension size, Func func)
   {
     return Discretization<T,Func>(min, max, size, func);
   }
   
   template <typename T>
-  auto discretization(T min, T max, cuiloa::ArrayDimension size)
+  auto discretization(T min, T max, necomi::ArrayDimension size)
   {
     return discretization(min, max, size, [](auto&& a){ return a; });
   }
@@ -66,7 +66,7 @@ namespace cuiloa
   {
     static_assert(Array::ndim == 1,
 		  "nearest-neighbor interpolation only available for one-dimensional arrays");
-    auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
+    auto x0 = static_cast<necomi::ArrayIndex>(0.5 + x);
     return a(x0);
   }
   
@@ -83,7 +83,7 @@ namespace cuiloa
     static_assert(Array::ndim == 1,
 		  "nearest-neighbor interpolation only available for one-dimensional arrays");
     return [a](U x) {
-      auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
+      auto x0 = static_cast<necomi::ArrayIndex>(0.5 + x);
       return a(x0);
     };
   }
@@ -101,7 +101,7 @@ namespace cuiloa
     return make_delayed<Array1::dtype,Array2::ndim>(xvals.dimensions(),
 						    [a,xvals](const auto& coords) {
 						      typename Array2::dtype x = xvals(coords);
-      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto x0 = static_cast<necomi::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
 
@@ -121,7 +121,7 @@ namespace cuiloa
   {
     static_assert(Array::ndim == 1,
 		  "linear interpolation only available for one-dimensional arrays");
-    auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+    auto x0 = static_cast<necomi::ArrayIndex>(x);
     auto y0 = a(x0);
     auto y1 = a(x0 + 1);
 
@@ -141,7 +141,7 @@ namespace cuiloa
     static_assert(Array::ndim == 1,
 		  "linear interpolation only available for one-dimensional arrays");
     return [a](U x) {
-      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto x0 = static_cast<necomi::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
 
@@ -183,7 +183,7 @@ auto rescale(typename Array::dtype imin, typename Array::dtype imax,
     [xmin,xmax,a,xvals]
     (const auto& coords) {
 								typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, a.size(), xvals(coords));
-      auto x0 = static_cast<cuiloa::ArrayIndex>(x);
+      auto x0 = static_cast<necomi::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
 

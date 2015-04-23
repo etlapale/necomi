@@ -1,4 +1,4 @@
-// cuiloa/base/traits.h – Basic data types
+// necomi/base/traits.h – Basic data types
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include <type_traits>
 
-namespace cuiloa {
+namespace necomi {
 
   /**
    * Single coordinate component.
@@ -101,7 +101,7 @@ namespace cuiloa {
    *
    * You could write:
    * \code{.cpp}
-   * CUILOA_MAKE_HAS_TYPE_FIELD(iterator)
+   * NECOMI_MAKE_HAS_TYPE_FIELD(iterator)
    * \endcode
    *
    * And then test for the existence of the scoped type:
@@ -109,7 +109,7 @@ namespace cuiloa {
    * constexpr bool b = has_iterator<std::vector>::value;
    * \endcode
    */
-#define CUILOA_MAKE_HAS_TYPE_FIELD(field)				\
+#define NECOMI_MAKE_HAS_TYPE_FIELD(field)				\
   template <typename T, typename = void>				\
   struct has_##field : std::false_type {};				\
 									\
@@ -124,7 +124,7 @@ namespace cuiloa {
  */
 template <typename T> class DebugType;
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local variables:
 // mode: c++

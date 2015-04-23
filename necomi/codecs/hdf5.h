@@ -1,4 +1,4 @@
-// cuiloa/codecs/hdf5.h – HDF5 codecs
+// necomi/codecs/hdf5.h – HDF5 codecs
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -23,7 +23,7 @@ using namespace H5;
  * \ingroup Codecs
  */
 
-namespace cuiloa
+namespace necomi
 {
 
 /**
@@ -270,7 +270,7 @@ void hdf5_save(const Array<T,N>& a,
   hdf5_save<T,N>(a, hf, dset, output_type);
 }
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

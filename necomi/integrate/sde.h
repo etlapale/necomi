@@ -1,4 +1,4 @@
-// cuiloa/integrate/sde.h – Elementary SDE solver
+// necomi/integrate/sde.h – Elementary SDE solver
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include "../base/array.h"
 
-namespace cuiloa {
+namespace necomi {
 
 /**
  * Euler-Maruyama integration of stochastic differential equations.
@@ -19,14 +19,14 @@ template <typename T, ArrayDimension N,
 class EulerMaruyama
 {
   // Make sure Drift and Diffusion objects have the correct return type.
-  static_assert(std::is_convertible<decltype((std::declval<Drift>())(std::declval<cuiloa::Array<T,N>>())),cuiloa::Array<T,N>>::value,
+  static_assert(std::is_convertible<decltype((std::declval<Drift>())(std::declval<necomi::Array<T,N>>())),necomi::Array<T,N>>::value,
 		"invalid Drift type for the EM SDE solver");
-  static_assert(std::is_convertible<decltype((std::declval<Diffusion>())(std::declval<cuiloa::Array<T,N>>())),cuiloa::Array<T,N+1>>::value,
+  static_assert(std::is_convertible<decltype((std::declval<Diffusion>())(std::declval<necomi::Array<T,N>>())),necomi::Array<T,N+1>>::value,
 		"invalid Diffusion type for the EM SDE solver");
 public:
   /**
    * Both drift and diffusion must be function objects taking the
-   * current state as argument, a const cuiloa::Array<T,N> instance,
+   * current state as argument, a const necomi::Array<T,N> instance,
    * of dimensions given by \c dimensions [d1×…×dN].
    * The drift must return an array of the same dimensions, [d1×…×dN],
    * while the diffusion must return an array of adding an extra

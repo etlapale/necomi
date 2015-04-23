@@ -1,4 +1,4 @@
-// cuiloa/base/delayed.h – Delayed arrays
+// necomi/base/delayed.h – Delayed arrays
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -10,7 +10,7 @@
 #include "array.h"
 #include "concepts.h"
 
-namespace cuiloa
+namespace necomi
 {
 template <typename T, ArrayIndex N> class Array;
 
@@ -162,7 +162,7 @@ template <typename Array1, typename Array2,
 	    Array1::ndim==Array2::ndim>* = nullptr>
 auto operator==(const Array1& a, const Array2& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot compare arrays of different dimensions");
@@ -177,7 +177,7 @@ template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
 auto operator!=(const Array1& a, const Array2& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot compare arrays of different dimensions");
@@ -192,7 +192,7 @@ template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
 auto operator*(const Array1& a, const Array2& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot multiply arrays of different dimensions");
@@ -229,7 +229,7 @@ template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
 auto operator/(const Array1& a, const Array2& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot divide arrays of different dimensions");
@@ -267,7 +267,7 @@ auto operator-(const Array1& a, const Array2& b)
   using C = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
   
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot sum arrays of different dimensions");
@@ -305,7 +305,7 @@ auto operator+(const Array1& a, const Array2& b)
   using C = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
   
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot sum arrays of different dimensions");
@@ -337,7 +337,7 @@ auto operator+(const Array1& a, const Array2& b)
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const Array<T,N>& b)
   {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
@@ -351,7 +351,7 @@ auto operator+(const Array1& a, const Array2& b)
   template <typename T, ArrayIndex N>
   auto operator<(const Array<T,N>& a, const Array<T,N>& b)
   {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
     if (a.dimensions() != b.dimensions())
       throw std::length_error("cannot sum arrays of different dimensions");
@@ -438,7 +438,7 @@ auto range(T stop)
   template <typename T>
   auto range(T start, T stop, T step=1)
   {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
     if (stop <= start)
       throw std::out_of_range("stop must be greater than start for ranges");
     if (step <= 0)
@@ -471,7 +471,7 @@ auto range(T stop)
 template <std::size_t M, typename Array>
 auto reshape(const Array& a, const Dimensions<M>& d)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the input and output array sizes are the same
     auto out_size = std::accumulate(d.cbegin(), d.cend(),
 				    static_cast<ArrayDimension>(1),
@@ -494,7 +494,7 @@ template <typename Array, typename ...Dimensions,
 	  typename std::enable_if_t<all_indices<Dimensions...>::value>* = nullptr>
 auto reshape(const Array& a, Dimensions... dims)
 {
-  cuiloa::Dimensions<sizeof...(Dimensions)> d =
+  necomi::Dimensions<sizeof...(Dimensions)> d =
     {static_cast<std::size_t>(dims)...};
   return reshape(a, d);
 }
@@ -505,7 +505,7 @@ auto reshape(const Array& a, Dimensions... dims)
 template <typename Array>
 auto roll(const Array& a, ArrayIndex shift, ArrayIndex dim)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   if (dim >= Array::ndim)
     throw std::out_of_range("invalid rolling dimension");
 #endif
@@ -540,7 +540,7 @@ template <typename Array1, typename Array2,
 	  std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
 auto zip(const Array1& a, const Array2& b)
 {
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dimensions() != b.dimensions())
     throw std::length_error("cannot zip arrays of different dimensions");
@@ -632,7 +632,7 @@ auto slice(Array a, std::size_t i)
 {
   static_assert(Array::ndim >= 1,
 		"only arrays with more than one dimension are sliceable");
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (i >= a.dim(0))
     throw std::range_error("slice index is too large");
@@ -657,9 +657,8 @@ auto fix_dimension(const Array& a, ArrayIndex dim, ArrayIndex val)
 			     });
 }
 
-} // namespace cuiloa
+} // namespace necomi
 
-// namespace cuiloa
 // Local Variables:
 // mode: c++
 // End:

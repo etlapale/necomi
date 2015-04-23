@@ -1,4 +1,4 @@
-// cuiloa/codecs/png.h – PNG codecs based on libpng
+// necomi/codecs/png.h – PNG codecs based on libpng
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -9,7 +9,7 @@
 
 #include <png.h>
 
-namespace cuiloa {
+namespace necomi {
 
   class png_exception : public std::runtime_error
   {
@@ -72,7 +72,7 @@ namespace cuiloa {
     }
 
     // Callbacks
-    png_set_read_fn(ps, (png_voidp) &is, &cuiloa::libpng_read_callback);
+    png_set_read_fn(ps, (png_voidp) &is, &necomi::libpng_read_callback);
 
     // Parse image metadata
     png_set_sig_bytes(ps, sizeof(sig));
@@ -152,8 +152,8 @@ namespace cuiloa {
     
     // Callbacks
     png_set_write_fn(ps, (png_voidp) &os,
-		     &cuiloa::libpng_write_callback,
-		     &cuiloa::libpng_flush_callback);
+		     &necomi::libpng_write_callback,
+		     &necomi::libpng_flush_callback);
 
     // Write the header
     auto& dims = a.dimensions();
@@ -177,7 +177,7 @@ namespace cuiloa {
     png_save(a, std::ofstream(filename));
   }
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++
