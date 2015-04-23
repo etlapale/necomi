@@ -28,4 +28,4 @@ Tarballs containing the source code are available in the
 [releases](http://emilien.tlapale.com/data/cuiloa) web directory.
 Please refer to [INSTALL.md](@ref install) for the installation notes.
 Cuiloa is released under the
-[Apache License, version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+[Simplified BSD License](http://emilien.tlapale.com/data/licenses/BSD).
