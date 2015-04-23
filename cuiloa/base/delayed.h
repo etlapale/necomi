@@ -184,101 +184,77 @@ auto operator!=(const Array1& a, const Array2& b)
 					 });
 }
 
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2>
-  auto operator*(const AbstractArray<Concrete1,T,N>& a,
-		 const AbstractArray<Concrete2,T,N>& b)
-  {
+template <typename Array1, typename Array2,
+	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+auto operator*(const Array1& a, const Array2& b)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot multiply arrays of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot multiply arrays of different dimensions");
 #endif
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(),b=b.shallow_copy()]
-			     (auto& path) { return a(path) * b(path); });
-  }
+  using C = typename std::common_type<typename Array1::dtype,
+				      typename Array2::dtype>::type;
+  return make_delayed<C,Array1::ndim>(a.dimensions(),
+				      [a,b] (const auto& x) { return a(x) * b(x); });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto operator*(T value, const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=value]
-			     (auto& path) { return value*a(path); });
-  }
+template <typename U, typename Array,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_indexable<U>::value>* = nullptr>
+auto operator*(const Array& a, U value)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return a(x)*value; });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<U,T>::value>* = nullptr>
-  auto operator*(U value, const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<T>(value)]
-			     (auto& path) { return value*a(path); });
-  }
+template <typename U, typename Array,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_indexable<U>::value>* = nullptr>
+auto operator*(U value, const Array& a)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return value*a(x); });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<T,U>::value>* = nullptr>
-  auto operator*(U value, const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<U,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=value]
-			     (auto& path)
-			     { return value*static_cast<U>(a(path)); }
-			    );
-  }
-
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<U,T>::value>* = nullptr>
-  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<T>(value)]
-			     (auto& path) { return a(path)*value; });
-  }
-
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_arithmetic<U>::value && is_promotable<T,U>::value>* = nullptr>
-  auto operator*(const AbstractArray<Concrete,T,N>& a, U value)
-  {
-    return make_delayed<U,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=value]
-			     (auto& path)
-			     { return static_cast<U>(a(path))*value; }
-			    );
-  }
-
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2>
-  auto operator/(const AbstractArray<Concrete1,T,N>& a,
-		 const AbstractArray<Concrete2,T,N>& b)
-  {
+template <typename Array1, typename Array2,
+	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+auto operator/(const Array1& a, const Array2& b)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot multiply arrays of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot divide arrays of different dimensions");
 #endif
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(),b=b.shallow_copy()]
-			     (auto& path) { return a(path) / b(path); });
-  }
+  using C = typename std::common_type<typename Array1::dtype,
+				      typename Array2::dtype>::type;
+  return make_delayed<C,Array1::ndim>(a.dimensions(),
+				      [a,b] (const auto& x) { return a(x) / b(x); });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  auto operator/(U value, const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<U>(value)]
-			     (auto& path) { return value/a(path); });
-  }
+template <typename Array, typename U,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto operator/(U value, const Array& a)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return value/a(x); });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  auto operator/(const AbstractArray<Concrete,T,N>& a, U value)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<T>(value)]
-			     (auto& path) { return a(path)/value; });
-  }
+template <typename Array, typename U,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto operator/(const Array& a, U value)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return a(x)/value; });
+}
 
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
@@ -298,23 +274,25 @@ auto operator-(const Array1& a, const Array2& b)
 				       });
 }
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  auto operator-(U value, const AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<U>(value)]
-			     (auto& path) { return value-a(path); });
-  }
+template <typename Array, typename U,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto operator-(U value, const Array& a)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return value - a(x); });
+}
 
-  template <typename Concrete, typename T, ArrayIndex N, typename U,
-	    typename std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  auto operator-(const AbstractArray<Concrete,T,N>& a, U value)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(), value=static_cast<T>(value)]
-			     (auto& path) { return a(path)-value; });
-  }
+template <typename Array, typename U,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto operator-(const Array& a, U value)
+{
+  using C = typename std::common_type<typename Array::dtype, U>::type;
+  return make_delayed<C,Array::ndim>(a.dimensions(),
+				     [a,value] (const auto& x)
+				     { return a(x) - value; });
+}
 
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
@@ -404,55 +382,55 @@ auto zeros(Dims... dims)
   return constants<T,sizeof...(Dims)>({static_cast<std::size_t>(dims)...}, 0);
 }
 
+/**
+ * Create an array with the same dimensions filled with a constant
+ * value.
+ * \see zeros_like
+ */
+template <typename T, typename Array>
+auto constants_like(const Array& a, const T&& value)
+{
+  return make_delayed<T>(a.dimensions(),
+			 [value](const auto&){ return value; });
+}
 
-  /**
-   * Create an array with the same dimensions filled with a constant
-   * value.
-   * \see zeros_like
-   */
-  template <typename T, typename U, ArrayIndex N, typename Concrete>
-  auto constants_like(const AbstractArray<Concrete,U,N>& a, const T&& value)
-  {
-    return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
-  }
+/**
+ * Create an array with the same dimensions filled with a constant
+ * value.
+ * \see zeros_like
+ */
+/*template <typename T, ArrayIndex N, typename Concrete>
+auto constants_like(const AbstractArray<Concrete,T,N>& a, const T&& value)
+{
+  return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
+  }*/
 
-  /**
-   * Create an array with the same dimensions filled with a constant
-   * value.
-   * \see zeros_like
-   */
-  template <typename T, ArrayIndex N, typename Concrete>
-  auto constants_like(const AbstractArray<Concrete,T,N>& a, const T&& value)
-  {
-    return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
-  }
+/**
+ * Create an array with the same dimensions filled with zero values.
+ * \see constants_like
+ */
+template <typename Array>
+auto zeros_like(const Array& a)
+{
+  return constants_like<typename Array::dtype>(a, 0);
+}
 
-  /**
-   * Create an array with the same dimensions filled with zero values.
-   * \see constants_like
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  auto zeros_like(const AbstractArray<Concrete,T,N>& a)
-  {
-    return constants_like<T,N,Concrete>(a, 0);
-  }
+/**
+ * Create an array with the same dimensions filled with zero values.
+ * \see constants_like
+ */
+template <typename T, typename Array>
+auto zeros_like(const Array& a)
+{
+  return constants_like<T,Array>(a, 0);
+}
 
-  /**
-   * Create an array with the same dimensions filled with zero values.
-   * \see constants_like
-   */
-  template <typename T, typename U, ArrayIndex N, typename Concrete>
-  auto zeros_like(const AbstractArray<Concrete,U,N>& a)
-  {
-    return constants_like<T,U,N,Concrete>(a, 0);
-  }
-
-  template <typename T>
-  auto range(T stop)
-  {
-    return make_delayed<T,1>({{static_cast<ArrayIndex>(stop)}},
-			     [](auto& path){ return path[0]; });
-  }
+template <typename T>
+auto range(T stop)
+{
+  return make_delayed<T,1>({{static_cast<ArrayIndex>(stop)}},
+			   [](auto& path){ return path[0]; });
+}
 
   template <typename T>
   auto range(T start, T stop, T step=1)
@@ -574,17 +552,17 @@ auto zip(const Array1& a, const Array2& b)
 			     });
 }
   
-  template <typename T, ArrayDimension N, typename Concrete>
-  auto shifted(const AbstractArray<Concrete,T,N>& a,
-	       std::array<T,N> offset,
-	       T default_value = 0)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-	[a=a.shallow_copy(),offset=std::move(offset),
+template <typename Array, typename T=typename Array::dtype>
+auto shifted(const Array& a,
+	     std::array<T,Array::ndim> offset,
+	     T default_value = 0)
+{
+  return make_delayed<T,Array::ndim>(a.dimensions(),
+	[a=a,offset=std::move(offset),
          default_value=std::move(default_value)]
-	(auto& coords) {
-	  Coordinates<N> cx;
-	  for (ArrayIndex i = 0; i < a.ndim; i++) {
+	(const auto& coords) {
+				       Coordinates<Array::ndim> cx;
+	  for (ArrayIndex i = 0; i < Array::ndim; i++) {
 	    // Check for negative resulting coordinates
 	    if (offset[i] < 0
 		&& static_cast<ArrayDimension>(-offset[i]) > coords[i])
@@ -596,7 +574,7 @@ auto zip(const Array1& a, const Array2& b)
 	  }
 	  return a(cx);
 	});
-  }
+}
 
 /**
  * Utility class to get an element amongst heterogeneous arrays.  Used
@@ -666,17 +644,17 @@ auto slice(Array a, std::size_t i)
   
   //////////////////////////////////////////////////////////////////////////
   
-  template <typename T, ArrayDimension N, typename Concrete>
-  auto fix_dimension(const AbstractArray<Concrete,T,N>& a,
-		     ArrayIndex dim, ArrayIndex val)
-  {
-    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
-			       [a=a.shallow_copy(),dim,val]
-			       (auto& coords) {
-				 return a(add_coordinate(coords, dim, val));
-			       });
-  }
+template <typename Array>
+auto fix_dimension(const Array& a, ArrayIndex dim, ArrayIndex val)
+{
+  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dimensions(), dim),
+			     [a,dim,val]
+			     (const auto& coords) {
+			       return a(add_coordinate(coords, dim, val));
+			     });
 }
+
+} // namespace cuiloa
 
 // namespace cuiloa
 // Local Variables:
