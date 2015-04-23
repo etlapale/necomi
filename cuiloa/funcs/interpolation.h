@@ -1,23 +1,13 @@
-/* Copyright © 2014 University of California
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// cuiloa/funcs/interpolation.h – Discretizations and interpolations
+//
+// Copyright © 2014–2015 University of California, Irvine
+// Licensed under the Simplified BSD License.
 
 #pragma once
 
 #include <algorithm>
 
-#include "array.h"
+#include "../base/array.h"
 
 namespace cuiloa
 {
@@ -68,12 +58,14 @@ namespace cuiloa
    * Nearest-neighbor interpolation.
    */
   template <InterpolationMethod method, typename U=double,
-            typename T, typename Concrete,
+            typename Array,
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::NearestNeighbor>* = nullptr>
-  U interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a, U x)
+  U interpolation(const Array& a, U x)
   {
+    static_assert(Array::ndim == 1,
+		  "nearest-neighbor interpolation only available for one-dimensional arrays");
     auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
     return a(x0);
   }
@@ -82,13 +74,15 @@ namespace cuiloa
    * Nearest-neighbor interpolation.
    */
   template <InterpolationMethod method, typename U=double,
-            typename T, typename Concrete,
+            typename Array,
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::NearestNeighbor>* = nullptr>
-  auto interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a)
+  auto interpolation(const Array& a)
   {
-    return [a=a.shallow_copy()](U x) {
+    static_assert(Array::ndim == 1,
+		  "nearest-neighbor interpolation only available for one-dimensional arrays");
+    return [a](U x) {
       auto x0 = static_cast<cuiloa::ArrayIndex>(0.5 + x);
       return a(x0);
     };
@@ -98,14 +92,15 @@ namespace cuiloa
    * Linear interpolation.
    */
   template <InterpolationMethod method,
-            typename T, ArrayIndex N, typename Concrete1, typename Concrete2,
+	    typename Array1, typename Array2,
 	    typename std::enable_if_t<method==InterpolationMethod::Linear>* = nullptr>
-  auto interpolation(const cuiloa::AbstractArray<Concrete1,T,1>& a,
-                     const cuiloa::AbstractArray<Concrete2,T,N>& xvals)
+  auto interpolation(const Array1& a, const Array2& xvals)
   {
-  return make_delayed<T,N>(xvals.dimensions(),
-    [a=a.shallow_copy(),xvals=xvals.shallow_copy()](const auto& coords) {
-      T x = xvals(coords);
+    static_assert(Array2::ndim == 1,
+		  "linear interpolation only available for one-dimensional arrays");
+    return make_delayed<Array1::dtype,Array2::ndim>(xvals.dimensions(),
+						    [a,xvals](const auto& coords) {
+						      typename Array2::dtype x = xvals(coords);
       auto x0 = static_cast<cuiloa::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
@@ -118,12 +113,14 @@ namespace cuiloa
    * Linear interpolation.
    */
   template <InterpolationMethod method, typename U=double,
-            typename T, typename Concrete,
+            typename Array,
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::Linear>* = nullptr>
-  U interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a, U x)
+  U interpolation(const Array& a, U x)
   {
+    static_assert(Array::ndim == 1,
+		  "linear interpolation only available for one-dimensional arrays");
     auto x0 = static_cast<cuiloa::ArrayIndex>(x);
     auto y0 = a(x0);
     auto y1 = a(x0 + 1);
@@ -135,13 +132,15 @@ namespace cuiloa
    * Linear interpolation.
    */
   template <InterpolationMethod method, typename U=double,
-            typename T, typename Concrete,
+            typename Array,
 	    typename std::enable_if_t<
 	      std::is_arithmetic<U>::value &&
 	      method==InterpolationMethod::Linear>* = nullptr>
-  auto interpolation(const cuiloa::AbstractArray<Concrete,T,1>& a)
+  auto interpolation(const Array& a)
   {
-    return [a=a.shallow_copy()](U x) {
+    static_assert(Array::ndim == 1,
+		  "linear interpolation only available for one-dimensional arrays");
+    return [a](U x) {
       auto x0 = static_cast<cuiloa::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
@@ -156,30 +155,34 @@ namespace cuiloa
     return (x - imin)*(omax-omin)/(imax-imin)+omin;
   }
 
-  template <typename T, ArrayDimension N, typename Concrete>
-  auto rescale(T imin, T imax, T omin, T omax,
-               const cuiloa::AbstractArray<Concrete,T,N>& a)
-  {
-    return make_delayed<T,N>(a.dimensions(),
-    [imin,imax,omin,omax,a=a.shallow_copy()](const auto& coords) {
-      return rescale<T>(imin, imax, omin, omax, a(coords));
-    });
-  }
+template <typename Array>
+auto rescale(typename Array::dtype imin, typename Array::dtype imax,
+	     typename Array::dtype omin, typename Array::dtype omax,
+	     const Array& a)
+{
+  using T = typename Array::dtype;
+  return make_delayed<T, Array::ndim>(a.dimensions(),
+			   [imin,imax,omin,omax,a](const auto& coords) {
+			     return rescale<T>(imin, imax, omin, omax, a(coords));
+			   });
+}
   
   /**
    * Linear interpolation.
    */
   template <InterpolationMethod method,
-            typename T, ArrayIndex N, typename Concrete1, typename Concrete2,
+            typename Array1, typename Array2,
 	    typename std::enable_if_t<method==InterpolationMethod::Linear>* = nullptr>
-  auto scaled_interpolation(const cuiloa::AbstractArray<Concrete1,T,1>& a,
-                            T xmin, T xmax,
-                            const cuiloa::AbstractArray<Concrete2,T,N>& xvals)
+  auto scaled_interpolation(const Array1& a,
+			    typename Array2::dtype xmin,
+			    typename Array2::dtype xmax, const Array2& xvals)
   {
-  return make_delayed<T,N>(xvals.dimensions(),
-    [xmin,xmax,a=a.shallow_copy(),xvals=xvals.shallow_copy()]
+    static_assert(Array1::ndim == 1,
+		  "linear interpolation only available for one-dimensional arrays");
+    return make_delayed<typename Array1::dtype, Array2::ndim>(xvals.dimensions(),
+    [xmin,xmax,a,xvals]
     (const auto& coords) {
-      T x = rescale<T>(xmin, xmax, 0, a.size(), xvals(coords));
+								typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, a.size(), xvals(coords));
       auto x0 = static_cast<cuiloa::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
