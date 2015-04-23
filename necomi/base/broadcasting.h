@@ -1,4 +1,4 @@
-// cuiloa/base/broadcasting.h – Shape broadcasting operations.
+// necomi/base/broadcasting.h – Shape broadcasting operations.
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include "delayed.h"
 
-namespace cuiloa {
+namespace necomi {
 
 /**
  * Prepend extra dimensions to an array.
@@ -16,7 +16,7 @@ template <std::size_t M, typename Array>
 auto widen(const Dimensions<M>& dims, const Array& a)
 {
   static_assert(M > Array::ndim, "array dimensions cannot be shrinked");
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions are matching
   for (ArrayIndex i = 0; i < Array::ndim; i++)
     if (a.dimensions()[i] != dims[i+M-Array::ndim])
@@ -38,7 +38,7 @@ template <ArrayIndex M, typename Array>
 auto widen_right(const Dimensions<M>& dims, const Array& a)
 {
   static_assert(M > Array::ndim, "array dimensions cannot be shrinked");
-#ifndef CUILOA_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions are matching
   for (ArrayIndex i = 0; i < Array::ndim; i++)
     if (a.dimensions()[i] != dims[i])
@@ -59,7 +59,7 @@ template <typename Array1, typename Array2,
   >
 auto operator*(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator*(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator*(widen<Array2::ndim>(b.dimensions(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -67,7 +67,7 @@ template <typename Array1, typename Array2,
   >
 auto operator*(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator*(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator*(a, widen<Array1::ndim>(a.dimensions(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -75,7 +75,7 @@ template <typename Array1, typename Array2,
   >
 auto operator/(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator/(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator/(widen<Array2::ndim>(b.dimensions(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -83,7 +83,7 @@ template <typename Array1, typename Array2,
   >
 auto operator/(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator/(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator/(a, widen<Array1::ndim>(a.dimensions(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -91,7 +91,7 @@ template <typename Array1, typename Array2,
   >
 auto operator+(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator+(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator+(widen<Array2::ndim>(b.dimensions(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -99,7 +99,7 @@ template <typename Array1, typename Array2,
   >
 auto operator+(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator+(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator+(a, widen<Array1::ndim>(a.dimensions(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -107,7 +107,7 @@ template <typename Array1, typename Array2,
   >
 auto operator-(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator-(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator-(widen<Array2::ndim>(b.dimensions(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -115,12 +115,12 @@ template <typename Array1, typename Array2,
   >
 auto operator-(const Array1& a, const Array2& b)
 {
-  return cuiloa::delayed::operator-(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator-(a, widen<Array1::ndim>(a.dimensions(), b));
 }
 
 } // namespace broadcasting
 } // namespace delayed
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

@@ -2,8 +2,8 @@
 
 #include "catch.hpp"
 
-#include <cuiloa/cuiloa.h>
-using namespace cuiloa;
+#include <necomi/necomi.h>
+using namespace necomi;
 
 
 TEST_CASE( "random number generation", "[random]" ) {

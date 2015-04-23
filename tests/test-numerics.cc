@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include <cuiloa/cuiloa.h>
-using namespace cuiloa;
-using namespace cuiloa::delayed;
+#include <necomi/necomi.h>
+using namespace necomi;
+using namespace necomi::delayed;
 
 static constexpr double float_tol = 1e-3;
 

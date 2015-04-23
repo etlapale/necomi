@@ -1,4 +1,4 @@
-// cuiloa/base/slices.h – Slicing data types
+// necomi/base/slices.h – Slicing data types
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include "basearray.h"
 
-namespace cuiloa
+namespace necomi
 {
   template <ArrayIndex N>
   class Slice
@@ -73,7 +73,7 @@ namespace cuiloa
     return Slice<1>(start, size, stride);
   }
   
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

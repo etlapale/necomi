@@ -1,4 +1,4 @@
-// cuiloa/cuiloa.h – Catch-all header
+// necomi/necomi.h – Catch-all header
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.

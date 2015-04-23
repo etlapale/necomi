@@ -1,10 +1,10 @@
-PROJECT_NAME		= cuiloa
+PROJECT_NAME		= necomi
 PROJECT_NUMBER		= @PROJECT_VERSION@
 OUTPUT_DIRECTORY	= doc
 JAVADOC_AUTOBRIEF	= YES
 BUILTIN_STL_SUPPORT	= YES
 EXTRACT_ALL		= YES
-INPUT			= cuiloa doc/src INSTALL.md
+INPUT			= necomi doc/src INSTALL.md
 RECURSIVE		= YES
 HTML_HEADER		= doc/doxy/header.html
 HTML_FOOTER		= doc/doxy/footer.html

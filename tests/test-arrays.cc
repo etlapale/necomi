@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include <cuiloa/cuiloa.h>
-using namespace cuiloa;
+#include <necomi/necomi.h>
+using namespace necomi;
 
 
 TEST_CASE( "basic array operations", "[base]" ) {
@@ -322,7 +322,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "increment operator" ) {
-    using namespace cuiloa::delayed;
+    using namespace necomi::delayed;
     
     Array<int,2> a = reshape(range(20), 4, 5);
     Array<int,2> b = 3 * reshape(range(20), 4, 5);
@@ -349,7 +349,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
   
   SECTION( "copy to a slice" ) {
-    using namespace cuiloa::delayed;
+    using namespace necomi::delayed;
 
     auto a = immediate(reshape(range(24), 6,4));
     auto a0 = a[0];
@@ -370,7 +370,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
   
   SECTION( "immediate behavior" ) {
-    using namespace cuiloa::delayed;
+    using namespace necomi::delayed;
 
     auto a = immediate(range(24));
 

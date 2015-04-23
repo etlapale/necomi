@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-project (Cuiloa)
+project (Necomitl)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-missing-braces")
@@ -22,7 +22,7 @@ endif ()
 # Downloaded external dependencies
 set (ext_deps
      "tests/catch.hpp https://raw.githubusercontent.com/philsquared/Catch/master/single_include/catch.hpp"
-     "share/bitmaps/baboon.png http://emilien.tlapale.com/data/cuiloa/share/bitmaps/baboon.png")
+     "share/bitmaps/baboon.png http://emilien.tlapale.com/data/necomitl/share/bitmaps/baboon.png")
 foreach (dep IN LISTS ext_deps)
   separate_arguments (dep)
   list (GET dep 0 filename)
@@ -35,11 +35,11 @@ endforeach ()
 
 # Unit tests
 file (GLOB CATCH_SRC tests/test-*.cc)
-add_executable (cuiloa-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
-target_link_libraries (cuiloa-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES})
+add_executable (necomi-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
+target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES})
 add_custom_target (check)
-add_dependencies (check cuiloa-catch-test)
-add_custom_command (TARGET check POST_BUILD COMMAND cuiloa-catch-test)
+add_dependencies (check necomi-catch-test)
+add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)
 
 # Documentation
 find_package (Doxygen)
@@ -50,9 +50,9 @@ if (DOXYGEN_FOUND)
 endif ()
 
 # pkg-config support
-configure_file (cuiloa.pc.in cuiloa.pc @ONLY)
+configure_file (necomi.pc.in necomi.pc @ONLY)
 
 # Installlation
-install (DIRECTORY cuiloa DESTINATION include
+install (DIRECTORY necomi DESTINATION include
          FILES_MATCHING PATTERN "*.h")
-install (FILES cuiloa.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+install (FILES necomi.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")

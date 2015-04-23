@@ -1,4 +1,4 @@
-// cuiloa/base/streams.h – Pretty printers for cuiloa data types
+// necomi/base/streams.h – Pretty printers for necomi data types
 //
 // Copyright © 2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -10,7 +10,7 @@
 
 #include "traits.h"
 
-namespace cuiloa
+namespace necomi
 {
 /**
  * Print array coordinates or dimensions on an output stream.
@@ -41,15 +41,15 @@ std::ostream& operator<<(std::ostream& os, const Array& a)
 {
   os << "[";
   for (auto i = 0UL; i < a.dim(0)-1; i++)
-    os << cuiloa::delayed::slice(a,i) << ", ";
+    os << necomi::delayed::slice(a,i) << ", ";
   if (a.dim(0) > 0)
-    os << cuiloa::delayed::slice(a,a.dim(0)-1);
+    os << necomi::delayed::slice(a,a.dim(0)-1);
   return os << "]";
 }
 
-} // namespace cuiloa
+} // namespace necomi
 
-// namespace cuiloa
+// namespace necomi
 // Local Variables:
 // mode: c++
 // End:

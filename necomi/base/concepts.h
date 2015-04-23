@@ -1,4 +1,4 @@
-// cuiloa/base/concepts.h – Type-level utilities
+// necomi/base/concepts.h – Type-level utilities
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -13,10 +13,10 @@
  * @{
  */
 
-namespace cuiloa
+namespace necomi
 {
   // Define had_dtype and has_ndim
-  CUILOA_MAKE_HAS_TYPE_FIELD(dtype)
+  NECOMI_MAKE_HAS_TYPE_FIELD(dtype)
   
   template <typename T, typename = void>
   struct has_ndim : std::false_type {};
@@ -33,8 +33,8 @@ namespace cuiloa
   /**
    * \anchor Array
    *
-   * Check if a given type is a cuiloa array.
-   * A cuiloa array must define the following types:
+   * Check if a given type is a necomi array.
+   * A necomi array must define the following types:
    * - \c dtype	Type of the elements.
    *
    * An array must also define the following compile-time constants:
@@ -76,7 +76,7 @@ namespace cuiloa
   {};
 
   /**
-   * \struct cuiloa::is_indexable<T>
+   * \struct necomi::is_indexable<T>
    * \anchor IndexableArray
    *
    * Check if individual array elements are accessible.
@@ -110,7 +110,7 @@ namespace cuiloa
 			     // TODO: add a test for (x_1,x_2,…,x_ndim)
 			     > {};
 
-} // namespace cuiloa
+} // namespace necomi
 
 /**@}*/
 

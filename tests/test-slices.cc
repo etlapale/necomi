@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include <cuiloa/cuiloa.h>
-using namespace cuiloa;
+#include <necomi/necomi.h>
+using namespace necomi;
 
 
 TEST_CASE( "slices", "[base]" ) {
@@ -98,7 +98,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "slicing with stride" ) {
-    using namespace cuiloa::delayed;
+    using namespace necomi::delayed;
     
     Array<int,1> a(100);
     a.map([](auto& path, auto& val) { val = path[0]; });
@@ -139,7 +139,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
   
   SECTION(" slice for dimension" ) {
-    using namespace cuiloa::delayed;
+    using namespace necomi::delayed;
     
     auto a = immediate(reshape(range(24), 2, 4, 3));
     REQUIRE( a(0,2,1) == 7 );

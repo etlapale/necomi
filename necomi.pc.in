@@ -3,7 +3,7 @@ exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
-Name: cuiloa
+Name: necomi
 Description: A multidimensional array library.
 Version: @PROJECT_VERSION@
 

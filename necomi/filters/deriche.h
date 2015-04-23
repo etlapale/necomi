@@ -1,4 +1,4 @@
-// cuiloa/base/deriche.h – Canny-Deriche recursive filter
+// necomi/base/deriche.h – Canny-Deriche recursive filter
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -16,7 +16,7 @@
  * \ingroup filters
  */
 
-namespace cuiloa
+namespace necomi
 {
 
 /**
@@ -211,7 +211,7 @@ deriche(Array<T,N>&& a, ArrayIndex dim, T sigma,
   }
 
 
-} // namespace cuiloa
+} // namespace necomi
 
 // Local Variables:
 // mode: c++

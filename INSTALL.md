@@ -1,10 +1,10 @@
-Cuiloa installation guide	{#install}
+Necomi installation guide	{#install}
 =========================
 
 Quick install
 -------------
 
-Cuiloa uses [CMake] as build system. You can simply configure the library
+Necomi uses [CMake] as build system. You can simply configure the library
 and generate the appropriate platform dependent make files with
 
     $ cmake .
@@ -25,11 +25,11 @@ have the proper rights to write in the chosen install prefix.
 Building
 --------
 
-Cuiloa is distributed as a templatized library, so no code will be compiled
+Necomi is distributed as a templatized library, so no code will be compiled
 with a plain `make` call. The `check` target will build and run the unit
 tests.
 
-To use cuiloa, you need a compiler with support for C++14. The library
+To use necomi, you need a compiler with support for C++14. The library
 has been succesfully built with GCC 4.9.1 and clang 3.4.2.
 
 Testing
@@ -64,11 +64,11 @@ Linking
 -------
 
 Building a software with the library simply requires adding an appropriate
-`#include <cuiloa/cuiloa.h>` in your source code, and making sure the
+`#include <necomi/necomi.h>` in your source code, and making sure the
 compiler can find the headers. With clang or GCC this requires adding
-an `-I/path/to/cuiloa` option, if not installed in the standard locations.
+an `-I/path/to/necomi` option, if not installed in the standard locations.
 You may prefer to delegate the options finding to pkg-config or CMake.
-We provide both `cuiloa.pc` and `FindCuiloa.cmake` in the source distribution.
+We provide both `necomi.pc` and `FindNecomi.cmake` in the source distribution.
 
 [Catch]: https://github.com/philsquared/Catch
 [CMake]: http://cmake.org

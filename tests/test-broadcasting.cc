@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include <cuiloa/cuiloa.h>
-using namespace cuiloa;
-using namespace cuiloa::delayed;
+#include <necomi/necomi.h>
+using namespace necomi;
+using namespace necomi::delayed;
 
 
 TEST_CASE( "broadcasting", "[core]" ) {
@@ -34,7 +34,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
   }
 
   SECTION( "broadcasting products" ) {
-    using namespace cuiloa::delayed::broadcasting;
+    using namespace necomi::delayed::broadcasting;
 
     auto a = range(4);
     auto b = reshape(range(8), 2, 4);
