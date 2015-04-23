@@ -154,7 +154,8 @@ namespace delayed
  * shape broadcasting by other operators.
  */
 template <typename Array1, typename Array2,
-	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<is_array<Array1>::value && 
+	    Array1::ndim==Array2::ndim>* = nullptr>
 auto operator==(const Array1& a, const Array2& b)
 {
 #ifndef CUILOA_NO_BOUND_CHECKS
@@ -533,7 +534,7 @@ auto reshape(const Array& a, const Dimensions<M>& d)
     auto old_strides = default_strides(a.dimensions());
     auto new_strides = default_strides(d);
     return make_delayed<typename Array::dtype,M>(d,
-			     [a=a.shallow_copy(),old_strides,new_strides]
+			     [a,old_strides,new_strides]
 			     (auto& path)
 	       { auto idx = std::inner_product(path.cbegin(), path.cend(),
 					       new_strides.cbegin(), 0);
@@ -579,29 +580,32 @@ auto roll(const Array& a, ArrayIndex shift)
   /**
    * Create an identity matrix.
    */
-  template <typename T=double>
-  auto identity(ArrayDimension dim)
-  {
-    return make_delayed<T,2>({dim,dim}, [](auto path) {
-	return path[0] == path[1];
-      });
-  }
+template <typename T=double>
+auto identity(ArrayDimension dim)
+{
+  return make_delayed<T,2>({dim,dim}, [](auto path) {
+      return path[0] == path[1];
+    });
+}
   
-  template <typename T, ArrayDimension N, typename C1, typename C2>
-  auto zip(const AbstractArray<C1,T,N>& a, const AbstractArray<C2,T,N>& b)
-  {
+template <typename Array1, typename Array2,
+	  std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
+auto zip(const Array1& a, const Array2& b)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot zip arrays of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot zip arrays of different dimensions");
 #endif
-    return make_delayed<T,N+1>(append_coordinate(a.dimensions(), 2),
-	[a=a.shallow_copy(), b=b.shallow_copy()]
-	(auto& coords) {
-          auto c = remove_coordinate(coords, N);
-	  return coords[N] == 0 ? a(c) : b(c);
-	});
-  }
+  using T = typename std::common_type<typename Array1::dtype,
+				      typename Array2::dtype>::type;
+  return make_delayed<T,Array1::ndim+1>(append_coordinate(a.dimensions(), 2),
+			     [a,b]
+			     (auto& coords) {
+					  auto c = remove_coordinate(coords, Array1::ndim);
+			       return coords[Array1::ndim] == 0 ? a(c) : b(c);
+			     });
+}
 
   template <typename T, ArrayDimension N, typename Concrete>
   auto round(const AbstractArray<Concrete,T,N>& a)
