@@ -199,39 +199,6 @@ auto operator!=(const Array1& a, const Array2& b)
 			     (auto& path) { return a(path) * b(path); });
   }
 
-  /*
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2, typename U,
-	    typename std::enable_if_t<is_promotable<T,U>::value>* = nullptr>
-  auto operator*(const AbstractArray<Concrete1,T,N>& a,
-		 const AbstractArray<Concrete2,U,N>& b)
-  {
-#ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot multiply arrays of different dimensions");
-#endif
-    return make_delayed<U,N>(a.dimensions(),
-			     [a=a.shallow_copy(),b=b.shallow_copy()]
-			     (auto& path) { return static_cast<U>(a(path)) * b(path); });
-  }
-
-  template <typename Concrete1, typename T, ArrayIndex N,
-	    typename Concrete2, typename U,
-	    typename std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
-  auto operator*(const AbstractArray<Concrete1,T,N>& a,
-		 const AbstractArray<Concrete2,U,N>& b)
-  {
-#ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot multiply arrays of different dimensions");
-#endif
-    return make_delayed<T,N>(a.dimensions(),
-			     [a=a.shallow_copy(),b=b.shallow_copy()]
-			     (auto& path) { return a(path) * static_cast<T>(b(path)); });
-			     }*/
-
   template <typename Concrete, typename T, ArrayIndex N>
   auto operator*(T value, const AbstractArray<Concrete,T,N>& a)
   {
@@ -718,24 +685,6 @@ auto slice(Array a, std::size_t i)
 				 return a(add_coordinate(coords, dim, val));
 			       });
   }
-  
-  /*template <typename T, ArrayDimension N, typename Concrete,
-	    typename std::enable_if_t<AbstractArray<Concrete,T,N>::is_modifiable()>* = nullptr>
-  auto fix_dimension(AbstractArray<Concrete,T,N>& a,
-		     ArrayIndex dim, ArrayIndex val)
-  {
-    return make_delayed<T,N-1>(remove_coordinate(a.dimensions(), dim),
-			       [a=a.shallow_copy(),dim,val]
-			       (auto& coords) -> T& {
-				 //return a(add_coordinate(coords, dim, val));
-				 auto c = add_coordinate(coords, dim, val);
-				 T& t = a(c);
-				 return t;
-			       });
-			       }*/
-
-
-
 }
 
 // namespace cuiloa
