@@ -1,18 +1,7 @@
-/*
- * Copyright © 2014–2015	University of California, Irvine
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// cuiloa/base/array.h – Immediate arrays
+//
+// Copyright © 2014–2015 University of California, Irvine
+// Licensed under the Simplified BSD License.
 
 #pragma once
 
@@ -314,17 +303,15 @@ namespace cuiloa
 	  old = val;
 	});
     }
-    
-    void operator=(const Array<T,N>& a)
-    {
-      this->operator=(static_cast<const AbstractArray<Array<T,N>,T,N>&>(a));
-    }
 
     /**
      * Fill an array with an abstract array.
      */
-    template <typename Concrete>
-    void operator=(const AbstractArray<Concrete,T,N>& a)
+    template <typename Array,
+	      std::enable_if_t<is_indexable<Array>::value
+			       && Array::ndim == N
+			       && is_promotable<typename Array::dtype,T>::value>* = nullptr>
+    void operator=(const Array& a)
     {
 #ifndef CUILOA_NO_BOUND_CHECKS
       // Make sure the dimensions of a and b are the same
@@ -334,6 +321,11 @@ namespace cuiloa
       this->map([&a](auto& path, auto& val) {
 	  val = a(path);
 	});
+    }
+
+    void operator=(const Array<T,N>& a)
+    {
+      this->operator=<Array<T,N>>(a);
     }
 
     /**
@@ -373,66 +365,68 @@ namespace cuiloa
   };
 
 
-  /**
-   * Cumulative sum.
-   */
-  template <typename Concrete, typename T, ArrayIndex N>
-  Array<T,N> cumsum(const AbstractArray<Concrete,T,N>& a,
-		    ArrayIndex dim = 0) {
-    Array<T,N> res(a.dimensions());
-    a.map([&res,dim](auto& path, auto val) {
-	if (path[dim] == 0) {
-	  res(path) = val;
-	}
-	else {
-	  auto prev = path;
-	  prev[dim]--;
-	  res(path) = res(prev) + val;
-	}
-      });
-    return res;
-  }
+/**
+ * Cumulative sum.
+ */
+template <typename Indexable, typename T=typename Indexable::dtype>
+Array<T,Indexable::ndim> cumsum(const Indexable& a, ArrayIndex dim = 0)
+{
+  Array<T,Indexable::ndim> res(a.dimensions());
+  a.map([&res,dim](auto& path, auto val) {
+      if (path[dim] == 0) {
+	res(path) = val;
+      }
+      else {
+	auto prev = path;
+	prev[dim]--;
+	res(path) = res(prev) + val;
+      }
+    });
+  return res;
+}
 
-  template <typename T, ArrayIndex N, typename Concrete>
-  Array<T,N>& operator+=(Array<T,N>& a, const AbstractArray<Concrete,T,N>& b)
-  {
+template <typename Indexable, typename T=typename Indexable::dtype>
+Array<T,Indexable::ndim>& operator+=(Array<T,Indexable::ndim>& a,
+				     const Indexable& b)
+{
 #ifndef CUILOA_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
-      throw std::length_error("cannot increment with array of different dimensions");
+  // Make sure the dimensions of a and b are the same
+  if (a.dimensions() != b.dimensions())
+    throw std::length_error("cannot increment with array of different dimensions");
 #endif
-    a.map([&b](auto& path, auto& val) {val += b(path);});
-    return a;
-  }
+  a.map([&b](auto& path, auto& val) {val += b(path);});
+  return a;
+}
 
-  /**
-   * Convert an abstract array to an immediate one with element casting.
-   *
-   * A new array with copied or casted elements is returned,
-   * even if the original array already was an immediate with same
-   * element type.
-   */
-  template <typename To, typename From, ArrayIndex N, typename Concrete,
-            typename std::enable_if_t<std::is_convertible<From,To>::value>* = nullptr>
-  Array<To,N> immediate(const AbstractArray<Concrete,From,N>& a) {
-    Array<To,N> res(a.dimensions());
-    res.map([&a](auto& coords, auto& val) {
-	val = static_cast<To>(a(coords));
-      });
-    return res;
-  }
+/**
+ * Convert an abstract array to an immediate one with element casting.
+ *
+ * A new array with copied or casted elements is returned,
+ * even if the original array already was an immediate with same
+ * element type.
+ */
+template <typename U, typename From, typename T=typename From::dtype,
+	  typename std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
+Array<U, From::ndim> immediate(const From& a)
+{
+  Array<U, From::ndim> res(a.dimensions());
+  res.map([&a](auto& coords, auto& val) {
+      val = static_cast<U>(a(coords));
+    });
+  return res;
+}
 
-  /**
-   * Convert an abstract array to an immediate one with same element type.
-   *
-   * A new array with copied or casted elements is always returned.
-   */
-  template <typename From, ArrayIndex N, typename Concrete>
-  Array<From,N> immediate(const AbstractArray<Concrete,From,N>& a)
-  {
-    return immediate<From,From,N,Concrete>(a);
-  }
-  
+/**
+ * Convert an abstract array to an immediate one with same element type.
+ *
+ * A new array with copied or casted elements is always returned.
+ */
+template <typename From, typename T=typename From::dtype>
+Array<T, From::ndim> immediate(const From& a)
+{
+  return immediate<T,From>(a);
+}
+
   template <typename T=double,
 	    typename ...Values,
             typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
@@ -444,30 +438,31 @@ namespace cuiloa
     return a;
   }
   
-  template <typename Concrete, typename T, ArrayDimension N, typename U,
-            std::enable_if_t<std::is_convertible<U,T>::value>* = nullptr>
-  Array<T,N>& operator/=(Array<T,N>& numerator,
-			 const AbstractArray<Concrete,U,N>& denominator)
-  {
-    numerator.map([&denominator](auto& coords, auto& val) {
-	val /= denominator(coords);
-      });
-    return numerator;
-  }
-  
-  namespace broadcasting
-  {
-    template <typename T, ArrayDimension N,
-	      typename Concrete, typename U, ArrayDimension M,
-	      std::enable_if_t<(N>M) && std::is_convertible<U,T>::value>* = nullptr>
-    Array<T,N>& operator/=(Array<T,N>& numerator,
-			   const AbstractArray<Concrete,U,M>& denominator)
-    {
-      return cuiloa::operator/=(numerator,
-				widen(numerator.dimensions(), denominator));
-    }
-  } // namespace broadcasting
+template <typename T, ArrayDimension N,
+	  typename Indexable, typename U=typename Indexable::dtype,
+	  std::enable_if_t<is_promotable<U,T>::value
+			   && N==Indexable::ndim>* = nullptr>
+Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
+{
+  numerator.map([&denominator](auto& coords, auto& val) {
+      val /= denominator(coords);
+    });
+  return numerator;
 }
+  
+namespace broadcasting
+{
+template <typename T, ArrayDimension N,
+	  typename Indexable, typename U=typename Indexable::dtype,
+	  std::enable_if_t<(N>Indexable::ndim) && is_promotable<U,T>::value>* = nullptr>
+Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
+{
+  return cuiloa::operator/=(numerator,
+			    widen(numerator.dimensions(), denominator));
+}
+
+} // namespace broadcasting
+} // namespace cuiloa
 
 // Local Variables:
 // mode: c++
