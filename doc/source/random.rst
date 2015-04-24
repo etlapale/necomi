@@ -63,8 +63,15 @@ functions.
      Dimensions<3> d = {5,3,7};
      auto c = normal(d, rng);          // 3D array of doubles
 
+   The returned array is stored in memory to fix the element values.
+
 .. cpp:function:: Array<T,N> normal(T mean, T deviation, Dims dims, PRNG& prng)
 
    Idem but with a specific mean and deviation.
+
+.. cpp:function:: Array<T,N> uniform(T min, T max, Dims dims, PRNG& prng)
+
+   Idem but for a uniform distribution of floating point values
+   in [min,max);
 
 .. _normal: https://en.wikipedia.org/wiki/Normal_distribution
