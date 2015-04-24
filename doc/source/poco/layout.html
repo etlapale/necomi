@@ -94,7 +94,8 @@
     <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css" />
     {%- for cssfile in css_files %}
     <link rel="stylesheet" href="{{ pathto(cssfile, 1) }}" type="text/css" />
-    {%- endfor %}
+  {%- endfor %}
+  <link rel="stylesheet" href="{{ pathto('_static/fonts/font-awesome-4.2.0/css/font-awesome.min.css', 1) }}" type="text/css" />
 {%- endmacro %}
 
 <html>
@@ -153,8 +154,23 @@
       {%- endblock %}
     </article>
   {%- endblock %}
-  {%- block sidebar1 %}{{ sidebar() }}{% endblock %}
-  {%- block relbar1 %}{{ relbar() }}{% endblock %}
+  {%- block navbar %}
+    <ul id="navbar">
+      {%- if prev %}
+	<li>
+	  <a class="fa fa-angle-double-left" href="{{ prev.link|e }}" title="{{ _('previous chapter') }}"><span>{{ prev.title }}</span></a>
+	</li>
+      {%- endif %}
+      <li>
+	<a class="fa fa-home" href="{{ pathto(master_doc) }}" title="{{ _('entrypoint') }}"><span>Home</span></a>
+      </li>
+      {%- if next %}
+	<li>
+	  <a class="fa fa-angle-double-right" href="{{ next.link|e }}" title="{{ _('next chapter') }}"><span>{{ next.title }}</span></a>
+	</li>
+      {%- endif %}
+    </ul>
+  {%- endblock %}
 </div>
 
 {%- block footer %}
