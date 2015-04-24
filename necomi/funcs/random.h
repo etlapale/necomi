@@ -70,8 +70,21 @@ Array<T,N> normal(const T& mean, const T& deviation,
   return a;
 }
 
-template <typename T, ArrayIndex N, typename PRNG>
-Array<T,N> normal(const std::array<ArrayIndex,N>& dims, PRNG& prng)
+
+// TODO
+
+/*
+template <typename T=double, ArrayIndex N, typename PRNG>
+constexpr auto normal(std::initializer_list<std::size_t> dims, PRNG& prng)
+{
+  Dimensions<dims.size()> d(dims);
+  return normal<T,dims.size(),PRNG>(0, 1, d, prng);
+}
+*/
+
+
+template <typename T=double, ArrayIndex N, typename PRNG>
+Array<T,N> normal(const Dimensions<N>& dims, PRNG& prng)
 {
   return normal<T,N,PRNG>(0, 1, dims, prng);
 }
