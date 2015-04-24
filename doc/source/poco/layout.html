@@ -164,6 +164,9 @@
       <li>
 	<a class="fa fa-home" href="{{ pathto(master_doc) }}" title="{{ shorttitle|e }}"><span>{{shorttitle|e}}</span></a>
       </li>
+      <li>
+	<a class="fa fa-search" href="{{ pathto('search') }}" title="{{ _('search') }}"><span>{{_('search')}}</span></a>
+      </li>
       {%- if next %}
 	<li>
 	  <a class="fa fa-angle-double-right" href="{{ next.link|e }}" title="{{ next.title }}"><span>{{ next.title }}</span></a>
