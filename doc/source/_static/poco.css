@@ -412,16 +412,26 @@ tt
 
 /* Function descriptions */
 
-dl.function dt tt.descname
+tt.descname
 {
     font-weight: bold;
     color: #5e6550;
 }
 
-dl.function dt
+dl.function > dt
 {
     background-color: #f5f8ef;
 }
+
+dl.class > dt
+{
+    background-color: #ffefec;
+}
+
+dl.class > dd
+{
+}
+
 
 /* Docutils messages */
 

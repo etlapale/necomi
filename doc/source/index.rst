@@ -28,6 +28,7 @@ Documentation
    tutorial
    arrays
    numerics
+   io
    license
 
 *  :ref:`genindex`
