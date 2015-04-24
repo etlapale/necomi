@@ -410,6 +410,19 @@ tt
   font-family  : "FiraMono", "Fira Mono", monospace;
 }
 
+/* Function descriptions */
+
+dl.function dt tt.descname
+{
+    font-weight: bold;
+    color: #5e6550;
+}
+
+dl.function dt
+{
+    background-color: #f5f8ef;
+}
+
 /* Docutils messages */
 
 .system-messages, .system-message

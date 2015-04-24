@@ -4,8 +4,8 @@ Necomi
 .. highlight:: c++
 
 Necomi is a C++ template library for multidimensional arrays. It
-allows easy manipulation of arrays including slices, shared views,
-I/O, and provides multiple numerical functions.
+allows easy manipulation of slices, shared views, I/O, and provides
+multiple numerical functions.
 
 ::
 	  
@@ -13,7 +13,7 @@ I/O, and provides multiple numerical functions.
     auto a = hdf5_load<double,3>("myfile.h5", "dataset");
     // Get a shared 2D slice of the dataset
     auto b = a[1];
-    // Blur the 2D image `b`
+    // Blur the 2D slice
     deriche(b, 2.0);
 
 Necomi is released under the :doc:`Simplified BSD License <license>`.
@@ -26,7 +26,6 @@ Documentation
 
    install
    tutorial
-   concepts
    arrays
    numerics
    license

@@ -3,7 +3,7 @@ Random number generation
 
 .. highlight:: c++
 
-Seeding
+Engines
 -------
 	       
 Efficiently generating good quality pseudo random numbers on a
@@ -22,10 +22,22 @@ secure source. On some systems we can use `std::random_device`_, and
 its wrapper `RandomDevSeedSequence`, to seed it::
 
   necomi::RandomDevSeedSequence rdss;
-  std::mt19937_64 prng(rdss);
+  std::mt19937_64 rng(rdss);
 
 .. _defines: http://en.cppreference.com/w/cpp/numeric/random
 .. _`std::random_device`: http://en.cppreference.com/w/cpp/numeric/random/random_device
+
+Of course you are not limited to the engines given by the standard,
+and can use external libraries such as the `PCG family`_::
+
+  #include <pcg_random.hpp>
+  pcg_extras::seed_seq_from<std::random_device> seed_source;
+  pcg32 rng(seed_source);
+
+As long as the engines follow the C++ standard they can given as
+argument to Necomi functions.
+
+.. _PCG family: http://www.pcg-random.org/
 
 Distributions
 -------------
@@ -39,7 +51,7 @@ functions.
    (Gaussian) distribution.
 
    By default an array of `double` values is generated, but you can
-   set `T` to another element type. The dimensionality `N` is infered,
+   set `T` to another element type. The dimensionality `N` is inferred,
    if possible, from the `dims` argument: if a single scalar is given,
    a 1D array is returned; passing a `const Dimensions<N>&` allows
    specifying an arbitrary shape. The random number generator `prng`

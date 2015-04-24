@@ -24,3 +24,4 @@ tests/catch.hpp
 .emacs.desktop*
 make.bat
 doc/build
+doc/source/_static/fonts
