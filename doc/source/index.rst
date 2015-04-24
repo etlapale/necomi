@@ -30,6 +30,9 @@ Documentation
    numerics
    license
 
+*  :ref:`genindex`
+*  :ref:`search`
+
 Download
 --------
 `necomi-0.4.tar.xz <http://emilien.tlapale.com/data/necomi/necomi-0.4.tar.xz>`_
