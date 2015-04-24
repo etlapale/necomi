@@ -158,15 +158,15 @@
     <ul id="navbar">
       {%- if prev %}
 	<li>
-	  <a class="fa fa-angle-double-left" href="{{ prev.link|e }}" title="{{ _('previous chapter') }}"><span>{{ prev.title }}</span></a>
+	  <a class="fa fa-angle-double-left" href="{{ prev.link|e }}" title="{{ prev.title }}"><span>{{ prev.title }}</span></a>
 	</li>
       {%- endif %}
       <li>
-	<a class="fa fa-home" href="{{ pathto(master_doc) }}" title="{{ _('entrypoint') }}"><span>Home</span></a>
+	<a class="fa fa-home" href="{{ pathto(master_doc) }}" title="{{ shorttitle|e }}"><span>{{shorttitle|e}}</span></a>
       </li>
       {%- if next %}
 	<li>
-	  <a class="fa fa-angle-double-right" href="{{ next.link|e }}" title="{{ _('next chapter') }}"><span>{{ next.title }}</span></a>
+	  <a class="fa fa-angle-double-right" href="{{ next.link|e }}" title="{{ next.title }}"><span>{{ next.title }}</span></a>
 	</li>
       {%- endif %}
     </ul>
