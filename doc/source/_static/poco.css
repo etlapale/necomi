@@ -476,6 +476,11 @@ a[href$="/data/necomi/"]:before {
     opacity: 1;
 }
 
+.highlighted
+{
+    background-color: #ffd8ad;
+}
+
 /* Old style */
 
 a
