@@ -95,9 +95,9 @@ then be:
      });
    png_save(new_img, "rotated.png");
    
-.. image:: /code/necomi/images/baboon.png
+.. image:: ../../share/bitmaps/baboon.png
    :width: 128
-.. image:: /code/necomi/images/baboon-rot90.png
+.. image:: ../../share/bitmaps/baboon-rot90.png
    :width: 128
 
 where ``png_load`` and ``png_save`` are necomi_’s interface to

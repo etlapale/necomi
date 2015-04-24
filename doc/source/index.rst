@@ -5,8 +5,7 @@ Necomi
 
 Necomi is a C++ template library for multidimensional arrays. It
 allows easy manipulation of arrays including slices, shared views,
-I/O, or conversion to and from raw C arrays. It also implements
-several algorithms such as multidimensional recursive filters.
+I/O, and provides multiple numerical functions.
 
 ::
 	  
@@ -25,17 +24,21 @@ Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    install
    tutorial
-   overview
+   concepts
+   arrays
+   numerics
    license
 
-Releases
+Download
 --------
-`cuiloa-0.3.1.tar.xz <http://emilien.tlapale.com/data/necomi/cuiloa-0.3.1.tar.xz>`_
-(2014-11-20) Added operators, trigonometrics and interpolation functions.
+`necomi-0.4.tar.xz <http://emilien.tlapale.com/data/necomi/necomi-0.4.tar.xz>`_
+(2015-04-25) Renamed, documented with Sphinx_, removed CRTP, added
+reshaping and numerical functions.
 
 `archives <http://emilien.tlapale.com/data/necomi/>`_
 
+.. _Sphinx: http://sphinx-doc.org

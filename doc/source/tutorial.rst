@@ -14,9 +14,7 @@ The most common objects manipulated in necomi are multidimensional
 arrays. Each array contains a number of elements, which may or may no
 be present in memory, and which are accessible through their coordinates.
 Both arrays and coordinates are C++ types available in the ``necomi``
-namespace:
-
-.. code:: c++
+namespace::
 
    #include <necomi/necomi.h>
    using namespace necomi;
@@ -26,9 +24,7 @@ Here, we declared a two dimensional array of 5×4 elements. We also
 specified that the array elements are floating point numbers of type
 ``double``. Yet, the elements in this array have undefined value, so
 you may prefer to use one of the construction functions available in
-the ``necomi::delayed`` namespace:
-
-.. code:: c++
+the ``necomi::delayed`` namespace::
 
    using namespace necomi::delayed;
    Array<int,1> b = range(10);
@@ -37,16 +33,11 @@ Here we create an 1D array of 10 elements whose elements take the
 successive values between 0 and 9. The ``range`` function can accept
 additional arguments to further define the numerical range, and
 several other construction function are defined. For instance, to
-create an array of random values taken from a normal distribution:
+create an array of random values taken from a normal distribution (see
+:doc:`random`)::
 
-.. code:: c++
-
-   // Mersenne-Twister with a 19937 bits seed taken from the
-   // operating system random device
-   RandomDevSeedSequence rdss;
-   std::mt19937_64 prng(rdss);
    // Create a 2D array of 5×4 normally distributed numbers
-   Array<double,2> c = normal({5,4}, prng);
+   auto c = normal<double,2>({5,4}, prng);
 
 Finally, an array can also be created from a larger expression:
 

@@ -13,7 +13,8 @@ libpng_, before building the tests.
 
 To configure, build and run the tests, run the following commands::
 
-  cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ . && make check
+  cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++ .
+  make check
 
 where we manually specified the clang_ compiler.
 

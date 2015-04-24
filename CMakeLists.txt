@@ -42,12 +42,12 @@ add_dependencies (check necomi-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)
 
 # Documentation
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-  add_custom_target (doc)
-  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
-  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
-endif ()
+#find_package (Doxygen)
+#if (DOXYGEN_FOUND)
+#  add_custom_target (doc)
+#  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
+#  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
+#endif ()
 
 # pkg-config support
 configure_file (necomi.pc.in necomi.pc @ONLY)

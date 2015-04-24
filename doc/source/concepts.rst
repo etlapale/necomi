@@ -1,8 +1,5 @@
-Overview
-========
-
 Concepts
---------
+========
 
 Necomi defines several C++ concepts, named set of requirements, to be
 implemented by the actual array classes. The array concepts are as followed:
@@ -22,11 +19,3 @@ Although the C++ standard does
 include a formal way to verify that those concepts are matched by specific
 classes, we provide a set a of utilities to check for those
 constraints in `necomi/base/concepts.h`.
-
-Array Classes
--------------
-
-.. toctree::
-   :maxdepth: 3
-
-   delayed
