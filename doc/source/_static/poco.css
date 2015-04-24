@@ -458,6 +458,13 @@ a[href^="http://www.linkedin.com"]:before {
     margin-right: .25em;
 }
 
+a[href$="/data/necomi/"]:before {
+    font-family: FontAwesome;
+    content: "\f187";
+    margin-right: .25em;
+}
+
+
 .headerlink
 {
     opacity: 0.08;

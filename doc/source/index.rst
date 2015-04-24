@@ -29,10 +29,14 @@ Documentation
    arrays
    numerics
    io
-   license
-
+   
 *  :ref:`genindex`
 *  :ref:`search`
+
+.. toctree::
+   :hidden:
+
+   license
 
 Download
 --------
