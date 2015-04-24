@@ -158,7 +158,7 @@ namespace delayed
  * shape broadcasting by other operators.
  */
 template <typename Array1, typename Array2,
-	  typename std::enable_if_t<is_array<Array1>::value && 
+	  typename std::enable_if_t<is_array<Array1>::value &&
 	    Array1::ndim==Array2::ndim>* = nullptr>
 auto operator==(const Array1& a, const Array2& b)
 {

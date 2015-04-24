@@ -22,7 +22,8 @@ endif ()
 # Downloaded external dependencies
 set (ext_deps
      "tests/catch.hpp https://raw.githubusercontent.com/philsquared/Catch/master/single_include/catch.hpp"
-     "share/bitmaps/baboon.png http://emilien.tlapale.com/data/necomitl/share/bitmaps/baboon.png")
+     "share/bitmaps/baboon.png http://emilien.tlapale.com/data/necomi/share/bitmaps/baboon.png"
+     "share/bitmaps/baboon-rot90.png http://emilien.tlapale.com/data/necomi/share/bitmaps/baboon-rot90.png")
 foreach (dep IN LISTS ext_deps)
   separate_arguments (dep)
   list (GET dep 0 filename)
@@ -42,12 +43,12 @@ add_dependencies (check necomi-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)
 
 # Documentation
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-  add_custom_target (doc)
-  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
-  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
-endif ()
+#find_package (Doxygen)
+#if (DOXYGEN_FOUND)
+#  add_custom_target (doc)
+#  configure_file (doc/Doxyfile.in doc/Doxyfile @ONLY)
+#  add_custom_command (TARGET doc PRE_BUILD COMMAND ${DOXYGEN_EXECUTABLE} doc/Doxyfile)
+#endif ()
 
 # pkg-config support
 configure_file (necomi.pc.in necomi.pc @ONLY)
