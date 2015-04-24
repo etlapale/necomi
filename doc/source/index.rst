@@ -40,10 +40,10 @@ Documentation
 
 Download
 --------
-`necomi-0.4.tar.xz <http://necomi.atelo.org/data/necomi/necomi-0.4.tar.xz>`_
+`necomi-0.4.tar.xz <http://necomi.atelo.org/data/necomi-0.4.tar.xz>`_
 (2015-04-24) Renamed, documented with Sphinx_, removed CRTP, added
 reshaping and numerical functions.
 
-`archives <http://necomi.atelo.org/data/necomi/>`_
+`archives <http://necomi.atelo.org/data/>`_
 
 .. _Sphinx: http://sphinx-doc.org

@@ -22,8 +22,8 @@ endif ()
 # Downloaded external dependencies
 set (ext_deps
      "tests/catch.hpp https://raw.githubusercontent.com/philsquared/Catch/master/single_include/catch.hpp"
-     "share/bitmaps/baboon.png http://emilien.tlapale.com/data/necomi/share/bitmaps/baboon.png"
-     "share/bitmaps/baboon-rot90.png http://emilien.tlapale.com/data/necomi/share/bitmaps/baboon-rot90.png")
+     "share/bitmaps/baboon.png http://necomi.atelo.org/data/share/bitmaps/baboon.png"
+     "share/bitmaps/baboon-rot90.png http://necomi.atelo.org/data/share/bitmaps/baboon-rot90.png")
 foreach (dep IN LISTS ext_deps)
   separate_arguments (dep)
   list (GET dep 0 filename)
