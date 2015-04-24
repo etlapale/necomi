@@ -16,9 +16,7 @@ I/O, and provides multiple numerical functions.
     // Blur the 2D image `b`
     deriche(b, 2.0);
 
-Necomi is released under the `Simplified BSD License`_.
-
-.. _Simplified BSD License: /data/necomi/LICENSE
+Necomi is released under the :doc:`Simplified BSD License <license>`.
 
 Documentation
 -------------
