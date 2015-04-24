@@ -4,8 +4,8 @@ Necomi
 .. highlight:: c++
 
 Necomi is a C++ template library for multidimensional arrays. It
-allows easy manipulation of slices, shared views, I/O, and provides
-multiple numerical functions.
+allows easy manipulation of slices, shared views, :doc:`I/O <io>`, and
+provides multiple :doc:`numerical functions <numerics>`.
 
 ::
 	  
