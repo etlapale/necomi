@@ -249,7 +249,7 @@ namespace necomi
  */
 template <typename T,ArrayIndex N>
 void
-inr_save(const Array<T,N>& a, const char* path)
+inr_save(const char* path, const Array<T,N>& a)
 {
   static_assert(N == 3 || N == 4,
                 "Only 3D and 4D arrays can be stored as INR");

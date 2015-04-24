@@ -169,22 +169,16 @@ Array<T,N> hdf5_load(const char* filename, const char* dset_name)
  *
  * \ingroup Codecs
  */
-template <typename T, ArrayIndex N>
-DataSet hdf5_create_dataset(const Array<T,N>& a,
-                            H5File& hf,
+template <typename T=double, ArrayIndex N>
+DataSet hdf5_create_dataset(H5File& hf,
                             const char* dset_name,
-                            hsize_t duplicates=0,
+			    const Dimensions<N>& dims,
                             PredType output_type = pred_type<T>::type())
 {
   // Dataset dimensions
-  auto ndims = N + (duplicates > 0);
-  hsize_t dims[ndims];
-  if (duplicates > 0)
-    dims[0] = duplicates;
-  std::copy(a.dimensions().cbegin(),
-            a.dimensions().cend(),
-            dims + (duplicates > 0));
-  DataSpace dspace(ndims, dims);
+  hsize_t hdims[N];
+  std::copy(dims.cbegin(), dims.cend(), hdims);
+  DataSpace dspace(N, hdims);
 
   // Create the dataset
   return hf.createDataSet(dset_name, output_type, dspace);
@@ -201,7 +195,7 @@ DataSet hdf5_create_dataset(const Array<T,N>& a,
  *       the array if the original one is not contiguous.
  */
 template <typename T, ArrayIndex N>
-void hdf5_store_slice(const Array<T,N>& a, DataSet& dset, hsize_t slice)
+void hdf5_store_slice(DataSet& dset, hsize_t slice, const Array<T,N>& a)
 {
   // Get the dataset dimensions
   auto dset_space = dset.getSpace();
@@ -234,9 +228,7 @@ void hdf5_store_slice(const Array<T,N>& a, DataSet& dset, hsize_t slice)
  *       the array if the original one is not contiguous.
  */
 template <typename T, ArrayIndex N>
-void hdf5_save(const Array<T,N>& a,
-               H5File& hf,
-               const char* dset_name,
+void hdf5_save(H5File& hf, const char* dset_name, const Array<T,N>& a,
                PredType output_type = pred_type<T>::type())
 {
   // Dataset dimensions
@@ -258,16 +250,14 @@ void hdf5_save(const Array<T,N>& a,
  * \warning If the HDF5 file already exists, it will be erased.
  */
 template <typename T, ArrayIndex N>
-void hdf5_save(const Array<T,N>& a,
-               const char* path,
-               const char* dset,
+void hdf5_save(const char* path, const char* dset, const Array<T,N>& a,
                PredType output_type = pred_type<T>::type())
 {
   // Create the HDF5 file
   H5File hf(path, H5F_ACC_TRUNC);
 
   // Store the dataset
-  hdf5_save<T,N>(a, hf, dset, output_type);
+  hdf5_save<T,N>(hf, dset, a, output_type);
 }
 
 } // namespace necomi
