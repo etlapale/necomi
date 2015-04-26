@@ -371,14 +371,14 @@ auto operator+(const Array1& a, const Array2& b)
     return make_delayed<T>(dims, [value](auto&){ return value; });
   }
   
-template <ArrayIndex N=1, typename T=double>
+template <typename T=double, ArrayIndex N>
 auto zeros(const Dimensions<N>& dims)
 {
   return constants<T,N>(dims,0);
 }
 
-template <typename ...Dims,
-	  typename T=double,
+template <typename T=double,
+	  typename ...Dims,
 	  typename std::enable_if<all_indices<Dims...>::value>* = nullptr>
 auto zeros(Dims... dims)
 {
@@ -535,7 +535,8 @@ auto identity(ArrayDimension dim)
       return path[0] == path[1];
     });
 }
-  
+
+// TODO: remove (stack() special case)
 template <typename Array1, typename Array2,
 	  std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
 auto zip(const Array1& a, const Array2& b)
@@ -626,6 +627,9 @@ auto stack(Array a, Arrays... as)
       return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
     });							   
 }
+
+
+// TODO: remove, special case of fix_dimension
 
 template <typename Array>
 auto slice(Array a, std::size_t i)

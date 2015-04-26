@@ -2,6 +2,23 @@ Delayed arrays
 ==============
 
 .. highlight:: c++
+
+.. cpp:class:: DelayedArray
+
+   Array whose elements are given by a specific function.
+
+   A delayed array can either instantiate the :doc:`ReferenceableArray
+   <arrays>` concept if the subjacent function returns a reference to
+   the elements, or an :doc:`IndexableArray <arrays>` otherwise.
+
+.. toctree::
+
+   delayed/creation
+   delayed/arithmetics
+   delayed/transforms
+   delayed/broadcasting
+	       
+**Old documentation**
 	       
 necomi_ 0.3 adds support for delayed arrays to avoid allocation of
 temporary ones and multiple loops while creating complex array

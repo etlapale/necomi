@@ -56,7 +56,7 @@ of elements in it, is not changed:
 
    Array<int,1> e = range(20);
    // e := [0 1 2 3 … 17 18 19]
-   Array<int,2> f = reshape(e, {5, 4});
+   Array<int,2> f = reshape(e, 5, 4);
    /* f := [ 0  1  2  3  4
              5  6  7  8  9
             10 11 12 13 14
@@ -165,7 +165,7 @@ available in the ``necomi::delayed::broadcasting`` namespace:
 
 .. code:: c++
 
-   auto a = range(4);                    // 1D array of size 4
+   auto a = range(4);                // 1D array of size 4
    auto b = reshape(range(8), 2, 4); // 2D array of size 2×4
    // Create a 2D array with c(i,j) = a(j) + b(i,j);
    auto c = a * b;

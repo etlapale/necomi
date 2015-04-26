@@ -14,14 +14,14 @@ IndexableArray
     Array in which each element can be accessed through a set of
     coordinates.
 
-ModifiableArray
-    IndexableArray in which a reference to an element ca be returned.
+ReferencableArray
+    IndexableArray in which a reference to an element can be returned.
 
 Although the C++ standard does
 `not yet <http://en.cppreference.com/w/cpp/language/constraints>`_
 include a formal way to verify that those concepts are matched by specific
 classes, we provide a set a of utilities to check for those
-constraints in `necomi/base/concepts.h`.
+constraints in ``necomi/base/concepts.h``.
 
 Array classes
 -------------
@@ -36,6 +36,6 @@ DelayedArray
     for the elements to exist in memory.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    delayed

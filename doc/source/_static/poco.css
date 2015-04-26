@@ -380,7 +380,7 @@ footer a[href]
   color: #af9793;
 }
 
-.code .comment, .highlight .c1 {
+.code .comment, .highlight .c1, .highlight .cm {
   color: #a08f7d;
 }
 
@@ -425,7 +425,7 @@ dl.function > dt
 
 dl.class > dt
 {
-    background-color: #ffefec;
+    background-color: #fff3e6;
 }
 
 dl.class > dd
@@ -458,12 +458,17 @@ a[href^="http://www.linkedin.com"]:before {
     margin-right: .25em;
 }
 
-a[href$="/data/necomi/"]:before {
+a[href$="/data/"]:before {
     font-family: FontAwesome;
     content: "\f187";
     margin-right: .25em;
 }
 
+a[href*="_sources"]:before {
+    font-family: FontAwesome;
+    content: "\f121";
+    margin-right: .25em;
+}
 
 .headerlink
 {

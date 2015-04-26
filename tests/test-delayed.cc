@@ -266,6 +266,11 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( e(1) == 2 );
     REQUIRE( e(2) == 4 );
     REQUIRE( e(3) == 6 );
+
+    auto f = range(3,12,4);
+    REQUIRE( f(0) == 3 );
+    REQUIRE( f(1) == 7 );
+    REQUIRE( f(2) == 11 );
   }
 
   SECTION( "reshaping" ) {
