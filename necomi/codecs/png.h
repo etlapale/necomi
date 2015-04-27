@@ -83,7 +83,7 @@ namespace necomi {
     auto depth = png_get_bit_depth(ps, pi);
     auto channels = png_get_channels(ps, pi);
     auto color_type = png_get_color_type(ps, pi);
-    auto interlace_type = png_get_interlace_type(ps, pi);
+    //auto interlace_type = png_get_interlace_type(ps, pi);
 
     /*std::cout << "width: " << width << std::endl
 	      << "height: " << height << std::endl
