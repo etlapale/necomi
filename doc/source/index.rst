@@ -46,4 +46,6 @@ reshaping and numerical functions.
 
 `archives <http://necomi.atelo.org/data/>`_
 
+`Project website <http://git.atelo.org/etlapale/necomi>`_
+
 .. _Sphinx: http://sphinx-doc.org
