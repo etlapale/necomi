@@ -458,9 +458,15 @@ a[href^="http://www.linkedin.com"]:before {
     margin-right: .25em;
 }
 
-a[href$="/data/necomi/"]:before {
+a[href$="/data/"]:before {
     font-family: FontAwesome;
     content: "\f187";
+    margin-right: .25em;
+}
+
+a[href^="http://git.atelo.org/"]:before {
+    font-family: FontAwesome;
+    content: "\f1d3";
     margin-right: .25em;
 }
 
