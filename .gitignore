@@ -25,3 +25,4 @@ tests/catch.hpp
 make.bat
 doc/build
 doc/source/_static/fonts
+fonts/
