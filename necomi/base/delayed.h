@@ -241,7 +241,8 @@ auto operator/(const Array1& a, const Array2& b)
 }
 
 template <typename Array, typename U,
-	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<U>::valu>* = nullptr>
 auto operator/(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
@@ -251,7 +252,8 @@ auto operator/(U value, const Array& a)
 }
 
 template <typename Array, typename U,
-	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<U>::value>* = nullptr>
 auto operator/(const Array& a, U value)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
@@ -279,7 +281,8 @@ auto operator-(const Array1& a, const Array2& b)
 }
 
 template <typename Array, typename U,
-	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<U>::value>* = nullptr>
 auto operator-(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
@@ -289,7 +292,8 @@ auto operator-(U value, const Array& a)
 }
 
 template <typename Array, typename U,
-	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<U>::value>* = nullptr>
 auto operator-(const Array& a, U value)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;

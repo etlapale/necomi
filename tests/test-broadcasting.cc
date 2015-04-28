@@ -51,4 +51,20 @@ TEST_CASE( "broadcasting", "[core]" ) {
     auto d = b * a;
     REQUIRE( all(c == d) );
   }
+
+  SECTION( "broadcasting heterogeneous arrays" ) {
+    using namespace necomi::delayed::broadcasting;
+
+    auto a = immediate(range(4));
+    auto b = reshape(range(8), 2, 4);
+
+    auto c = a - b;
+    auto d = a + b;
+    auto e = a * b;
+    auto f = a / b;
+
+    REQUIRE( c.dimensions() == d.dimensions() );
+    REQUIRE( d.dimensions() == e.dimensions() );
+    REQUIRE( e.dimensions() == f.dimensions() );
+  }
 }
