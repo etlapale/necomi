@@ -212,7 +212,7 @@ template <typename Array>
 auto norm_angle_diff(const Array& a)
 {
   return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
-			   [a](const auto& coords) {
+			   [a](const auto& coords){
 							    typename Array::dtype x = a(coords);
 			     if (x >= -180 && x <= 180)
 			       return x;

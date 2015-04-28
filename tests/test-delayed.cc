@@ -697,4 +697,17 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     REQUIRE( all(a == d) );
   }
+
+  SECTION( "normalized angular differences" ) {
+
+    auto a = linspace<int>(-200, 200, 17);
+    auto b = norm_angle_diff(a);
+
+    REQUIRE( b(0) == -160 );
+    REQUIRE( b(1) == -175 );
+    REQUIRE( b(2) == -150 );
+    REQUIRE( b(8) == 0 );
+    REQUIRE( b(10) == 50 );
+    REQUIRE( b(16) == 160 );
+  }
 }
