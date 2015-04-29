@@ -158,8 +158,9 @@ namespace delayed
  * shape broadcasting by other operators.
  */
 template <typename Array1, typename Array2,
-	  typename std::enable_if_t<is_array<Array1>::value &&
-	    Array1::ndim==Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<is_array<Array1>::value
+				    && is_array<Array2>::value>* = nullptr,
+	  typename std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
 auto operator==(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -174,7 +175,9 @@ auto operator==(const Array1& a, const Array2& b)
 }
 
 template <typename Array1, typename Array2,
-	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<is_array<Array1>::value &&
+				    is_array<Array2>::value &&
+				    Array1::ndim==Array2::ndim>* = nullptr>
 auto operator!=(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
