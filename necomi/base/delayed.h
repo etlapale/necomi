@@ -635,7 +635,8 @@ auto stack(Array a, Arrays... as)
 
 // TODO: remove, special case of fix_dimension
 
-template <typename Array>
+template <typename Array,
+	  std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto slice(Array a, std::size_t i)
 {
   static_assert(Array::ndim >= 1,
