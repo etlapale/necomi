@@ -710,4 +710,15 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( b(10) == 50 );
     REQUIRE( b(16) == 160 );
   }
+
+  SECTION( "square roots" ) {
+    using namespace std;
+
+    double a = sqrt(89);
+    REQUIRE( std::fabs(a - 9.43398) < float_tol );
+    auto b = range<double>(100);
+    auto c = sqrt(b);
+    REQUIRE( std::fabs(c(0) - 0) < float_tol );
+    REQUIRE( std::fabs(c(89) - 9.43398) < float_tol );
+  }
 }

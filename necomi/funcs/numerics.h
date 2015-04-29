@@ -117,7 +117,8 @@ power(T val)
 /**
  * Square root.
  */
-template <typename Array>
+template <typename Array,
+	  std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto sqrt(const Array& a)
 {
   return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
