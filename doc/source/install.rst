@@ -2,7 +2,7 @@ Installation
 ============
 
 Necomi is a C++14 library requiring a modern compiler to build your
-programs. The clang_ compiler is currently the recommended option.
+programs. Both clang_ 3.6.0 and GCC_ 4.9.2 have been tested successfully.
 All other dependencies are optional.
 
 Necomi is a header-only library, but we provide a CMake_ script to
