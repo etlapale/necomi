@@ -360,11 +360,11 @@ footer a[href]
   color: #ce7668;
 }
 
-.code .string, .highlight .s {
+.code .string, .highlight .s, .highlight .s2 {
   color: #7c94a4;
 }
 
-.code .keyword, .highlight .k, .highlight .kt {
+.code .keyword, .highlight .k, .highlight .kt, .highlight .kr {
   color: #82a63b;
 }
 
