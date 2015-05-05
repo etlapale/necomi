@@ -15,6 +15,7 @@ Delayed arrays
 
    delayed/creation
    delayed/arithmetics
+   delayed/statistics
    delayed/transforms
    delayed/broadcasting
 	       
