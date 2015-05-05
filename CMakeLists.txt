@@ -11,7 +11,8 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
 if (HDF5_FOUND)
-  add_definitions ("-DHAVE_HDF5 ${HDF5_DEFINITIONS}")
+  add_definitions ("-DHAVE_HDF5")
+  add_definitions (${HDF5_DEFINITIONS})
   include_directories ("${HDF5_INCLUDE_DIRS}")
 endif ()
 # - libpng
