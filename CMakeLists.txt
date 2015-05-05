@@ -11,12 +11,14 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
 if (HDF5_FOUND)
-  add_definitions ("-DHAVE_HDF5")
+  add_definitions ("-DHAVE_HDF5 ${HDF5_DEFINITIONS}")
+  include_directories ("${HDF5_INCLUDE_DIRS}")
 endif ()
 # - libpng
 find_package (PNG)
 if (PNG_FOUND)
-  add_definitions ("-DHAVE_LIBPNG")
+  add_definitions ("-DHAVE_LIBPNG ${PNG_DEFINITIONS}")
+  include_directories ("${PNG_INCLUDE_DIRS}")
 endif ()
 
 # Downloaded external dependencies
