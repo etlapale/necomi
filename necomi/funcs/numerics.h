@@ -31,10 +31,6 @@ enum class Norm {
   Infinity
 };
 
-/**
- * Average an array across a given dimension.
- * \param a	An \ref IndexableArray "indexable array".
- */
 template <typename IndexableArray>
 auto norm(const IndexableArray& a, Norm norm)
 {

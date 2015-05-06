@@ -4,5 +4,6 @@ Numerics
 .. toctree::
    :maxdepth: 3
 
-   random
-   filters
+   numerics/ufuncs
+   numerics/random
+   numerics/filters

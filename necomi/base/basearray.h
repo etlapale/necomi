@@ -77,6 +77,15 @@ class BaseArray
     return add_coordinate(coords, 0, value);
   }
 
+template <ArrayIndex N>
+Coordinates<N> change_coordinate(const Coordinates<N>& coords,
+				 ArrayIndex dim, ArrayDimension value)
+{
+  Coordinates<N> c = coords;
+  c[dim] = value;
+  return c;
+}
+
 #ifndef IN_DOXYGEN
 /**
 * Final case of for loops through template metaprogramming.

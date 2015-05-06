@@ -59,3 +59,29 @@ Arithmetics
 
    Idem but for operator ``-``.
    
+Global operations
+-----------------
+
+.. cpp:function:: T norm(const Array& a, Norm norm)
+
+   Compute the norm of an array.
+
+.. cpp:type:: Norm
+
+   Order of a norm. Must be ``Infinity``.
+
+Element operations
+------------------
+
+.. cpp:function:: auto abs(const Array& a)
+
+   Return an equivalent delayed array whose elements are the absolute
+   of those in ``a``.
+
+.. cpp:function:: auto exp(const Array& a)
+
+   Idem but calling ``exp`` on each element.
+
+.. cpp:function:: auto sqrt(const Array& a)
+
+   Idem but calling ``sqrt`` on each element.

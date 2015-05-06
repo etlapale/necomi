@@ -3,7 +3,7 @@ Transformations
 
 .. highlight:: c++
 
-Those functions transform existing arrays.
+Those functions transform the shape or order of existing arrays.
 
 Reordering
 ----------

@@ -629,10 +629,34 @@ struct choose_array<I>
 template <typename Array, typename ...Arrays>
 auto stack(Array a, Arrays... as)
 {
-  return make_delayed<double,Array::ndim+1>(prepend_coordinate(a.dimensions(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
+  using T = typename std::common_type<typename Array::dtype,
+				      typename Arrays::dtype...>::type;
+  // TODO: check dimensions
+  return make_delayed<T,Array::ndim+1>(prepend_coordinate(a.dimensions(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
       auto c = remove_coordinate(coords, 0);
       return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
     });							   
+}
+
+/**
+ * Concatenate arrays.
+ */
+template <typename Array1, typename Array2>
+auto concat(const Array1& a, const Array2& b)
+{
+  auto d = 0UL;	// Dimension along which to concatenate
+  static_assert(Array1::ndim == Array2::ndim,
+		"only arrays of same dimensionality can be concatenated");
+  using T = typename std::common_type<typename Array1::dtype,
+				      typename Array2::dtype>::type;
+  // TODO: check dimensions
+  return make_delayed<T,Array1::ndim>(change_coordinate(a.dimensions(), d, a.dim(d) + b.dim(d)), [d,a,b](const auto& coords) {
+      auto i = coords[d];
+      if (i < a.dim(d))
+	return a(change_coordinate(coords, d, i));
+      else
+	return b(change_coordinate(coords, d, i-a.dim(d)));
+    });
 }
 
 
