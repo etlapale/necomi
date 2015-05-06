@@ -727,11 +727,41 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = constants({3}, 67);
     auto b = constants({5}, 38);
     auto c = concat(a, b);
+    
     REQUIRE( c.ndim == 1 );
     REQUIRE( c.dim(0) == 8 );
     REQUIRE( c(0) == 67 );
     REQUIRE( c(2) == 67 );
     REQUIRE( c(3) == 38 );
     REQUIRE( c(7) == 38 );
+
+    auto d = constants({7}, 42);
+    auto e = concat(a, b, a, d, 0);
+  }
+
+  SECTION( "same dimensions" ) {
+
+    auto a = zeros(1,3,4);
+    auto b = zeros(1,3);
+    auto c = zeros(1,3,4);
+    Array<double,3> d(1,3,4);
+    Array<int,2> e(1,3);
+    Array<float,3> f(1,3,4);
+    auto g = zeros(1,3,4,5);
+
+    REQUIRE( ! same_dimensions(a,b) );
+    REQUIRE( same_dimensions(a,a) );
+    REQUIRE( same_dimensions(b,b) );
+    REQUIRE( ! same_dimensions(b,a) );
+    REQUIRE( same_dimensions(a,a,a) );
+    REQUIRE( same_dimensions(b,b,b,b) );
+    
+    REQUIRE( same_dimensions(a,d,f) );
+    REQUIRE( same_dimensions(f,d,a,d,f,f,a) );
+    REQUIRE( ! same_dimensions(f,d,a,d,b,f,a) );
+    REQUIRE( ! same_dimensions(e,b,b,e,b,g,e) );
+    
+    REQUIRE( ! same_dimensions(a,g) );
+    REQUIRE( ! same_dimensions(g,a) );
   }
 }

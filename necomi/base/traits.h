@@ -119,6 +119,104 @@ namespace necomi {
     : std::true_type {};
 
 
+
+/**
+ * Utility class to get an element amongst heterogeneous arrays.  Used
+ * to get the element at coordinates c of the i-th array, you can use
+ * \c choose_array<0,Array,Arrays...>::at(i, c, a, as), where the
+ * arrays are denoted by a, as..., with respective types Array,
+ * Arrays.... The 0 is the mandatory index to start the search.  A
+ * simpler interface is provided by stack() which creates a delayed
+ * array from a list of arrays.
+ */
+template <std::size_t, typename...>
+struct choose_array;
+
+template <std::size_t I, typename Array, typename... Arrays>
+struct choose_array<I, Array, Arrays...>
+{
+  static double at(std::size_t n, const Coordinates<Array::ndim>& coords,
+		   const Array& a, const Arrays&... as)
+  {
+    if (n == I)
+      return a(coords);
+    else
+      return choose_array<I+1, Arrays...>::at(n, coords, as...);
+  }
+};
+
+template <std::size_t I>
+struct choose_array<I>
+{
+  template <ArrayDimension N>
+  static double at(std::size_t, const Coordinates<N>&)
+  { throw std::range_error("invalid array chosen"); }
+};
+
+
+/**
+ * Indicate whether multiple arrays all have the same dimensions.
+ */
+template <typename Array1, typename Array2, typename... Arrays>
+static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
+same_dimensions(const Array1&, const Array2&, const Arrays&...)
+{
+  return false;
+}
+
+template <typename Array1, typename Array2, typename... Arrays>
+static std::enable_if_t<Array1::ndim == Array2::ndim, bool>
+same_dimensions(const Array1& a, const Array2& b, const Arrays&... as)
+{
+  return a.dimensions() == b.dimensions() && same_dimensions(b, as...);
+}
+
+template <typename Array>
+bool same_dimensions(const Array&)
+{
+  return true;
+}
+
+
+#if 0
+/**
+ */
+template <typename...>
+struct same_dimensions;
+
+template <typename Array1, typename Array2, typename... Arrays>
+struct same_dimensions<Array1, Array2, Arrays...>
+{
+  static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
+  value(const Array1&, const Array2&, const Arrays&... as)
+  {
+    return false;
+  }
+  
+  static std::enable_if_t<Array1::ndim == Array2::ndim, bool>
+  value(const Array1& a, const Array2& b, const Arrays&... as)
+  {
+    return a.dimensions() == b.dimensions()
+      && same_dimensions<Array2, Arrays...>::value(b, as...);
+  }
+};
+
+template <typename Array>
+struct same_dimensions<Array>
+{
+  static bool value(const Array&)
+  {
+    return true;
+  }
+};
+
+template <typename Array, typename ...Arrays>
+bool have_same_dimensions(const Array& a, const Arrays&... as)
+{
+  return same_dimensions<Array,Arrays...>::value(a, as...);
+}
+#endif
+
 /**
  * Undefined template to elicit an error message to debug types.
  */
