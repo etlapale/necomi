@@ -594,11 +594,16 @@ auto shifted(const Array& a,
  * orginal arrays, and the rest of the coordinates will index into them.
  */
 template <typename Array, typename ...Arrays>
-auto stack(Array a, Arrays... as)
+auto stack(const Array& a, const Arrays&... as)
 {
+#ifndef NECOMI_NO_BOUND_CHECKS
+  if (! same_dimensions(a, as...))
+    throw std::length_error("stacked arrays must have the same dimensions");
+#endif
+		
   using T = typename std::common_type<typename Array::dtype,
 				      typename Arrays::dtype...>::type;
-  // TODO: check dimensions
+
   return make_delayed<T,Array::ndim+1>(prepend_coordinate(a.dimensions(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
       auto c = remove_coordinate(coords, 0);
       return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
@@ -625,7 +630,6 @@ auto concat(const Array1& a, const Array2& b)
 	return b(change_coordinate(coords, d, i-a.dim(d)));
     });
 }
-
 
 // TODO: remove, special case of fix_dimension
 

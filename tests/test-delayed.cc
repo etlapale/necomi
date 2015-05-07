@@ -666,6 +666,15 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( i(0,2,1) == 7 );
     REQUIRE( i(1,2,1) == 11 );
     REQUIRE( i(1,3,0) == 13 );
+
+    bool exception_thrown = false;
+    try {
+      auto j = range<int>(12);
+      auto k = stack(a, j);
+    } catch (std::length_error& e) {
+      exception_thrown = true;
+    }
+    REQUIRE( exception_thrown );
   }
 
   SECTION( "slicing" ) {
@@ -736,7 +745,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(7) == 38 );
 
     auto d = constants({7}, 42);
-    auto e = concat(a, b, a, d, 0);
+    //auto e = concat(a, b, a, d, 0);
   }
 
   SECTION( "same dimensions" ) {
