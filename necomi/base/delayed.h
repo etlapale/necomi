@@ -618,12 +618,10 @@ auto stack(const Array& a, const Arrays&... as)
 template <typename Array1, typename Array2>
 auto concat(const Array1& a, const Array2& b)
 {
-  static_assert(same_dimensionality<Array,Arrays...>::value,
+  static_assert(same_dimensionality<Array1,Array2>::value,
 		"concatenated arrays must have the same number of dimensions");
   
   auto d = 0UL;	// Dimension along which to concatenate
-  static_assert(Array1::ndim == Array2::ndim,
-		"only arrays of same dimensionality can be concatenated");
   using T = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
   // TODO: check dimensions
