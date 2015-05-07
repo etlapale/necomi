@@ -155,6 +155,22 @@ struct choose_array<I>
 
 
 /**
+ * Indicate whether multiple arrays all have the same dimensionality.
+ */
+template <typename Array, typename...>
+struct same_dimensionality;
+
+template <typename Array1, typename Array2, typename... Arrays>
+struct same_dimensionality<Array1, Array2, Arrays...>
+  : std::integral_constant<bool, Array1::ndim == Array2::ndim
+			   && same_dimensionality<Array2, Arrays...>::value>
+{};
+
+template <typename Array>
+struct same_dimensionality<Array> : std::true_type {};
+
+
+/**
  * Indicate whether multiple arrays all have the same dimensions.
  */
 template <typename Array1, typename Array2, typename... Arrays>

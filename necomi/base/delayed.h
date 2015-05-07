@@ -596,6 +596,8 @@ auto shifted(const Array& a,
 template <typename Array, typename ...Arrays>
 auto stack(const Array& a, const Arrays&... as)
 {
+  static_assert(same_dimensionality<Array,Arrays...>::value,
+		"stacked arrays must have the same number of dimensions");
 #ifndef NECOMI_NO_BOUND_CHECKS
   if (! same_dimensions(a, as...))
     throw std::length_error("stacked arrays must have the same dimensions");
@@ -616,6 +618,9 @@ auto stack(const Array& a, const Arrays&... as)
 template <typename Array1, typename Array2>
 auto concat(const Array1& a, const Array2& b)
 {
+  static_assert(same_dimensionality<Array,Arrays...>::value,
+		"concatenated arrays must have the same number of dimensions");
+  
   auto d = 0UL;	// Dimension along which to concatenate
   static_assert(Array1::ndim == Array2::ndim,
 		"only arrays of same dimensionality can be concatenated");
