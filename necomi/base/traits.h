@@ -174,21 +174,47 @@ struct same_dimensionality<Array> : std::true_type {};
  * Indicate whether multiple arrays all have the same dimensions.
  */
 template <typename Array1, typename Array2, typename... Arrays>
-static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
-same_dimensions(const Array1&, const Array2&, const Arrays&...)
-{
-  return false;
-}
-
-template <typename Array1, typename Array2, typename... Arrays>
 static std::enable_if_t<Array1::ndim == Array2::ndim, bool>
 same_dimensions(const Array1& a, const Array2& b, const Arrays&... as)
 {
   return a.dimensions() == b.dimensions() && same_dimensions(b, as...);
 }
 
+template <typename Array1, typename Array2, typename... Arrays>
+static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
+same_dimensions(const Array1&, const Array2&, const Arrays&...)
+{
+  return false;
+}
+
 template <typename Array>
 bool same_dimensions(const Array&)
+{
+  return true;
+}
+
+/**
+ * Indicate whethere multiple arrays have the same dimensions except one.
+ */
+template <typename Array1, typename Array2, typename... Arrays>
+static std::enable_if_t<Array1::ndim == Array2::ndim, bool>
+almost_same_dimensions(std::size_t idx, const Array1& a, const Array2& b, const Arrays&... as)
+{
+  for (auto i = 0UL; i < Array1::ndim; i++)
+    if (idx != i && a.dimensions()[i] != b.dimensions()[i])
+      return false;
+  return same_dimensions(b, as...);
+}
+
+template <typename Array1, typename Array2, typename... Arrays>
+static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
+almost_same_dimensions(std::size_t, const Array1&, const Array2&, const Arrays&...)
+{
+  return false;
+}
+
+template <typename Array>
+bool almost_same_dimensions(std::size_t, const Array&)
 {
   return true;
 }

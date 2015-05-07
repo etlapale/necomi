@@ -618,13 +618,17 @@ auto stack(const Array& a, const Arrays&... as)
 template <typename Array1, typename Array2>
 auto concat(const Array1& a, const Array2& b)
 {
-  static_assert(same_dimensionality<Array1,Array2>::value,
+  static_assert(same_dimensionality<Array1, Array2>::value,
 		"concatenated arrays must have the same number of dimensions");
-  
   auto d = 0UL;	// Dimension along which to concatenate
+  #ifndef NECOMI_NO_BOUND_CHECKS
+  if (! almost_same_dimensions(d, a, b))
+    throw std::length_error("concatenated arrays must have almost the same dimensions");
+#endif
+  
   using T = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
-  // TODO: check dimensions
+
   return make_delayed<T,Array1::ndim>(change_coordinate(a.dimensions(), d, a.dim(d) + b.dim(d)), [d,a,b](const auto& coords) {
       auto i = coords[d];
       if (i < a.dim(d))
