@@ -193,46 +193,6 @@ bool same_dimensions(const Array&)
   return true;
 }
 
-
-#if 0
-/**
- */
-template <typename...>
-struct same_dimensions;
-
-template <typename Array1, typename Array2, typename... Arrays>
-struct same_dimensions<Array1, Array2, Arrays...>
-{
-  static std::enable_if_t<Array1::ndim != Array2::ndim, bool>
-  value(const Array1&, const Array2&, const Arrays&... as)
-  {
-    return false;
-  }
-  
-  static std::enable_if_t<Array1::ndim == Array2::ndim, bool>
-  value(const Array1& a, const Array2& b, const Arrays&... as)
-  {
-    return a.dimensions() == b.dimensions()
-      && same_dimensions<Array2, Arrays...>::value(b, as...);
-  }
-};
-
-template <typename Array>
-struct same_dimensions<Array>
-{
-  static bool value(const Array&)
-  {
-    return true;
-  }
-};
-
-template <typename Array, typename ...Arrays>
-bool have_same_dimensions(const Array& a, const Arrays&... as)
-{
-  return same_dimensions<Array,Arrays...>::value(a, as...);
-}
-#endif
-
 /**
  * Undefined template to elicit an error message to debug types.
  */
