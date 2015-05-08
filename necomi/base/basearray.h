@@ -173,19 +173,19 @@ public:
   using dim_type = DimType;
   using dims_type = std::array<dim_type, N>;
   
-  DimArray(const Dimensions<N>& dims)
+  DimArray(const dims_type& dims)
     : m_dims(dims)
   {}
 
-  const Dimensions<N>& dims() const
+  const dims_type& dims() const
   { return m_dims; }
 
-  ArrayDimension dim(ArrayIndex i) const
+  dim_type dim(dim_type i) const
   { return m_dims[i]; }
   
 protected:
   /// Storage for the array dimensions.
-  Dimensions<N> m_dims;
+  dims_type m_dims;
 };
 
 /**
