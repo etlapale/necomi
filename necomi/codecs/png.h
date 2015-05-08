@@ -156,14 +156,13 @@ namespace necomi {
 		     &necomi::libpng_flush_callback);
 
     // Write the header
-    auto& dims = a.dimensions();
-    png_set_IHDR(ps, pi, dims[1], dims[0], 8,
+    png_set_IHDR(ps, pi, a.dim(1), a.dim(0), 8,
 		 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
 		 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     png_write_info(ps, pi);
 
     // Write the rows
-    for (unsigned int y = 0; y < dims[0]; y++)
+    for (unsigned int y = 0; y < a.dim(0); y++)
       png_write_row(ps, a[y].data());
 
     // Cleanup

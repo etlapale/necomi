@@ -33,7 +33,7 @@ struct Array1
 {
   using dtype = double;
   enum { ndim = 1 };
-  Dimensions<ndim> dimensions() const { return Dimensions<ndim>(); };
+  Dimensions<ndim> dims() const { return Dimensions<ndim>(); };
 };
 
 // Minimal indexable array definition

@@ -61,9 +61,9 @@ TEST_CASE( "slices", "[base]" ) {
     REQUIRE( a(3,2) == 17 );
 
     auto b = a.slice((slice(1,3),slice(1,2)));
-    REQUIRE( b.dimensions().size() == 2 );
-    REQUIRE( b.dimensions()[0] == 3 );
-    REQUIRE( b.dimensions()[1] == 2 );
+    REQUIRE( b.ndim == 2 );
+    REQUIRE( b.dim(0) == 3 );
+    REQUIRE( b.dim(1) == 2 );
 
     REQUIRE( b.strides()[0] == a.strides()[0]);
     REQUIRE( b.strides()[1] == 1);
@@ -82,9 +82,9 @@ TEST_CASE( "slices", "[base]" ) {
     auto b = a.slice((slice(1,3),slice(1,4)));
     auto c = b.slice((slice(0,3),slice(2,2)));
 
-    REQUIRE( c.dimensions().size() == 2 );
-    REQUIRE( c.dimensions()[0] == 3 );
-    REQUIRE( c.dimensions()[1] == 2 );
+    REQUIRE( c.ndim == 2 );
+    REQUIRE( c.dim(0) == 3 );
+    REQUIRE( c.dim(1) == 2 );
 
     REQUIRE( c.strides()[0] == 5 );
     REQUIRE( c.strides()[1] == 1 );

@@ -16,10 +16,9 @@ TEST_CASE( "PNG storage", "[codecs]" ) {
     auto img = png_load(baboon_path);
 
     // Check dimensions
-    auto& dims = img.dimensions();
-    REQUIRE( dims[0] == 512 );
-    REQUIRE( dims[1] == 512 );
-    REQUIRE( dims[2] == 3 );
+    REQUIRE( img.dim(0) == 512 );
+    REQUIRE( img.dim(1) == 512 );
+    REQUIRE( img.dim(2) == 3 );
 
     // Check pixel values
     REQUIRE( img(305,122,0) == 0x2e );
@@ -37,7 +36,7 @@ TEST_CASE( "PNG storage", "[codecs]" ) {
 
     // Rotate the image
     auto new_img =
-      make_delayed<unsigned char>(img.dimensions(), [&img](auto& path) {
+      make_delayed<unsigned char>(img.dims(), [&img](auto& path) {
 	  return img(path[1], path[0], path[2]);
 	});
     // Save a copy

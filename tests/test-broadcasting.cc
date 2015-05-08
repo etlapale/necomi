@@ -11,7 +11,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
     Dimensions<3> dims{3,4,5};
     auto b = widen(dims, a);
 
-    REQUIRE( b.dimensions() == dims );
+    REQUIRE( b.dims() == dims );
     REQUIRE( b(0,3,2) == 17 );
     REQUIRE( b(2,3,2) == 17 );
     REQUIRE( b(0,1,2) == 7 );
@@ -23,7 +23,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
     Dimensions<2> dims{3,4};
     auto b = widen_right(dims, a);
 
-    REQUIRE( b.dimensions() == dims );
+    REQUIRE( b.dims() == dims );
     REQUIRE( b(0,0) == 0 );
     REQUIRE( b(0,1) == 0 );
     REQUIRE( b(0,2) == 0 );
@@ -40,7 +40,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
     auto b = reshape(range(8), 2, 4);
 
     auto c = a * b;
-    REQUIRE( c.dimensions() == b.dimensions() );
+    REQUIRE( c.dims() == b.dims() );
     REQUIRE( c(0,0) == 0 );
     REQUIRE( c(0,3) == 9 );
     REQUIRE( c(1,0) == 0 );
@@ -63,8 +63,8 @@ TEST_CASE( "broadcasting", "[core]" ) {
     auto e = a * b;
     auto f = a / b;
 
-    REQUIRE( c.dimensions() == d.dimensions() );
-    REQUIRE( d.dimensions() == e.dimensions() );
-    REQUIRE( e.dimensions() == f.dimensions() );
+    REQUIRE( c.dims() == d.dims() );
+    REQUIRE( d.dims() == e.dims() );
+    REQUIRE( e.dims() == f.dims() );
   }
 }

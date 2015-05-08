@@ -233,7 +233,7 @@ void hdf5_save(H5File& hf, const char* dset_name, const Array<T,N>& a,
 {
   // Dataset dimensions
   hsize_t dims[N];
-  std::copy(a.dimensions().cbegin(), a.dimensions().cend(), dims);
+  std::copy(a.dims().cbegin(), a.dims().cend(), dims);
   DataSpace dspace(N, dims);
 
   // Create the dataset

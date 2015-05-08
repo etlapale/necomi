@@ -26,9 +26,9 @@ namespace necomi
     : std::true_type {};
   
   template <typename T, typename = void>
-  struct has_dimensions : std::false_type {};
+  struct has_dims : std::false_type {};
   
-  template <typename T> struct has_dimensions<T, decltype(&T::dimensions, void())> : std::true_type {};
+  template <typename T> struct has_dims<T, decltype(&T::dims, void())> : std::true_type {};
   
   /**
    * \anchor Array
@@ -60,7 +60,7 @@ namespace necomi
     : std::integral_constant<bool,
 			     has_dtype<T>::value
 			     && has_ndim<T>::value
-			     && has_dimensions<T>::value>
+			     && has_dims<T>::value>
                              // TODO: check dimensions type
   {};
   

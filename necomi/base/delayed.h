@@ -96,10 +96,10 @@ protected:
 
   template <typename T=double, ArrayDimension N=1, typename Expr>
   DelayedArray<T,N,Expr>
-  make_delayed(const Dimensions<N>& dimensions, Expr fun)
+  make_delayed(const Dimensions<N>& dims, Expr fun)
   {
     // TODO: pass dimensions by value since we copy them in the constructor
-    return DelayedArray<T,N,Expr>(dimensions, std::move(fun));
+    return DelayedArray<T,N,Expr>(dims, std::move(fun));
   }
 
   /*
@@ -121,7 +121,7 @@ protected:
 template <typename Array>
 auto delay(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 							  [a](const auto& x)
 							  { return a(x); });
 }
@@ -143,7 +143,7 @@ auto delay(const Array& a)
   auto make_delayed(const Array& a, Expr&& e)
   {
     return DelayedArray<typename Array::dtype, Array::ndim, Expr>
-      (a.dimensions(), std::forward<Expr>(e));
+      (a.dims(), std::forward<Expr>(e));
   }
 
   /**@}*/
@@ -167,10 +167,10 @@ auto operator==(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot compare arrays of different dimensions");
 #endif
-  return make_delayed<bool,Array1::ndim>(a.dimensions(),
+  return make_delayed<bool,Array1::ndim>(a.dims(),
 					 [a,b] (const auto& coords) {
 					   return a(coords) == b(coords);
 					 });
@@ -184,10 +184,10 @@ auto operator!=(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot compare arrays of different dimensions");
 #endif
-  return make_delayed<bool,Array1::ndim>(a.dimensions(),
+  return make_delayed<bool,Array1::ndim>(a.dims(),
 					 [a,b] (const auto& coords) {
 					   return a(coords) != b(coords);
 					 });
@@ -199,12 +199,12 @@ auto operator*(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot multiply arrays of different dimensions");
 #endif
   using C = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
-  return make_delayed<C,Array1::ndim>(a.dimensions(),
+  return make_delayed<C,Array1::ndim>(a.dims(),
 				      [a,b] (const auto& x) { return a(x) * b(x); });
 }
 
@@ -214,7 +214,7 @@ template <typename U, typename Array,
 auto operator*(const Array& a, U value)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return a(x)*value; });
 }
@@ -225,7 +225,7 @@ template <typename U, typename Array,
 auto operator*(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return value*a(x); });
 }
@@ -236,12 +236,12 @@ auto operator/(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot divide arrays of different dimensions");
 #endif
   using C = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
-  return make_delayed<C,Array1::ndim>(a.dimensions(),
+  return make_delayed<C,Array1::ndim>(a.dims(),
 				      [a,b] (const auto& x) { return a(x) / b(x); });
 }
 
@@ -251,7 +251,7 @@ template <typename Array, typename U,
 auto operator/(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return value/a(x); });
 }
@@ -262,7 +262,7 @@ template <typename Array, typename U,
 auto operator/(const Array& a, U value)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return a(x)/value; });
 }
@@ -276,10 +276,10 @@ auto operator-(const Array1& a, const Array2& b)
   
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-  return make_delayed<C, Array1::ndim>(a.dimensions(),
+  return make_delayed<C, Array1::ndim>(a.dims(),
 				       [a,b](const auto& coords) {
 					 return a(coords) - b(coords);
 				       });
@@ -291,7 +291,7 @@ template <typename Array, typename U,
 auto operator-(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return value - a(x); });
 }
@@ -302,7 +302,7 @@ template <typename Array, typename U,
 auto operator-(const Array& a, U value)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dimensions(),
+  return make_delayed<C,Array::ndim>(a.dims(),
 				     [a,value] (const auto& x)
 				     { return a(x) - value; });
 }
@@ -316,10 +316,10 @@ auto operator+(const Array1& a, const Array2& b)
   
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot sum arrays of different dimensions");
 #endif
-  return make_delayed<C, Array1::ndim>(a.dimensions(),
+  return make_delayed<C, Array1::ndim>(a.dims(),
 				       [a,b](const auto& coords) {
 					 return a(coords) + b(coords);
 				       });
@@ -331,7 +331,7 @@ auto operator+(const Array1& a, const Array2& b)
     auto fun = [a,val](auto& path) {
         return a(path) > val;
       };
-    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
+    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -340,7 +340,7 @@ auto operator+(const Array1& a, const Array2& b)
     auto fun = [a,val](auto& path) {
         return a(path) < val;
       };
-    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
+    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -348,13 +348,13 @@ auto operator+(const Array1& a, const Array2& b)
   {
 #ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
+    if (a.dims() != b.dims())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
     auto fun = [a,b](auto& path) {
         return a(path) > b(path);
       };
-    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
+    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
   }
 
   template <typename T, ArrayIndex N>
@@ -362,13 +362,13 @@ auto operator+(const Array1& a, const Array2& b)
   {
 #ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
-    if (a.dimensions() != b.dimensions())
+    if (a.dims() != b.dims())
       throw std::length_error("cannot sum arrays of different dimensions");
 #endif
     auto fun = [a,b](auto& path) {
         return a(path) < b(path);
       };
-    return DelayedArray<bool,N,decltype(fun)>(a.dimensions(), fun);
+    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
   }
 
   /**
@@ -402,7 +402,7 @@ auto zeros(Dims... dims)
 template <typename T, typename Array>
 auto constants_like(const Array& a, const T&& value)
 {
-  return make_delayed<T>(a.dimensions(),
+  return make_delayed<T>(a.dims(),
 			 [value](const auto&){ return value; });
 }
 
@@ -414,7 +414,7 @@ auto constants_like(const Array& a, const T&& value)
 /*template <typename T, ArrayIndex N, typename Concrete>
 auto constants_like(const AbstractArray<Concrete,T,N>& a, const T&& value)
 {
-  return make_delayed<T>(a.dimensions(), [value](auto&){ return value; });
+  return make_delayed<T>(a.dims(), [value](auto&){ return value; });
   }*/
 
 /**
@@ -488,7 +488,7 @@ auto reshape(const Array& a, const Dimensions<M>& d)
     if (out_size != size(a))
       throw std::length_error("invalid dimensions for reshaped array");
 #endif
-    auto old_strides = default_strides(a.dimensions());
+    auto old_strides = default_strides(a.dims());
     auto new_strides = default_strides(d);
     return make_delayed<typename Array::dtype,M>(d,
 			     [a,old_strides,new_strides]
@@ -518,8 +518,8 @@ auto roll(const Array& a, ArrayIndex shift, ArrayIndex dim)
   if (dim >= Array::ndim)
     throw std::out_of_range("invalid rolling dimension");
 #endif
-  auto sz = a.dimensions()[dim];
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  auto sz = a.dims()[dim];
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a,sz,dim,shift]
 			   (auto path) {
 			     path[dim] = (path[dim] + sz - shift) % sz;
@@ -552,12 +552,12 @@ auto zip(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot zip arrays of different dimensions");
 #endif
   using T = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
-  return make_delayed<T,Array1::ndim+1>(append_coordinate(a.dimensions(), 2),
+  return make_delayed<T,Array1::ndim+1>(append_coordinate(a.dims(), 2),
 			     [a,b]
 			     (auto& coords) {
 					  auto c = remove_coordinate(coords, Array1::ndim);
@@ -570,7 +570,7 @@ auto shifted(const Array& a,
 	     std::array<T,Array::ndim> offset,
 	     T default_value = 0)
 {
-  return make_delayed<T,Array::ndim>(a.dimensions(),
+  return make_delayed<T,Array::ndim>(a.dims(),
 	[a=a,offset=std::move(offset),
          default_value=std::move(default_value)]
 	(const auto& coords) {
@@ -608,7 +608,7 @@ auto stack(const Array& a, const Arrays&... as)
   using T = typename std::common_type<typename Array::dtype,
 				      typename Arrays::dtype...>::type;
 
-  return make_delayed<T,Array::ndim+1>(prepend_coordinate(a.dimensions(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
+  return make_delayed<T,Array::ndim+1>(prepend_coordinate(a.dims(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
       auto c = remove_coordinate(coords, 0);
       return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
     });							   
@@ -631,7 +631,7 @@ auto concat(const Array1& a, const Array2& b)
   using T = typename std::common_type<typename Array1::dtype,
 				      typename Array2::dtype>::type;
 
-  return make_delayed<T,Array1::ndim>(change_coordinate(a.dimensions(), d, a.dim(d) + b.dim(d)), [d,a,b](const auto& coords) {
+  return make_delayed<T,Array1::ndim>(change_coordinate(a.dims(), d, a.dim(d) + b.dim(d)), [d,a,b](const auto& coords) {
       auto i = coords[d];
       if (i < a.dim(d))
 	return a(change_coordinate(coords, d, i));
@@ -653,7 +653,7 @@ auto slice(Array a, std::size_t i)
   if (i >= a.dim(0))
     throw std::range_error("slice index is too large");
 #endif
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dimensions(), 0), [a,i] (const auto& coords) {
+  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), 0), [a,i] (const auto& coords) {
       auto c = prepend_coordinate(coords, i);
       return a(c);
     });
@@ -666,7 +666,7 @@ auto slice(Array a, std::size_t i)
 template <typename Array>
 auto fix_dimension(const Array& a, ArrayIndex dim, ArrayIndex val)
 {
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dimensions(), dim),
+  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), dim),
 			     [a,dim,val]
 			     (const auto& coords) {
 			       return a(add_coordinate(coords, dim, val));

@@ -18,7 +18,7 @@ template <typename IndexableArray,
 	  typename std::enable_if_t<is_indexable<IndexableArray>::value>* = nullptr>
 auto abs(const IndexableArray& a)
 {
-  return make_delayed(a.dimensions(),
+  return make_delayed(a.dims(),
 		      [a](const Coordinates<IndexableArray::ndim>& path)
 		      { return std::abs(a(path)); });
 }
@@ -43,7 +43,7 @@ auto norm(const IndexableArray& a, Norm norm)
 template <typename Array>
 auto exp(const Array& a)
 {
-  return make_delayed<typename Array::dtype,Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype,Array::ndim>(a.dims(),
 							 [a] (auto& x) {
 							   return std::exp(a(x));
 							 });
@@ -56,12 +56,12 @@ template <typename Array,
 	  typename std::enable_if<Array::ndim!=0>::type* = nullptr>
 auto sum(const Array&a, ArrayIndex dim)
 {
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dimensions(), dim), [a,dim] (auto& x) {
+  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), dim), [a,dim] (auto& x) {
       // Path in the original array
       auto orig_path = add_coordinate(x, dim);
       // Sum all the elements in the dimension
       typename Array::dtype val = 0;
-      for (ArrayIndex i = 0; i < a.dimensions()[dim]; i++) {
+      for (ArrayIndex i = 0; i < a.dims()[dim]; i++) {
 	orig_path[dim] = i;
 	val += a(orig_path);
       }
@@ -76,7 +76,7 @@ template <typename Array,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto average(const Array& a, ArrayIndex dim)
 {
-  return sum(a,dim) / static_cast<typename Array::dtype>(a.dimensions()[dim]);
+  return sum(a,dim) / static_cast<typename Array::dtype>(a.dims()[dim]);
 }
 
 /**
@@ -117,7 +117,7 @@ template <typename Array,
 	  std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto sqrt(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a] (const auto& x) { return std::sqrt(a(x)); });
 }
 
@@ -136,7 +136,7 @@ template <typename Array,
 auto variance(const Array& a, ArrayIndex dim, bool bessel_correction)
 {
   auto avg = immediate(average(a, dim));
-  return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dimensions(), dim),
+  return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dims(), dim),
 			     [a,dim,avg,bessel_correction]
 			     (const auto& x)
 			     {
@@ -144,7 +144,7 @@ auto variance(const Array& a, ArrayIndex dim, bool bessel_correction)
 			       auto orig_path = add_coordinate(x, dim);
 			       // Sum the squared deviations to the mean
 			       typename Array::dtype val = 0;
-			       for (ArrayIndex i = 0; i < a.dimensions()[dim]; i++) {
+			       for (ArrayIndex i = 0; i < a.dims()[dim]; i++) {
 				 orig_path[dim] = i;
 				 val += power<2>(a(orig_path) - avg(x));
 			       }
@@ -185,7 +185,7 @@ template <typename Array, typename U,
 	  typename std::enable_if_t<is_promotable<U,typename Array::dtype>::value>* = nullptr>
 auto max(const Array& a, U value)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 							  [a,value=static_cast<typename Array::dtype>(value)]
 							  (const auto& coords) { return std::max(a(coords), value); });
   }
@@ -197,7 +197,7 @@ template <unsigned beta, typename Array,
 	  typename std::enable_if_t<std::is_floating_point<typename Array::dtype>::value>* = nullptr>
 auto ggd(const Array& a, typename Array::dtype alpha, typename Array::dtype mu=0)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a,alpha,mu]
 			   (const auto& coords) {
 			     return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
@@ -208,7 +208,7 @@ auto ggd(const Array& a, typename Array::dtype alpha, typename Array::dtype mu=0
 template <typename Array>
 auto norm_angle_diff(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a](const auto& coords){
 							    typename Array::dtype x = a(coords);
 			     if (x >= -180 && x <= 180)
@@ -224,7 +224,7 @@ auto norm_angle_diff(const Array& a)
 template <typename Array>
 auto round(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dimensions(),
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a](const auto& coords) {
 			     return std::round(a(coords));
 			   });

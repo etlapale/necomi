@@ -109,7 +109,7 @@ namespace necomi
      */
     template <typename Expr>
     Array(const DelayedArray<T,N,Expr>& a)
-      : Array(a.dimensions())
+      : Array(a.dims())
     {
       this->operator=(a);
     }
@@ -343,7 +343,7 @@ namespace necomi
     {
 #ifndef NECOMI_NO_BOUND_CHECKS
       // Make sure the dimensions of a and b are the same
-      if (this->dimensions() != a.dimensions())
+      if (this->dims() != a.dims())
 	throw std::length_error("cannot copy from array with different dimensions");
 #endif
       this->map([&a](auto& path, auto& val) {
@@ -399,7 +399,7 @@ namespace necomi
 template <typename Indexable, typename T=typename Indexable::dtype>
 Array<T,Indexable::ndim> cumsum(const Indexable& a, ArrayIndex dim = 0)
 {
-  Array<T,Indexable::ndim> res(a.dimensions());
+  Array<T,Indexable::ndim> res(a.dims());
   res.map([&res,dim,&a](auto& path, auto& valx) {
       if (path[dim] == 0) {
 	valx = a(path);
@@ -419,7 +419,7 @@ Array<T,Indexable::ndim>& operator+=(Array<T,Indexable::ndim>& a,
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dimensions() != b.dimensions())
+  if (a.dims() != b.dims())
     throw std::length_error("cannot increment with array of different dimensions");
 #endif
   a.map([&b](auto& path, auto& val) {val += b(path);});
@@ -437,7 +437,7 @@ template <typename U, typename From, typename T=typename From::dtype,
 	  typename std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
 Array<U, From::ndim> immediate(const From& a)
 {
-  Array<U, From::ndim> res(a.dimensions());
+  Array<U, From::ndim> res(a.dims());
   res.map([&a](auto& coords, auto& val) {
       val = static_cast<U>(a(coords));
     });
@@ -486,7 +486,7 @@ template <typename T, ArrayDimension N,
 Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
 {
   return necomi::operator/=(numerator,
-			    widen(numerator.dimensions(), denominator));
+			    widen(numerator.dims(), denominator));
 }
 
 } // namespace broadcasting

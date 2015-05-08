@@ -71,7 +71,8 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "array dimensions" ) {
     Array<double,0> a0;
-    REQUIRE(a0.dimensions().empty());
+    REQUIRE( a0.ndim == 0 );
+    REQUIRE( size(a0) == 1 );
 
     Array<double,1> a1(127);
     REQUIRE( a1.ndim == 1 );
@@ -168,7 +169,8 @@ TEST_CASE( "basic array operations", "[base]" ) {
     for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     auto a1s = a1[45];
-    REQUIRE( a1s.dimensions().empty() );
+    REQUIRE( a1s.ndim == 0 );
+    REQUIRE( size(a1s) == 1);
     REQUIRE( a1s() == 45 );
 
     Array<int,2> a2(3,4);
@@ -285,7 +287,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     auto a = range(1,7);
     auto b = cumsum(a);
 
-    REQUIRE( b.dimensions() == a.dimensions() );
+    REQUIRE( b.dims() == a.dims() );
     REQUIRE( b(0) == 1 );
     REQUIRE( b(1) == 3 );
     REQUIRE( b(2) == 6 );

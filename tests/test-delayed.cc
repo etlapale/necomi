@@ -30,7 +30,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     {
       using dtype = double;
       enum { ndim = 1 };
-      Dimensions<ndim> dimensions() const { return Dimensions<ndim>(); }
+      Dimensions<ndim> dims() const { return Dimensions<ndim>(); }
       dtype operator()(const Coordinates<ndim>&) const { return 42; };
     } a;
     auto b = abs(a);
@@ -207,8 +207,8 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   SECTION( "infer make_delayed size template argument" ) {
     std::array<ArrayIndex,2> dims{{11,21}};
     auto a = make_delayed<int>(dims, [](auto&) { return 42; });
-    REQUIRE( a.dimensions().size() == 2 );
-    REQUIRE( a.dimensions()[0] == 11 );
+    REQUIRE( a.dims().size() == 2 );
+    REQUIRE( a.dims()[0] == 11 );
     REQUIRE( a(3,7) == 42 );
   }
 
@@ -216,12 +216,12 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     Array<int,1> a(127);
 
     auto b = zeros_like(a);
-    REQUIRE( b.dimensions() == a.dimensions() );
+    REQUIRE( b.dims() == a.dims() );
     REQUIRE( b(42) == 0 );
     REQUIRE( b(73) == 0 );
 
     auto c = constants_like(a, 42);
-    REQUIRE( c.dimensions() == a.dimensions() );
+    REQUIRE( c.dims() == a.dims() );
     REQUIRE( c(14) == 42 );
     REQUIRE( c(88) == 42 );
   }
@@ -235,33 +235,33 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "range creation" ) {
     auto a = range(8);
-    REQUIRE( a.dimensions().size() == 1 );
-    REQUIRE( a.dimensions()[0] == 8 );
+    REQUIRE( a.dims().size() == 1 );
+    REQUIRE( a.dims()[0] == 8 );
     REQUIRE( a(0) == 0 );
     REQUIRE( a(4) == 4 );
     REQUIRE( a(7) == 7 );
 
     auto b = range(2,8);
-    REQUIRE( b.dimensions().size() == 1 );
-    REQUIRE( b.dimensions()[0] == 6 );
+    REQUIRE( b.dims().size() == 1 );
+    REQUIRE( b.dims()[0] == 6 );
     REQUIRE( b(0) == 2 );
     REQUIRE( b(4) == 6 );
     REQUIRE( b(5) == 7 );
 
     auto c = range(0,6,2);
-    REQUIRE( c.dimensions()[0] == 3 );
+    REQUIRE( c.dims()[0] == 3 );
     REQUIRE( c(0) == 0 );
     REQUIRE( c(1) == 2 );
     REQUIRE( c(2) == 4 );
 
     auto d = range(0,6,2);
-    REQUIRE( d.dimensions()[0] == 3 );
+    REQUIRE( d.dims()[0] == 3 );
     REQUIRE( d(0) == 0 );
     REQUIRE( d(1) == 2 );
     REQUIRE( d(2) == 4 );
 
     auto e = range(0,7,2);
-    REQUIRE( e.dimensions()[0] == 4 );
+    REQUIRE( e.dims()[0] == 4 );
     REQUIRE( e(0) == 0 );
     REQUIRE( e(1) == 2 );
     REQUIRE( e(2) == 4 );
@@ -277,7 +277,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = range(20);
     std::array<ArrayIndex,2> dims{4,5};
     auto b = reshape(a, dims);
-    REQUIRE( b.dimensions() == dims );
+    REQUIRE( b.dims() == dims );
     REQUIRE( b(0,0) == 0);
     REQUIRE( b(1,1) == 6 );
     REQUIRE( b(3,2) == 17 );
@@ -298,25 +298,25 @@ TEST_CASE( "delayed arrays", "[core]" ) {
       });
 
     auto a0 = sum(a, 0);
-    REQUIRE( a0.dimensions().size() == 2 );
-    REQUIRE( a0.dimensions()[0] == 3 );
-    REQUIRE( a0.dimensions()[1] == 4 );
+    REQUIRE( a0.dims().size() == 2 );
+    REQUIRE( a0.dims()[0] == 3 );
+    REQUIRE( a0.dims()[1] == 4 );
     REQUIRE( a0(0,0) == 12 );
     REQUIRE( a0(1,1) == 22 );
     REQUIRE( a0(2,3) == 34 );
 
     auto a1 = sum(a, 1);
-    REQUIRE( a1.dimensions().size() == 2 );
-    REQUIRE( a1.dimensions()[0] == 2 );
-    REQUIRE( a1.dimensions()[1] == 4 );
+    REQUIRE( a1.dims().size() == 2 );
+    REQUIRE( a1.dims()[0] == 2 );
+    REQUIRE( a1.dims()[1] == 4 );
     REQUIRE( a1(0,0) == 12 );
     REQUIRE( a1(0,1) == 15 );
     REQUIRE( a1(1,1) == 51 );
 
     auto a2 = sum(a, 2);
-    REQUIRE( a2.dimensions().size() == 2 );
-    REQUIRE( a2.dimensions()[0] == 2 );
-    REQUIRE( a2.dimensions()[1] == 3 );
+    REQUIRE( a2.dims().size() == 2 );
+    REQUIRE( a2.dims()[0] == 2 );
+    REQUIRE( a2.dims()[1] == 3 );
     REQUIRE( a2(0,0) == 6 );
     REQUIRE( a2(1,1) == 70 );
     REQUIRE( a2(1,2) == 86 );
@@ -580,7 +580,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     auto b = fix_dimension(a, 1, 1);
     Coordinates<2> dims_b{4, 3};
-    REQUIRE( b.dimensions() == dims_b );
+    REQUIRE( b.dims() == dims_b );
     REQUIRE( b(0,0) == 3 );
     REQUIRE( b(1,2) == 11 );
     REQUIRE( b(3,1) == 22 );
@@ -616,7 +616,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     // modifiable delayed arrays are constructible
     auto b = immediate(a);
-    auto c = make_delayed<int>(b.dimensions(),
+    auto c = make_delayed<int>(b.dims(),
 			       [&b](auto& coords) -> int& {
 	return b(coords);
       });
@@ -700,7 +700,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(1,0) == 18 );
 
     auto d = stack(a0,a1);
-    REQUIRE( a.dimensions() == d.dimensions() );
+    REQUIRE( a.dims() == d.dims() );
     REQUIRE( a(0,0,0) == d(0,0,0) );
     REQUIRE( a(1,2,1) == d(1,2,1) );
 

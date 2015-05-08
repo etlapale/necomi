@@ -19,7 +19,7 @@ auto cos(const Array& a)
 {
   using std::cos;
   using C = decltype(cos(std::declval<typename Array::dtype>()));
-  return make_delayed<C,Array::ndim>(a.dimensions(), [a] (const auto& x) {
+  return make_delayed<C,Array::ndim>(a.dims(), [a] (const auto& x) {
       return std::cos(a(x));
     });
 }
@@ -52,7 +52,7 @@ template <typename Array,
 	  std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto radians(const Array& a)
 {
-  return make_delayed<typename Array::dtype,Array::ndim>(a.dimensions(), [a] (const auto& x) {
+  return make_delayed<typename Array::dtype,Array::ndim>(a.dims(), [a] (const auto& x) {
       return radians(a(x));
     });
 }

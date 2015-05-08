@@ -96,7 +96,7 @@ template <typename UnaryOperation, ArrayIndex M, typename Array>
 std::enable_if_t<M<Array::ndim>
 for_looper(Array& a, Coordinates<Array::ndim>& path, UnaryOperation f)
 {
-  for (auto i = 0UL; i < a.dimensions()[M]; i++) {
+  for (auto i = 0UL; i < a.dim(M); i++) {
     path[M] = i;
     for_looper<UnaryOperation,M+1,Array>(a, path, f);
   }
@@ -125,7 +125,7 @@ const_for_looper(const Array& a,
 		 Coordinates<Array::ndim>& path,
 		 ConstMapOperation f)
 {
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+  for (ArrayIndex i = 0; i < a.dim(M); i++) {
     path[M] = i;
     const_for_looper<ConstMapOperation,M+1,Array>(a, path, f);
   }
@@ -157,7 +157,7 @@ breakable_for_looper(const Array& a,
 		     Coordinates<Array::ndim>& path,
 		     Predicate p)
 {
-  for (ArrayIndex i = 0; i < a.dimensions()[M]; i++) {
+  for (ArrayIndex i = 0; i < a.dims()[M]; i++) {
     path[M] = i;
     bool ret = breakable_for_looper<Predicate,M+1,Array>(a, path, p);
     if (ret) return true;
@@ -165,31 +165,21 @@ breakable_for_looper(const Array& a,
   return false;
 }
 
-/**
- * Base class for std::size_t dimensions.
- */
+/// Base class helper for fixed-ndim std::size_t dimensions arrays.
 template <ArrayIndex N>
 class DimArray
 {
 public:
-  DimArray(const Dimensions<N>& dimensions)
-    : m_dims(dimensions)
+  DimArray(const Dimensions<N>& dims)
+    : m_dims(dims)
   {}
-
-  /**
-   * Dimensions of the array.
-   */
-  const Dimensions<N>& dimensions() const
-  { return m_dims; }
 
   const Dimensions<N>& dims() const
   { return m_dims; }
 
-  /**
-   * Return a given dimension.
-   */
   ArrayDimension dim(ArrayIndex i) const
   { return m_dims[i]; }
+  
 protected:
   /// Storage for the array dimensions.
   Dimensions<N> m_dims;

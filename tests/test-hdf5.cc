@@ -14,7 +14,7 @@ TEST_CASE( "HDF5 storage", "[hdf5]" ) {
     hdf5_save(path, "a0", a0);
 
     auto b0 = hdf5_load<int,0>(path, "a0");
-    REQUIRE( b0.dimensions() == a0.dimensions() );
+    REQUIRE( b0.dims() == a0.dims() );
     REQUIRE( b0() == a0() );
 
     remove(path);
@@ -28,7 +28,7 @@ TEST_CASE( "HDF5 storage", "[hdf5]" ) {
     hdf5_save(path, "a3", a3);
     
     auto b3 = hdf5_load<int,3>(path, "a3");
-    REQUIRE( a3.dimensions() == b3.dimensions() );
+    REQUIRE( a3.dims() == b3.dims() );
     REQUIRE( a3(1,2,3) == b3(1,2,3) );
     REQUIRE( a3(0,0,0) == b3(0,0,0) );
 

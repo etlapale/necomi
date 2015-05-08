@@ -19,7 +19,7 @@ auto widen(const Dimensions<M>& dims, const Array& a)
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions are matching
   for (ArrayIndex i = 0; i < Array::ndim; i++)
-    if (a.dimensions()[i] != dims[i+M-Array::ndim])
+    if (a.dims()[i] != dims[i+M-Array::ndim])
       throw std::length_error("cannot broadcast arrays to different dimensions");
 #endif
   return make_delayed<typename Array::dtype,M>(dims,
@@ -41,7 +41,7 @@ auto widen_right(const Dimensions<M>& dims, const Array& a)
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions are matching
   for (ArrayIndex i = 0; i < Array::ndim; i++)
-    if (a.dimensions()[i] != dims[i])
+    if (a.dims()[i] != dims[i])
       throw std::length_error("cannot right-broadcast arrays to different dimensions");
 #endif
   return make_delayed<typename Array::dtype, M>(dims,
@@ -59,7 +59,7 @@ template <typename Array1, typename Array2,
   >
 auto operator*(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator*(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator*(widen<Array2::ndim>(b.dims(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -67,7 +67,7 @@ template <typename Array1, typename Array2,
   >
 auto operator*(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator*(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator*(a, widen<Array1::ndim>(a.dims(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -75,7 +75,7 @@ template <typename Array1, typename Array2,
   >
 auto operator/(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator/(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator/(widen<Array2::ndim>(b.dims(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -83,7 +83,7 @@ template <typename Array1, typename Array2,
   >
 auto operator/(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator/(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator/(a, widen<Array1::ndim>(a.dims(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -91,7 +91,7 @@ template <typename Array1, typename Array2,
   >
 auto operator+(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator+(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator+(widen<Array2::ndim>(b.dims(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -99,7 +99,7 @@ template <typename Array1, typename Array2,
   >
 auto operator+(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator+(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator+(a, widen<Array1::ndim>(a.dims(), b));
 }
 
 template <typename Array1, typename Array2,
@@ -107,7 +107,7 @@ template <typename Array1, typename Array2,
   >
 auto operator-(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator-(widen<Array2::ndim>(b.dimensions(), a), b);
+  return necomi::delayed::operator-(widen<Array2::ndim>(b.dims(), a), b);
 }
 
 template <typename Array1, typename Array2,
@@ -115,7 +115,7 @@ template <typename Array1, typename Array2,
   >
 auto operator-(const Array1& a, const Array2& b)
 {
-  return necomi::delayed::operator-(a, widen<Array1::ndim>(a.dimensions(), b));
+  return necomi::delayed::operator-(a, widen<Array1::ndim>(a.dims(), b));
 }
 
 } // namespace broadcasting
