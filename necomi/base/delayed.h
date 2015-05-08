@@ -19,18 +19,16 @@ template <typename T, ArrayIndex N> class Array;
  * Make sure to register each dependency with add_reference.
  */
 template <typename T, ArrayDimension N, typename Expr>
-class DelayedArray : public DimArray<N>
+class DelayedArray : public DimArray<std::size_t,N>
 {
 public:
-  using dim_type = std::size_t;
-  using dims_type = std::array<std::size_t,N>;
   using dtype = T;
   enum { ndim = N };
   
   template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
   
   DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
-    : DimArray<N>(dims)
+    : DimArray<std::size_t,N>(dims)
     , m_e(std::move(e))
   {
     static_assert(is_callable<Expr,const Coordinates<N>&>::value,

@@ -166,10 +166,13 @@ breakable_for_looper(const Array& a,
 }
 
 /// Base class helper for fixed-ndim std::size_t dimensions arrays.
-template <ArrayIndex N>
+template <typename DimType, ArrayIndex N>
 class DimArray
 {
 public:
+  using dim_type = DimType;
+  using dims_type = std::array<dim_type, N>;
+  
   DimArray(const Dimensions<N>& dims)
     : m_dims(dims)
   {}

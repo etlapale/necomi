@@ -23,16 +23,13 @@ namespace necomi
    * Multi-dimensional arrays supporting non-contiguous shared data.
    */
   template <typename T, ArrayIndex N>
-  class Array : public DimArray<N>
+  class Array : public DimArray<std::size_t, N>
   {
   public:
-    using dim_type = std::size_t;
-    using dims_type = std::array<std::size_t,N>;
-    
     template <typename U, ArrayIndex M> friend class Array;
 
     /// Short name for the parent class
-    typedef DimArray<N> Parent;
+    typedef DimArray<std::size_t, N> Parent;
 
     using dtype = T;
     enum { ndim = N };
