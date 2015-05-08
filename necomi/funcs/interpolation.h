@@ -25,7 +25,7 @@ namespace necomi
     {}
     T operator()(T val) const
     {
-      auto idx = static_cast<necomi::ArrayIndex>(0.5 + (val - m_min)/(m_max - m_min) * (m_data.size() - 1));
+      auto idx = static_cast<necomi::ArrayIndex>(0.5 + (val - m_min)/(m_max - m_min) * (size(m_data) - 1));
       //auto rect = std::max(static_cast<ArrayIndex>(0),
       //std::min(idx, m_data.size()));
       return m_data(idx);

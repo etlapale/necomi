@@ -22,6 +22,8 @@ template <typename T, ArrayDimension N, typename Expr>
 class DelayedArray : public DimArray<N>
 {
 public:
+  using dim_type = std::size_t;
+  using dims_type = std::array<std::size_t,N>;
   using dtype = T;
   enum { ndim = N };
   
@@ -483,7 +485,7 @@ auto reshape(const Array& a, const Dimensions<M>& d)
     auto out_size = std::accumulate(d.cbegin(), d.cend(),
 				    static_cast<ArrayDimension>(1),
         [] (ArrayIndex a, ArrayIndex b) { return a * b; });
-    if (out_size != a.size())
+    if (out_size != size(a))
       throw std::length_error("invalid dimensions for reshaped array");
 #endif
     auto old_strides = default_strides(a.dimensions());

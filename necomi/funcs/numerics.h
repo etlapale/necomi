@@ -86,7 +86,7 @@ template <typename Array,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto average(const Array& a)
 {
-  return sum(a) / static_cast<typename Array::dtype>(a.size());
+  return sum(a) / static_cast<typename Array::dtype>(size(a));
 }
   
 template <unsigned N, typename T>
@@ -163,7 +163,7 @@ auto variance(const Array& a, bool bessel_correction)
   a.map([avg,&res](auto&, auto val) {
       res += power<2>(val - avg);
     });
-  return res / (bessel_correction ? a.size() - 1 : a.size());
+  return res / (bessel_correction ? size(a) - 1 : size(a));
 }
 
 template <typename Array,

@@ -57,16 +57,16 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "array sizes" ) {
     Array<double,0> a0;
-    REQUIRE( a0.size() == 1 );
+    REQUIRE( size(a0) == 1 );
 
     Array<double,1> a1(127);
-    REQUIRE( a1.size() == 127 );
+    REQUIRE( size(a1) == 127 );
 
     Array<double,2> a2(3,4);
-    REQUIRE( a2.size() == 3*4 );
+    REQUIRE( size(a2) == 3*4 );
 
     Array<double,5> a5(8,1,7,2,9);
-    REQUIRE( a5.size() == 8*1*7*2*9 );
+    REQUIRE( size(a5) == 8*1*7*2*9 );
   }
 
   SECTION( "array dimensions" ) {
@@ -74,18 +74,18 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE(a0.dimensions().empty());
 
     Array<double,1> a1(127);
-    REQUIRE( a1.dimensions().size() == 1 );
-    REQUIRE( a1.dimensions()[0] == 127 );
+    REQUIRE( a1.ndim == 1 );
+    REQUIRE( a1.dim(0) == 127 );
 
     Array<double,2> a2(3,4);
-    REQUIRE( a2.dimensions().size() == 2 );
-    REQUIRE( a2.dimensions()[0] == 3 );
-    REQUIRE( a2.dimensions()[1] == 4 );
+    REQUIRE( a2.ndim == 2 );
+    REQUIRE( a2.dim(0) == 3 );
+    REQUIRE( a2.dim(1) == 4 );
 
     Array<double,5> a5(8,1,7,2,9);
-    REQUIRE( a5.dimensions().size() == 5 );
-    REQUIRE( a5.dimensions()[1] == 1 );
-    REQUIRE( a5.dimensions()[4] == 9 );
+    REQUIRE( a5.ndim == 5 );
+    REQUIRE( a5.dim(1) == 1 );
+    REQUIRE( a5.dim(4) == 9 );
   }
 
   SECTION( "array strides" ) {
@@ -136,7 +136,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a1.data()[69] == 456 );
 
     Array<double,2> a2(3,4);
-    for (unsigned int i = 0; i < a2.size(); i++)
+    for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );
     REQUIRE( a2(2,3) == a2.index(2,3) );
@@ -165,19 +165,19 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "slicing" ) {
     Array<int,1> a1(127);
-    for (unsigned int i = 0; i < a1.size(); i++)
+    for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     auto a1s = a1[45];
     REQUIRE( a1s.dimensions().empty() );
     REQUIRE( a1s() == 45 );
 
     Array<int,2> a2(3,4);
-    for (unsigned int i = 0; i < a2.size(); i++)
+    for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     auto a2s = a2[2];
-    REQUIRE( a2s.dimensions().size() == 1 );
-    REQUIRE( a2s.size() == 4 );
-    REQUIRE( a2s.dimensions()[0] == 4 );
+    REQUIRE( a2s.ndim == 1 );
+    REQUIRE( size(a2s) == 4 );
+    REQUIRE( a2s.dim(0) == 4 );
     REQUIRE( a2s.strides().size() == 1 );
     REQUIRE( a2s.strides()[0] == 1 );
     REQUIRE( a2s(2) == 10 );
@@ -222,7 +222,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a0() == 124 );
     
     Array<int,1> a1(127);
-    for (unsigned int i = 0; i < a1.size(); i++)
+    for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     a1.map(incr);
     REQUIRE( a1(43) == 44 );

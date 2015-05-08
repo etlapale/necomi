@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <numeric>
 
 #include "traits.h"
@@ -198,6 +199,11 @@ public:
     return m_dims;
   }
 
+  const Dimensions<N>& dims() const
+  {
+    return m_dims;
+  }
+
   /**
    * Return a given dimension.
    */
@@ -205,19 +211,17 @@ public:
   {
     return m_dims[i];
   }
-
-  /**
-   * Number of elements in the array.
-   */
-  ArrayIndex size() const
-  {
-    return std::accumulate(m_dims.cbegin(), m_dims.cend(), 1,
-        [] (ArrayIndex a, ArrayIndex b) { return a * b; });
-  }
 protected:
   /// Storage for the array dimensions.
   Dimensions<N> m_dims;
 };
+
+template <typename Array, typename dim_type=typename Array::dim_type>
+dim_type size(const Array& a)
+{
+  return std::accumulate(a.dims().cbegin(), a.dims().cend(), 1,
+			 std::multiplies<>());
+}
 
 
 /**

@@ -199,8 +199,8 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "delayed one-liner" ) {
     auto a = make_delayed<int,2>({{11,21}}, [](auto&) { return 42; });
-    REQUIRE( a.dimensions().size() == 2 );
-    REQUIRE( a.dimensions()[0] == 11 );
+    REQUIRE( a.ndim == 2 );
+    REQUIRE( a.dim(0) == 11 );
     REQUIRE( a(3,7) == 42 );
   }
 
@@ -424,14 +424,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   SECTION( "linspace" ) {
     auto a = linspace<double>(0, 30, 10);
-    REQUIRE( a.size() == 10 );
+    REQUIRE( size(a) == 10 );
     REQUIRE( fabs(a(0) - 0) < float_tol );
     REQUIRE( fabs(a(1) - 3.3333333) < float_tol );
     REQUIRE( fabs(a(7) - 23.3333333) < float_tol );
     REQUIRE( fabs(a(9) - 30) < float_tol );
 
     auto b = linspace<double>(0, 30, 10, false);
-    REQUIRE( b.size() == 10 );
+    REQUIRE( size(b) == 10 );
     REQUIRE( fabs(b(0) - 0) < float_tol );
     REQUIRE( fabs(b(1) - 3) < float_tol );
     REQUIRE( fabs(b(7) - 21) < float_tol );
@@ -454,7 +454,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( exception_thrown );
 
     auto d = linspace<double>(0, 1, 10);
-    REQUIRE( d.size() == 10 );
+    REQUIRE( size(d) == 10 );
     REQUIRE( fabs(d(0) - 0) < float_tol );
     REQUIRE( fabs(d(9) - 1) < float_tol );
   }

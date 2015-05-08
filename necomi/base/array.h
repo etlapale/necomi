@@ -26,6 +26,9 @@ namespace necomi
   class Array : public DimArray<N>
   {
   public:
+    using dim_type = std::size_t;
+    using dims_type = std::array<std::size_t,N>;
+    
     template <typename U, ArrayIndex M> friend class Array;
 
     /// Short name for the parent class
@@ -50,7 +53,7 @@ namespace necomi
     Array(const std::array<ArrayIndex,N>& dims)
       : Parent(dims)
       , m_strides(default_strides(dims))
-      , m_shared_data(new T[Parent::size()], [](T* p){ delete [] p; })
+      , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
       , m_data(m_shared_data.get())
     {
     }
