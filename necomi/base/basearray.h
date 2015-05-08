@@ -263,21 +263,21 @@ bool all(const Array& a)
   return !breakable_for_looper<decltype(p),0,Array>(a, path, p);
 }
 
-  /**
-   * Compute the default strides for the given dimensions.
-   */
-  template <ArrayIndex N>
-  std::array<ArrayIndex,N>
-  default_strides(const std::array<ArrayIndex,N>& dims)
-  {
-    std::array<ArrayIndex,N> strides;
-    if (N > 0) {
-      auto prev = strides[N - 1] = 1;
-      for (long i = N - 2; i >= 0; i--)
-	prev = strides[i] = dims[i + 1] * prev;
-    }
-    return strides;
+/**
+ * Compute the default strides for the given dimensions.
+ */
+template <typename DimsType>
+DimsType default_strides(const DimsType& dims)
+{
+  auto N = dims.size();
+  DimsType strides(dims);	// Nop copy to set the size
+  if (N > 0) {
+    auto prev = strides[N - 1] = 1;
+    for (long i = N - 2; i >= 0; i--)
+      prev = strides[i] = dims[i + 1] * prev;
   }
+  return strides;
+}
 
   /**
    * Convert a scalar index into a multi-dimensional indexing path.
