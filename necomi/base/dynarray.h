@@ -27,6 +27,9 @@ public:
 
   const dims_type& dims() const
   { return m_dims; }
+
+  dim_type dim(dim_type i) const
+  { return m_dims[i]; }
 protected:
   dims_type m_dims;
 }; // class DynArray
