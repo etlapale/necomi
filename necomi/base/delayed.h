@@ -22,6 +22,8 @@ template <typename T, ArrayDimension N, typename Expr>
 class DelayedArray : public DimArray<std::size_t,N>
 {
 public:
+  using dim_type = std::size_t;
+  using dims_type = std::array<dim_type, N>;
   using dtype = T;
   enum { ndim = N };
   

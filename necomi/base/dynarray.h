@@ -32,6 +32,9 @@ public:
   { return m_dims[i]; }
 protected:
   dims_type m_dims;
+  dims_type m_strides;
+  std::shared_ptr<T> m_shared_data;
+  T* m_data;
 }; // class DynArray
 
 } // namespace necomi

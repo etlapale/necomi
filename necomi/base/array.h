@@ -26,13 +26,15 @@ namespace necomi
   class Array : public DimArray<std::size_t, N>
   {
   public:
+    using dim_type = std::size_t;
+    using dims_type = std::array<dim_type, N>;
+    using dtype = T;
+    enum { ndim = N };
+    
     template <typename U, ArrayIndex M> friend class Array;
 
     /// Short name for the parent class
     typedef DimArray<std::size_t, N> Parent;
-
-    using dtype = T;
-    enum { ndim = N };
 
   public:
     /**
@@ -41,13 +43,13 @@ namespace necomi
     template <typename ...Dim,
 	      typename std::enable_if_t<sizeof...(Dim) == N && all_indices<Dim...>()>* = nullptr>
       Array(Dim ...dims)
-      : Array(std::array<ArrayIndex,N>({{static_cast<ArrayIndex>(dims)...}}))
+      : Array(dims_type{static_cast<ArrayIndex>(dims)...})
     {}
 
     /**
      * Create a new multi-dimensional array with uninitialized elements.
      */
-    Array(const std::array<ArrayIndex,N>& dims)
+    Array(const dims_type& dims)
       : Parent(dims)
       , m_strides(default_strides(dims))
       , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
