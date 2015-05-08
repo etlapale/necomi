@@ -54,8 +54,7 @@ namespace necomi
       , m_strides(default_strides(dims))
       , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
       , m_data(m_shared_data.get())
-    {
-    }
+    {}
 
     /**
      * Create a shared view of the given array.
@@ -65,8 +64,7 @@ namespace necomi
       , m_strides(src.m_strides)
       , m_shared_data(src.m_shared_data)
       , m_data(src.m_data)
-    {
-    }
+    {}
 
     /**
      * Construct an array from already existing data.
@@ -170,27 +168,17 @@ namespace necomi
      * Convert a multi-dimensional position into an offset from
      * the beginning of the data (m_data).
      */
-    ArrayIndex index(const Coordinates<N>& path) const
-    {
-      return std::inner_product(path.cbegin(), path.cend(),
-				m_strides.cbegin(), 0);
-    }
-
-    /**
-     * Convert a multi-dimensional position into an offset from
-     * the beginning of the data (m_data).
-     */
     template <typename ...Indices>
     std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
                      ArrayIndex>
     index(Indices... indices) const
     {
       std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
-      return index(idx);
+      return necomi::index(*this, idx);
     }
 
     T& operator()(const Coordinates<N>& path) {
-      return m_data[index(path)];
+      return m_data[necomi::index(*this, path)];
     }
 
     /**
@@ -206,7 +194,7 @@ namespace necomi
     }
 
     const T& operator()(const Coordinates<N>& coords) const {
-      return m_data[index(coords)];
+      return m_data[necomi::index(*this, coords)];
     }
 
     /**
@@ -275,9 +263,7 @@ namespace necomi
       return this->slice(s);
     }
 
-    /**
-     * Return the data associated with the array.
-     */
+    /// Return a raw pointer to the data associated with the array.
     T* data()
     { return m_data; }
 

@@ -279,6 +279,15 @@ DimsType default_strides(const DimsType& dims)
   return strides;
 }
 
+/// Convert element coordinates in address offset.
+template <typename Array, typename dims_type = typename Array::dims_type>
+std::size_t index(const Array& a, const dims_type& coords)
+{
+  return std::inner_product(coords.cbegin(), coords.cend(),
+			    a.strides().cbegin(), 0);
+}
+
+
   /**
    * Convert a scalar index into a multi-dimensional indexing path.
    * \param strides The strides of the underlying array.
