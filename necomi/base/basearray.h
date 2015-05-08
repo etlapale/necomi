@@ -13,14 +13,6 @@
 
 namespace necomi
 {
-/**
-* The parent class of all array types.
-* Useful for managing heterogenous set of pointer to arrays.
-*/
-class BaseArray
-{
-};
-  
   /**
    * Remove a dimension or coordinate.
    */
@@ -87,7 +79,6 @@ Coordinates<N> change_coordinate(const Coordinates<N>& coords,
   return c;
 }
 
-#ifndef IN_DOXYGEN
 /**
 * Final case of for loops through template metaprogramming.
 */
@@ -173,14 +164,9 @@ breakable_for_looper(const Array& a,
   }
   return false;
 }
-#endif // IN_DOXYGEN
-
 
 /**
- * CRTP base class for immediate and delayed arrays.
- * This Curiously recurring template pattern allows static
- * polymorphism to share efficient general array definitions (indexing
- * and data access).
+ * Base class for std::size_t dimensions.
  */
 template <ArrayIndex N>
 class DimArray
@@ -188,29 +174,22 @@ class DimArray
 public:
   DimArray(const Dimensions<N>& dimensions)
     : m_dims(dimensions)
-  {
-  }
+  {}
 
   /**
    * Dimensions of the array.
    */
   const Dimensions<N>& dimensions() const
-  {
-    return m_dims;
-  }
+  { return m_dims; }
 
   const Dimensions<N>& dims() const
-  {
-    return m_dims;
-  }
+  { return m_dims; }
 
   /**
    * Return a given dimension.
    */
   ArrayDimension dim(ArrayIndex i) const
-  {
-    return m_dims[i];
-  }
+  { return m_dims[i]; }
 protected:
   /// Storage for the array dimensions.
   Dimensions<N> m_dims;
