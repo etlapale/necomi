@@ -312,10 +312,19 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "index to path" ) {
-    auto strides = default_strides<2>({{4, 5}});
+    auto dims = std::array<std::size_t,2>{4, 5};
+    auto strides = default_strides(dims);
     REQUIRE( strides.size() == 2 );
     REQUIRE( strides[0] == 5 );
     REQUIRE( strides[1] == 1 );
+    
+    auto dims2 = std::vector<std::size_t>{4, 5};
+    REQUIRE( dims2.size() == 2 );
+    auto strides2 = default_strides(dims2);
+    REQUIRE( strides.size() == strides2.size() );
+    REQUIRE( strides.size() == 2 );
+    REQUIRE( strides[0] == strides2[0] );
+    REQUIRE( strides[1] == strides2[1] );
 
     auto path = index_to_path(17, strides);
     REQUIRE( path.size() == 2 );
