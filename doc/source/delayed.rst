@@ -165,15 +165,6 @@ instead of ``[&img]``:
      return new_img;
    }
 
-The default copy constructor is fine for immediate or delay arrays,
-but when working with abstract arrays, derived of the CRTP class
-``BaseArray``, you must ensure that you apply the correct copy
-constructor, with ``shallow_copy``.
-
-.. code:: c++
-
-   make_delayed<T>(dims, [img=img.shallow_copy()](…){…});
-
 Loop example
 ------------
 A typical compiler will optimize out delayed operations such that a
