@@ -110,16 +110,16 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "indices" ) {
     Array<double,0> a0;
-    REQUIRE( a0.index() == 0 );
+    REQUIRE( index(a0) == 0 );
 
     Array<double,1> a1(127);
-    REQUIRE( a1.index(4) == 4 );
-    REQUIRE( a1.index(86) == 86 );
+    REQUIRE( index(a1, 4) == 4 );
+    REQUIRE( index(a1, 86) == 86 );
 
     Array<double,2> a2(3,4);
-    REQUIRE( a2.index(0,2) == 2 );
-    REQUIRE( a2.index(1,3) == 7 );
-    REQUIRE( a2.index(2,1) == 9 );
+    REQUIRE( index(a2, 0, 2) == 2 );
+    REQUIRE( index(a2, 1, 3) == 7 );
+    REQUIRE( index(a2, 2, 1) == 9 );
   }
 
   SECTION( "data access" ) {
@@ -140,7 +140,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );
-    REQUIRE( a2(2,3) == a2.index(2,3) );
+    REQUIRE( a2(2,3) == index(a2, 2, 3) );
   }
 
   SECTION( "creation from existing data" ) {

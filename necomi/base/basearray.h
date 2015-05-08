@@ -280,13 +280,25 @@ DimsType default_strides(const DimsType& dims)
 }
 
 /// Convert element coordinates in address offset.
-template <typename Array, typename dims_type = typename Array::dims_type>
+template <typename Array,
+	  typename dims_type = typename Array::dims_type,
+	  std::enable_if_t<std::is_same<dims_type, typename Array::dims_type>::value>* = nullptr>
 std::size_t index(const Array& a, const dims_type& coords)
 {
+  // TODO static/dynamic check on a.ndim
   return std::inner_product(coords.cbegin(), coords.cend(),
 			    a.strides().cbegin(), 0);
 }
 
+template <typename Array, typename ...Coords,
+	  typename dim_type = typename Array::dim_type,
+	  std::enable_if_t<all_convertible<Coords..., dim_type>::value>* = nullptr>
+std::size_t index(const Array& a, Coords... coords)
+{
+  // TODO static/dynamic check on a.ndim
+  using dims_type = typename Array::dims_type;
+  return index(a, dims_type{static_cast<dim_type>(coords)...});
+}
 
   /**
    * Convert a scalar index into a multi-dimensional indexing path.

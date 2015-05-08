@@ -164,49 +164,26 @@ namespace necomi
       return a;
     }
 
-    /**
-     * Convert a multi-dimensional position into an offset from
-     * the beginning of the data (m_data).
-     */
-    template <typename ...Indices>
-    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
-                     ArrayIndex>
-    index(Indices... indices) const
-    {
-      std::array<ArrayIndex,N> idx {{static_cast<ArrayIndex>(indices)...}};
-      return necomi::index(*this, idx);
-    }
+    T& operator()(const dims_type& coords)
+    { return m_data[index(*this, coords)];}
 
-    T& operator()(const Coordinates<N>& path) {
-      return m_data[necomi::index(*this, path)];
-    }
-
-    /**
-     * Return a reference to a single element.
-     */
-    template <typename ...Indices>
-    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
-                     T&>
-    operator()(Indices... indices)
+    const T& operator()(const dims_type& coords) const
+    { return m_data[index(*this, coords)]; }
+    
+    template <typename ...Coords,
+	      std::enable_if_t<sizeof...(Coords) == N && all_convertible<Coords...,dim_type>::value>* = nullptr>
+    T& operator()(Coords... coords)
     {
       // TODO check indices for out of bounds
-      return m_data[index(indices...)];
+      return m_data[index(*this, coords...)];
     }
-
-    const T& operator()(const Coordinates<N>& coords) const {
-      return m_data[necomi::index(*this, coords)];
-    }
-
-    /**
-     * Return the value of a single element.
-     */
-    template <typename ...Indices>
-    std::enable_if_t<sizeof...(Indices) == N && all_indices<Indices...>(),
-                     const T&>
-    operator()(Indices... indices) const
+    
+    template <typename ...Coords,
+	      std::enable_if_t<sizeof...(Coords) == N && all_convertible<Coords...,dim_type>::value>* = nullptr>
+    const T& operator()(Coords... coords) const
     {
       // TODO check indices for out of bounds
-      return m_data[index(indices...)];
+      return m_data[index(*this, coords...)];
     }
 
     /**
