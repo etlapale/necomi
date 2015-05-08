@@ -12,6 +12,7 @@
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
+#include "base/dynarray.h"
 
 #include "funcs/interpolation.h"
 #include "funcs/numerics.h"

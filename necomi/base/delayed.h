@@ -621,7 +621,7 @@ auto concat(const Array1& a, const Array2& b)
   static_assert(same_dimensionality<Array1, Array2>::value,
 		"concatenated arrays must have the same number of dimensions");
   auto d = 0UL;	// Dimension along which to concatenate
-  #ifndef NECOMI_NO_BOUND_CHECKS
+#ifndef NECOMI_NO_BOUND_CHECKS
   if (! almost_same_dimensions(d, a, b))
     throw std::length_error("concatenated arrays must have almost the same dimensions");
 #endif

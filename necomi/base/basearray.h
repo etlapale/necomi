@@ -182,7 +182,7 @@ breakable_for_looper(const Array& a,
  * and data access).
  */
 template <ArrayIndex N>
-class DimArray : public BaseArray
+class DimArray
 {
 public:
   DimArray(const Dimensions<N>& dimensions)
@@ -218,6 +218,7 @@ protected:
   /// Storage for the array dimensions.
   Dimensions<N> m_dims;
 };
+
 
 /**
  * Sum all the elements of an array.
