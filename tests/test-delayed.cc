@@ -536,6 +536,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     REQUIRE( min(a) == 4 );
     REQUIRE( max(a) == 99 );
+
+    REQUIRE( argmin(a)[0] == 4 );
+    REQUIRE( argmax(a)[0] == 1 );
   }
   
   SECTION( "shifted" ) {
