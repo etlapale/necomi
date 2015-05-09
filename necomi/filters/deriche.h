@@ -40,7 +40,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
            T a0, T a1, T a2, T a3,
            T b1, T b2)
 {
-  auto& dims = a.dimensions();
+  auto& dims = a.dims();
 
   if (K == dim) {
     path[K] = 0;
@@ -65,7 +65,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
            T a0, T a1, T a2, T a3,
            T b1, T b2)
 {
-  auto& dims = a.dimensions();
+  auto& dims = a.dims();
   auto ddim = dims[dim];
   auto stride = a.strides()[dim];
   
@@ -134,7 +134,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
   T b1 = -2 * ena;
   T b2 = ens;
   
-  auto& dims = a.dimensions();
+  const auto& dims = a.dims();
 
   T a0, a1, a2, a3;
 
