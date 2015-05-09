@@ -179,10 +179,10 @@ auto rescale(typename Array::dtype imin, typename Array::dtype imax,
   {
     static_assert(Array1::ndim == 1,
 		  "linear interpolation only available for one-dimensional arrays");
-    return make_delayed<typename Array1::dtype, Array2::ndim>(xvals.dimensions(),
+    return make_delayed<typename Array1::dtype, Array2::ndim>(xvals.dims(),
     [xmin,xmax,a,xvals]
     (const auto& coords) {
-								typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, a.size(), xvals(coords));
+								typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, size(a), xvals(coords));
       auto x0 = static_cast<necomi::ArrayIndex>(x);
       auto y0 = a(x0);
       auto y1 = a(x0 + 1);
