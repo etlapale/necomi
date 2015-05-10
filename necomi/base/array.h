@@ -427,7 +427,19 @@ Array<T, From::ndim> immediate(const From& a)
     std::copy_n(vals.begin(), sizeof...(Values), a.data());
     return a;
   }
-  
+
+template <typename T, ArrayDimension N,
+	  typename Indexable, typename U=typename Indexable::dtype,
+	  std::enable_if_t<is_promotable<U,T>::value
+			   && N==Indexable::ndim>* = nullptr>
+Array<T,N>& operator*=(Array<T,N>& numerator, const Indexable& denominator)
+{
+  numerator.map([&denominator](auto& coords, auto& val) {
+      val *= denominator(coords);
+    });
+  return numerator;
+}
+
 template <typename T, ArrayDimension N,
 	  typename Indexable, typename U=typename Indexable::dtype,
 	  std::enable_if_t<is_promotable<U,T>::value
