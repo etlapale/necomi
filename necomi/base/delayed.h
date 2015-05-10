@@ -325,23 +325,25 @@ auto operator+(const Array1& a, const Array2& b)
 				       });
 }
 
-  template <typename T, ArrayIndex N>
-  auto operator>(const Array<T,N>& a, const T& val)
-  {
-    auto fun = [a,val](auto& path) {
-        return a(path) > val;
-      };
-    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
-  }
+template <typename Array, typename T,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<T>::value>* = nullptr>
+auto operator>(const Array& a, const T& val)
+{
+  return make_delayed<bool,Array::ndim>(a.dims(), [a,val](auto& path) {
+      return a(path) > val;
+    });
+}
 
-  template <typename T, ArrayIndex N>
-  auto operator<(const Array<T,N>& a, const T& val)
-  {
-    auto fun = [a,val](auto& path) {
-        return a(path) < val;
-      };
-    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
-  }
+template <typename Array, typename T,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<T>::value>* = nullptr>
+auto operator<(const Array& a, const T& val)
+{
+  return make_delayed<bool,Array::ndim>(a.dims(), [a,val](auto& path) {
+      return a(path) < val;
+    });
+}
 
   template <typename T, ArrayIndex N>
   auto operator>(const Array<T,N>& a, const Array<T,N>& b)
