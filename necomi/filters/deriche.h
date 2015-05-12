@@ -206,7 +206,7 @@ deriche(StridedArray<T,N>&& a, std::size_t dim, T sigma,
 	      StridedArray<typename A::dtype,A::ndim> deriche(const A& a, double sigma,
 		     DericheOrder order=DericheOrder::BLUR)
   {
-    auto x = immediate(a);
+    auto x = strided_array(a);
     return deriche(x, sigma, order);
   }
 
