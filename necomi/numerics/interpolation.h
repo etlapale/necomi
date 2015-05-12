@@ -26,7 +26,7 @@ public:
   {}
   T operator()(T val) const
   {
-    auto idx = static_cast<necomi::ArrayIndex>(0.5 + (val - m_min)/(m_max - m_min) * (size(m_data) - 1));
+    auto idx = static_cast<std::size_t>(0.5 + (val - m_min)/(m_max - m_min) * (size(m_data) - 1));
     //auto rect = std::max(static_cast<ArrayIndex>(0),
     //std::min(idx, m_data.size()));
     return m_data(idx);
@@ -38,13 +38,13 @@ protected:
 };
   
 template <typename T, typename Func>
-auto discretization(T min, T max, necomi::ArrayDimension size, Func func)
+auto discretization(T min, T max, std::size_t size, Func func)
 {
   return Discretization<T,Func>(min, max, size, func);
 }
   
 template <typename T>
-auto discretization(T min, T max, necomi::ArrayDimension size)
+auto discretization(T min, T max, std::size_t size)
 {
   return discretization(min, max, size, [](auto&& a){ return a; });
 }
@@ -67,7 +67,7 @@ template <InterpolationMethod method, typename U=double,
 {
   static_assert(Array::ndim == 1,
 		"nearest-neighbor interpolation only available for one-dimensional arrays");
-  auto x0 = static_cast<necomi::ArrayIndex>(0.5 + x);
+  auto x0 = static_cast<std::size_t>(0.5 + x);
   return a(x0);
 }
   
@@ -84,7 +84,7 @@ template <InterpolationMethod method, typename U=double,
   static_assert(Array::ndim == 1,
 		"nearest-neighbor interpolation only available for one-dimensional arrays");
   return [a](U x) {
-    auto x0 = static_cast<necomi::ArrayIndex>(0.5 + x);
+    auto x0 = static_cast<std::size_t>(0.5 + x);
     return a(x0);
   };
 }
@@ -102,7 +102,7 @@ auto interpolation(const Array1& a, const Array2& xvals)
   return make_delayed<Array1::dtype,Array2::ndim>(xvals.dimensions(),
 						  [a,xvals](const auto& coords) {
 						    typename Array2::dtype x = xvals(coords);
-						    auto x0 = static_cast<necomi::ArrayIndex>(x);
+						    auto x0 = static_cast<std::size_t>(x);
 						    auto y0 = a(x0);
 						    auto y1 = a(x0 + 1);
 
@@ -122,7 +122,7 @@ template <InterpolationMethod method, typename U=double,
 {
   static_assert(Array::ndim == 1,
 		"linear interpolation only available for one-dimensional arrays");
-  auto x0 = static_cast<necomi::ArrayIndex>(x);
+  auto x0 = static_cast<std::size_t>(x);
   auto y0 = a(x0);
   auto y1 = a(x0 + 1);
 
@@ -142,7 +142,7 @@ template <InterpolationMethod method, typename U=double,
   static_assert(Array::ndim == 1,
 		"linear interpolation only available for one-dimensional arrays");
   return [a](U x) {
-    auto x0 = static_cast<necomi::ArrayIndex>(x);
+    auto x0 = static_cast<std::size_t>(x);
     auto y0 = a(x0);
     auto y1 = a(x0 + 1);
 
@@ -184,7 +184,7 @@ auto scaled_interpolation(const Array1& a,
 							    [xmin,xmax,a,xvals]
 							    (const auto& coords) {
 							      typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, size(a), xvals(coords));
-							      auto x0 = static_cast<necomi::ArrayIndex>(x);
+							      auto x0 = static_cast<std::size_t>(x);
 							      auto y0 = a(x0);
 							      auto y1 = a(x0 + 1);
 
