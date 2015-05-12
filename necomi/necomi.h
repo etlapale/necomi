@@ -48,10 +48,9 @@
 
 // Old uncleaned untested headers
 #if 0
-#include "funcs/numerics.h"
-#include "integrate/sde.h"
 #include "codecs/inr.h"
 #include "filters/deriche.h"
+#include "numerics/sde.h"
 #endif
 
 // Local Variables:
