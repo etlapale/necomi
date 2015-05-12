@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../core/loops.h"
 #include "../core/shape.h"
 #include "../core/slices.h"
