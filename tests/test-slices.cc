@@ -137,7 +137,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
   
   SECTION(" slice for dimension" ) {
-    auto a = immediate(reshape(range(24), 2, 4, 3));
+    auto a = strided_array(reshape(range(24), 2, 4, 3));
     REQUIRE( a(0,2,1) == 7 );
     REQUIRE( a(1,2,2) == 20 );
     

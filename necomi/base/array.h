@@ -54,35 +54,6 @@ Array<T,Indexable::ndim>& operator+=(Array<T,Indexable::ndim>& a,
   return a;
 }
 
-/**
- * Convert an abstract array to an immediate one with element casting.
- *
- * A new array with copied or casted elements is returned,
- * even if the original array already was an immediate with same
- * element type.
- */
-template <typename U, typename From, typename T=typename From::dtype,
-	  typename std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
-Array<U, From::ndim> immediate(const From& a)
-{
-  Array<U, From::ndim> res(a.dims());
-  res.map([&a](auto& coords, auto& val) {
-      val = static_cast<U>(a(coords));
-    });
-  return res;
-}
-
-/**
- * Convert an abstract array to an immediate one with same element type.
- *
- * A new array with copied or casted elements is always returned.
- */
-template <typename From, typename T=typename From::dtype>
-Array<T, From::ndim> immediate(const From& a)
-{
-  return immediate<T,From>(a);
-}
-
   template <typename T=double,
 	    typename ...Values,
             typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>

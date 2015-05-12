@@ -55,12 +55,11 @@ std::size_t index(const Array& a, Coords... coords)
  * \see default_strides to get strides for some dimensions.
  */
 template <typename dims_type,
-	  typename dim_type = typename dims_type::value_type,
-	  dim_type N>
+	  typename dim_type = typename dims_type::value_type>
 dims_type index_to_coords(dim_type idx, const dims_type& strides)
 {
   dims_type res;
-  for (dim_type i = 0; i < N; i++) {
+  for (dim_type i = 0; i < strides.size(); i++) {
     res[i] = idx / strides[i];
     idx %= strides[i];
   }

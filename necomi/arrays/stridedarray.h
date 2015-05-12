@@ -330,6 +330,36 @@ protected:
   T* m_data;
 };
 
+/**
+ * Convert an abstract array to an immediate one with element casting.
+ *
+ * A new array with copied or casted elements is returned,
+ * even if the original array already was an immediate with same
+ * element type.
+ */
+template <typename U, typename From, typename T=typename From::dtype,
+	  typename std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
+StridedArray<U, From::ndim> strided_array(const From& a)
+{
+  StridedArray<U, From::ndim> res(a.dims());
+  res.map([&a](auto& coords, auto& val) {
+      val = static_cast<U>(a(coords));
+    });
+  return res;
+}
+
+/**
+ * Convert an abstract array to an immediate one with same element type.
+ *
+ * A new array with copied or casted elements is always returned.
+ */
+template <typename From, typename T=typename From::dtype>
+StridedArray<T, From::ndim> strided_array(const From& a)
+{
+  return strided_array<T,From>(a);
+}
+
+
 } // namespace necomi
 
 // Local Variables:

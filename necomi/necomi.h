@@ -7,10 +7,12 @@
 
 // Type traits
 #include "traits/arrays.h"
+#include "traits/shape.h"
 #include "traits/generic.h"
 
 // Core definitions
 #include "core/loops.h"
+#include "core/mpl.h"
 #include "core/shape.h"
 #include "core/slices.h"
 #include "core/strides.h"
@@ -23,6 +25,7 @@
 // Array creation
 #include "delayed/comparisons.h"
 #include "delayed/ranges.h"
+#include "delayed/transforms.h"
 
 // Numerics
 #include "numerics/interpolation.h"
