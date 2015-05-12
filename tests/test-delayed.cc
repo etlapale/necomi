@@ -6,11 +6,10 @@
 
 #include <necomi/necomi.h>
 using namespace necomi;
-using namespace necomi::delayed;
 
 static constexpr double float_tol = 1e-2;
 
-static double my_constant_function(const std::array<ArrayIndex,2>& path)
+static double my_constant_function(const std::array<std::size_t,2>& path)
 {
   (void) path;
   return 42.0;
@@ -30,21 +29,24 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     {
       using dtype = double;
       enum { ndim = 1 };
-      Dimensions<ndim> dims() const { return Dimensions<ndim>(); }
-      dtype operator()(const Coordinates<ndim>&) const { return 42; };
+      using dim_type = std::size_t;
+      using dims_type = std::array<dim_type,ndim>;
+      
+      dims_type dims() const { return dims_type(); }
+      dtype operator()(const dims_type&) const { return 42; };
     } a;
     auto b = abs(a);
-    Coordinates<1> x{37};
+    std::array<std::size_t,1> x{37};
     REQUIRE( b(x) == 42 );
   }
   
   SECTION( "product" ) {
 
-    Array<int,1> a3(4);
+    StridedArray<int,1> a3(4);
     a3.map([](auto& path, auto& val) {
 	val = path[0];
       });
-    Array<int,1> b3(4);
+    StridedArray<int,1> b3(4);
     b3.map([](auto& path, auto& val) {
 	val = 2*path[0];
       });
@@ -61,8 +63,8 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "product bounds" ) {
-    Array<double,1> a3(3);
-    Array<double,1> a5(5);
+    StridedArray<double,1> a3(3);
+    StridedArray<double,1> a5(5);
 
     bool exception_thrown = false;
     try {
@@ -72,16 +74,16 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     }
     REQUIRE( exception_thrown );
 
-    Array<double,1> b3(3);
+    StridedArray<double,1> b3(3);
     a3*b3;
   }
 
   SECTION( "memory references" ) {
     // Return an expression whose array dependencies are stack allocated
     auto pfun = [](int x, int y) {
-      Array<double,1> a(5);
+      StridedArray<double,1> a(5);
       a.fill(x);
-      Array<double,1> b(5);
+      StridedArray<double,1> b(5);
       b.fill(y);
       return a * b;
     };
@@ -96,9 +98,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     // Same with sum
     auto sfun = [](int x, int y) {
-      Array<double,1> a(5);
+      StridedArray<double,1> a(5);
       a.fill(x);
-      Array<double,1> b(5);
+      StridedArray<double,1> b(5);
       b.fill(y);
       return a + b;
     };
@@ -111,10 +113,10 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "copy delayed into regular array" ) {
-    Array<int,2> a(3,4);
+    StridedArray<int,2> a(3,4);
     a.fill(8);
 
-    Array<int,1> b(4);
+    StridedArray<int,1> b(4);
     b.fill(7);
 
     a[1] = b * b;
@@ -126,8 +128,8 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "mixing delayed and regular arrays" ) {
-    Array<int,1> a(7);
-    Array<int,1> b(7);
+    StridedArray<int,1> a(7);
+    StridedArray<int,1> b(7);
     b.fill(13);
 
     a = b*b + b*b;
@@ -137,9 +139,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "bool any" ) {
-    Array<int,1> a(34);
+    StridedArray<int,1> a(34);
     a.fill(8);
-    Array<int,1> b(34);
+    StridedArray<int,1> b(34);
     b.fill(10);
     
     REQUIRE( ! any(a > b) );
@@ -148,9 +150,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "bool all" ) {
-    Array<int,1> a(34);
+    StridedArray<int,1> a(34);
     a.fill(8);
-    Array<int,1> b(34);
+    StridedArray<int,1> b(34);
     b.fill(10);
     
     REQUIRE( all(b > a) );
@@ -161,7 +163,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "comparison with constant element" ) {
-    Array<int,1> a(34);
+    StridedArray<int,1> a(34);
     a.fill(8);
 
     REQUIRE( ! any(a > 10) );
@@ -171,7 +173,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "convert an immediate to a delay and back" ) {
     // Create an immediate array
-    Array<int,1> a(7);
+    StridedArray<int,1> a(7);
     a.map([](auto& path, auto& val) {
 	val = path[0];
       });
@@ -181,7 +183,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(5) == b(5) );
 
     // Cast back to an immediate array
-    Array<int,1> c = b;
+    StridedArray<int,1> c = b;
     REQUIRE( c(0) == b(0) );
     REQUIRE( c(5) == b(5) );
     REQUIRE( c(0) == a(0) );
@@ -189,10 +191,10 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "delayed from standalone function" ) {
-    std::array<ArrayIndex,2> dimensions{{11,21}};
-    DelayedArray<int,2,double(&)(const std::array<ArrayIndex,2>&)>
+    std::array<std::size_t,2> dimensions{{11,21}};
+    DelayedArray<int,2,double(&)(const std::array<std::size_t,2>&)>
       a(dimensions, my_constant_function);
-    Array<int,2> b = a;
+    StridedArray<int,2> b = a;
     REQUIRE( a(1,1) == b(1,1) );
     REQUIRE( b(4,2) == 42 );
   }
@@ -205,7 +207,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "infer make_delayed size template argument" ) {
-    std::array<ArrayIndex,2> dims{{11,21}};
+    std::array<std::size_t,2> dims{{11,21}};
     auto a = make_delayed<int>(dims, [](auto&) { return 42; });
     REQUIRE( a.dims().size() == 2 );
     REQUIRE( a.dims()[0] == 11 );
@@ -213,7 +215,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "similar shape constructors" ) {
-    Array<int,1> a(127);
+    StridedArray<int,1> a(127);
 
     auto b = zeros_like(a);
     REQUIRE( b.dims() == a.dims() );
@@ -275,7 +277,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "reshaping" ) {
     auto a = range(20);
-    std::array<ArrayIndex,2> dims{4,5};
+    std::array<std::size_t,2> dims{4,5};
     auto b = reshape(a, dims);
     REQUIRE( b.dims() == dims );
     REQUIRE( b(0,0) == 0);
@@ -292,7 +294,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "sums" ) {
-    Array<int,3> a(2,3,4);
+    StridedArray<int,3> a(2,3,4);
     a.map([](auto& path, auto& val) {
         val = path[0]*12 + path[1] * 4 + path[2];
       });
@@ -365,7 +367,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "avoiding demotions" ) {
-    Array<int,1> a = range(10);
+    StridedArray<int,1> a = range(10);
     auto b = 2.3 * a;
 
     REQUIRE( std::fabs(b(1) - 2.3) < float_tol );
@@ -469,7 +471,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   /*SECTION( "constexpr delayed arrays" ) {
     auto a = constants({5}, 7);
-    Array<double,a(2)> b;
+    StridedArray<double,a(2)> b;
     //REQUIRE( sizeof(b) == sizeof(int)*13 );
     REQUIRE( b.ndim() == 7 );
 
@@ -582,7 +584,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = reshape(range(24), 4, 2, 3);
 
     auto b = fix_dimension(a, 1, 1);
-    Coordinates<2> dims_b{4, 3};
+    std::array<std::size_t,2> dims_b{4, 3};
     REQUIRE( b.dims() == dims_b );
     REQUIRE( b(0,0) == 3 );
     REQUIRE( b(1,2) == 11 );
@@ -618,7 +620,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( !a.is_modifiable() );
     
     // modifiable delayed arrays are constructible
-    auto b = immediate(a);
+    auto b = strided_array(a);
     auto c = make_delayed<int>(b.dims(),
 			       [&b](auto& coords) -> int& {
 	return b(coords);
@@ -756,9 +758,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = zeros(1,3,4);
     auto b = zeros(1,3);
     auto c = zeros(1,3,4);
-    Array<double,3> d(1,3,4);
-    Array<int,2> e(1,3);
-    Array<float,3> f(1,3,4);
+    StridedArray<double,3> d(1,3,4);
+    StridedArray<int,2> e(1,3);
+    StridedArray<float,3> f(1,3,4);
     auto g = zeros(1,3,4,5);
 
     REQUIRE( ! same_dimensions(a,b) );

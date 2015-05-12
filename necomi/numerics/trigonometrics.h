@@ -1,11 +1,14 @@
-// necomi/funcs/trigonometrics.h – Scalar and delayed trigonometrics
+// necomi/numerics/trigonometrics.h – Scalar and delayed trigonometrics
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
 
-#include "../base/delayed.h"
+#include <cmath>
+#include <type_traits>
+
+#include "../arrays/delayed.h"
 
 namespace necomi
 {

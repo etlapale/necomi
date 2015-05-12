@@ -7,19 +7,19 @@ using namespace necomi;
 TEST_CASE( "dynamic arrays", "[core]" ) {
 
   SECTION( "creation" ) {
-    DynArray<double> a(3, 7, 12, 5);
+    VarArray<double> a(3, 7, 12, 5);
     std::vector<std::size_t> v{3,7,12,5};
     REQUIRE( a.dims() == v );
     REQUIRE( size(a) == 1260 );
 
-    DynArray<double> b(3,4);
+    VarArray<double> b(3,4);
     std::vector<std::size_t> w{3,4};
     REQUIRE( b.dims() == w );
     REQUIRE( size(b) == 12 );
   }
 
   SECTION( "data access" ) {
-    DynArray<int> a0;
+    VarArray<int> a0;
     a0() = 123;
     REQUIRE( a0() == 123 );
     REQUIRE( a0.data()[0] == 123 );
@@ -34,7 +34,7 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     REQUIRE( exception_thrown );
 #endif // NECOMI_NO_BOUND_CHECKS
     
-    DynArray<int> a1(127);
+    VarArray<int> a1(127);
     a1(32) = 123;
     a1(69) = 456;
     REQUIRE( a1(32) == 123 );
@@ -42,7 +42,7 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     REQUIRE( a1.data()[32] == 123 );
     REQUIRE( a1.data()[69] == 456 );
 
-    DynArray<double> a2(3,4);
+    VarArray<double> a2(3,4);
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );

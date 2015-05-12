@@ -1,67 +1,101 @@
-// necomi/funcs/numerics.h – Basic numerical functions
+// necomi/numerics/statistics.h – Basic statistical functions
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
 
-#include "../base/delayed.h"
+#include "../arrays/delayed.h"
+#include "../arrays/stridedarray.h"
 
-namespace necomi {
-namespace delayed {
+namespace necomi
+{
 
 /**
- * Create a delayed array from the absolute values of another.
- * \param a	An \ref IndexableArray "indexable array".
+ * Sum all the elements of an array.
+ * \warning This may overflow.
  */
-template <typename IndexableArray,
-	  typename std::enable_if_t<is_indexable<IndexableArray>::value>* = nullptr>
-auto abs(const IndexableArray& a)
+template <typename Array, typename T=typename Array::dtype>
+T sum(const Array& a)
 {
-  return make_delayed(a.dims(),
-		      [a](const Coordinates<IndexableArray::ndim>& path)
-		      { return std::abs(a(path)); });
+  T total = 0;
+  a.map([&](auto&, auto val) { total += val; });
+  return total;
 }
 
 /**
- * Norms available to function \ref norm.
+ * Coordinate of the maximal value in an array.
  */
-enum class Norm {
-  /** Maximum of the absolute values. */
-  Infinity
-};
-
-template <typename IndexableArray>
-auto norm(const IndexableArray& a, Norm norm)
+template <typename Array, typename dims_type = typename Array::dims_type>
+dims_type argmax(const Array& a)
 {
-  switch (norm) {
-  case Norm::Infinity:
-    return max(abs(a));
-  }
+  // Set initial result to first coordinate
+  dims_type max_coords;
+  max_coords.fill(0);
+  auto max_val = a(max_coords);
+
+  // Search for the maximal value
+  a.map([&a,&max_coords,&max_val](const auto& coords, auto val)
+	{ if (val > max_val) {
+	    max_val = val;
+	    max_coords = coords;
+	  }
+	});
+
+  return max_coords;
 }
 
-template <typename Array>
-auto exp(const Array& a)
+/**
+ * Maximum value in the array.
+ */
+template <typename Array, typename T=typename Array::dtype>
+T max(const Array& a)
 {
-  return make_delayed<typename Array::dtype,Array::ndim>(a.dims(),
-							 [a] (auto& x) {
-							   return std::exp(a(x));
-							 });
+  return a(argmax(a));
 }
+
+template <typename Array, typename dims_type = typename Array::dims_type>
+dims_type argmin(const Array& a)
+{
+  // Set initial result to first coordinate
+  dims_type min_coords;
+  min_coords.fill(0);
+  auto min_val = a(min_coords);
+
+  // Search for the maximal value
+  a.map([&a,&min_coords,&min_val](const auto& coords, auto val)
+	{ if (val < min_val) {
+	    min_val = val;
+	    min_coords = coords;
+	  }
+	});
+
+  return min_coords;
+}
+
+/**
+ * Minimum value in the array.
+ */
+template <typename Array, typename T=typename Array::dtype>
+T min(const Array& a)
+{
+  return a(argmin(a));
+}
+
 
 /**
  * Sum an array across a given dimension.
  */
-template <typename Array,
+template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if<Array::ndim!=0>::type* = nullptr>
-auto sum(const Array&a, ArrayIndex dim)
+auto sum(const Array&a, dim_type dim)
 {
   return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), dim), [a,dim] (auto& x) {
       // Path in the original array
       auto orig_path = add_coordinate(x, dim);
       // Sum all the elements in the dimension
       typename Array::dtype val = 0;
-      for (ArrayIndex i = 0; i < a.dims()[dim]; i++) {
+      for (std::size_t i = 0; i < a.dims()[dim]; i++) {
 	orig_path[dim] = i;
 	val += a(orig_path);
       }
@@ -72,9 +106,9 @@ auto sum(const Array&a, ArrayIndex dim)
 /**
  * Average an array across a given dimension.
  */
-template <typename Array,
+template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
-auto average(const Array& a, ArrayIndex dim)
+auto average(const Array& a, dim_type dim)
 {
   return sum(a,dim) / static_cast<typename Array::dtype>(a.dims()[dim]);
 }
@@ -88,38 +122,8 @@ auto average(const Array& a)
 {
   return sum(a) / static_cast<typename Array::dtype>(size(a));
 }
-  
-template <unsigned N, typename T>
-std::enable_if_t<N==0,T>
-power(T)
-{
-  return 1;
-}
 
-template <unsigned N, typename T>
-std::enable_if_t<N==1,T>
-power(T val)
-{
-  return val;
-}
-  
-template <unsigned N, typename T>
-std::enable_if_t<1<N,T>
-power(T val)
-{
-  return val * power<N-1>(val);
-}
-  
-/**
- * Square root.
- */
-template <typename Array,
-	  std::enable_if_t<is_array<Array>::value>* = nullptr>
-auto sqrt(const Array& a)
-{
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a] (const auto& x) { return std::sqrt(a(x)); });
-}
+
 
 /**
  * Compute a sample variance with a two-pass formula.
@@ -131,11 +135,11 @@ auto sqrt(const Array& a)
  * (default in Matlab), otherwise a N divider is used (default
  * in NumPy).
  */
-template <typename Array,
+template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
-auto variance(const Array& a, ArrayIndex dim, bool bessel_correction)
+auto variance(const Array& a, dim_type dim, bool bessel_correction)
 {
-  auto avg = immediate(average(a, dim));
+  auto avg = strided_array(average(a, dim));
   return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dims(), dim),
 			     [a,dim,avg,bessel_correction]
 			     (const auto& x)
@@ -144,7 +148,7 @@ auto variance(const Array& a, ArrayIndex dim, bool bessel_correction)
 			       auto orig_path = add_coordinate(x, dim);
 			       // Sum the squared deviations to the mean
 			       typename Array::dtype val = 0;
-			       for (ArrayIndex i = 0; i < a.dims()[dim]; i++) {
+			       for (std::size_t i = 0; i < a.dims()[dim]; i++) {
 				 orig_path[dim] = i;
 				 val += power<2>(a(orig_path) - avg(x));
 			       }
@@ -166,9 +170,9 @@ auto variance(const Array& a, bool bessel_correction)
   return res / (bessel_correction ? size(a) - 1 : size(a));
 }
 
-template <typename Array,
+template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
-auto deviation(const Array& a, ArrayIndex dim, bool bessel_correction)
+auto deviation(const Array& a, dim_type dim, bool bessel_correction)
 {
   return sqrt(variance(a, dim, bessel_correction));
 }
@@ -190,47 +194,29 @@ auto max(const Array& a, U value)
 							  (const auto& coords) { return std::max(a(coords), value); });
   }
 
+
+
 /**
- * Non-normalized generalized Gaussian function with integral beta.
+ * Cumulative sum.
  */
-template <unsigned beta, typename Array,
-	  typename std::enable_if_t<std::is_floating_point<typename Array::dtype>::value>* = nullptr>
-auto ggd(const Array& a, typename Array::dtype alpha, typename Array::dtype mu=0)
+template <typename Indexable, typename T=typename Indexable::dtype>
+StridedArray<T,Indexable::ndim> cumsum(const Indexable& a, std::size_t dim = 0)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a,alpha,mu]
-			   (const auto& coords) {
-			     return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
-			   });
-  
-}
-
-template <typename Array>
-auto norm_angle_diff(const Array& a)
-{
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a](const auto& coords){
-							    typename Array::dtype x = a(coords);
-			     if (x >= -180 && x <= 180)
-			       return x;
-			     if (x > 180)
-			       return 360 - x;
-			     else // x < -180
-			       return -x-360;
-			   });
+  StridedArray<T,Indexable::ndim> res(a.dims());
+  res.map([&res,dim,&a](auto& path, auto& valx) {
+      if (path[dim] == 0) {
+	valx = a(path);
+      }
+      else {
+	auto prev = path;
+	prev[dim]--;
+	valx = res(prev) + a(path);
+      }
+    });
+  return res;
 }
 
 
-template <typename Array>
-auto round(const Array& a)
-{
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a](const auto& coords) {
-			     return std::round(a(coords));
-			   });
-}
-
-} // namespace delayed
 } // namespace necomi
 
 // Local Variables:

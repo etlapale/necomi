@@ -1,4 +1,4 @@
-// necomi/base/dynarray.h – Dynamically-sized strided arrays
+// necomi/arrays/vararray.h – Dynamically-sized strided arrays
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -11,7 +11,7 @@ namespace necomi
 {
 
 template <typename T>
-class DynArray
+class VarArray
 {
 public:
   using dim_type = std::size_t;
@@ -20,12 +20,12 @@ public:
 
   template <typename ...Dims,
 	    std::enable_if_t<all_convertible<Dims..., dim_type>::value>* = nullptr>
-  DynArray(Dims... dims)
-    : DynArray(dims_type{static_cast<dim_type>(dims)...})
+  VarArray(Dims... dims)
+    : VarArray(dims_type{static_cast<dim_type>(dims)...})
   {
   }
 
-  DynArray(const dims_type& dims)
+  VarArray(const dims_type& dims)
     : m_dims(dims)
     , m_strides(default_strides(dims))
     , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
@@ -33,7 +33,7 @@ public:
   {
   }
 
-  DynArray(const DynArray<T>& a)
+  VarArray(const VarArray<T>& a)
     : m_strides(a.m_strides)
     , m_shared_data(a.m_shared_data)
     , m_data(a.m_data)
@@ -87,7 +87,7 @@ protected:
   dims_type m_strides;
   std::shared_ptr<T> m_shared_data;
   T* m_data;
-}; // class DynArray
+}; // class VarArray
 
 } // namespace necomi
 
