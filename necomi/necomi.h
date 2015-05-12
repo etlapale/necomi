@@ -19,7 +19,11 @@
 #include "arrays/stridedarray.h"
 #include "arrays/vararray.h"
 
-//
+// Array creation
+#include "delayed/ranges.h"
+
+// Numerics
+#include "numerics/interpolation.h"
 
 
 #if 0
@@ -47,7 +51,6 @@ namespace necomi {
 #include "base/delayed.h"
 #include "base/dynarray.h"
 
-#include "funcs/interpolation.h"
 #include "funcs/numerics.h"
 #include "funcs/random.h"
 #include "funcs/trigonometrics.h"

@@ -10,62 +10,7 @@
 //#include "array.h"
 //#include "concepts.h"
 
-namespace necomi
-{
-
-  template <typename T=double, ArrayDimension N=1, typename Expr>
-  DelayedArray<T,N,Expr>
-  make_delayed(const Dimensions<N>& dims, Expr fun)
-  {
-    // TODO: pass dimensions by value since we copy them in the constructor
-    return DelayedArray<T,N,Expr>(dims, std::move(fun));
-  }
-
-  /*
-  template <typename T=double, typename Expr,
-            typename std::enable_if_t<is_callable<Expr,ArrayIndex>::value>* = nullptr>
-  auto make_delayed(ArrayDimension size, Expr fun)
-  {
-    return make_delayed<T,1>({size}, [fun](auto& coords) { return fun(coords[0]); });
-  }*/
-
-  template <typename T, typename Expr,
-            typename std::enable_if_t<is_callable<Expr,const Coordinates<1>&>::value>* = nullptr>
-  auto make_delayed(ArrayDimension size, Expr fun)
-  {
-    return DelayedArray<T,1,Expr>({size}, std::move(fun));
-  }
-
-/// Converts any array into a delayed one.
-template <typename Array>
-auto delay(const Array& a)
-{
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-							  [a](const auto& x)
-							  { return a(x); });
-}
-
-  /**
-   * \defgroup Delayed Delayed arrays.
-   * Define delayed arrays from functions and their utilities.
-   * @{
-   */
-  
-  /**
-   * Create a delayed array from an indexable one.
-   * The created array will have the same element type and array dimensions
-   * as the one in first argument, and will have its element values
-   * defined by the second argument.
-   */
-  template <typename Array, typename Expr,
-	    typename std::enable_if_t<is_array<Array>::value>* = nullptr>
-  auto make_delayed(const Array& a, Expr&& e)
-  {
-    return DelayedArray<typename Array::dtype, Array::ndim, Expr>
-      (a.dims(), std::forward<Expr>(e));
-  }
-
-  /**@}*/
+namespace necomi {
 
 template <typename Array, typename Function,
 	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
@@ -318,111 +263,6 @@ auto operator<(const Array& a, const T& val)
     return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
   }
 
-  /**
-   * Create an array filled with a constant value.
-   */
-  template <typename T=double, ArrayIndex N=1>
-  auto constants(const Dimensions<N>& dims, T value)
-  {
-    return make_delayed<T>(dims, [value](auto&){ return value; });
-  }
-  
-template <typename T=double, ArrayIndex N>
-auto zeros(const Dimensions<N>& dims)
-{
-  return constants<T,N>(dims,0);
-}
-
-template <typename T=double,
-	  typename ...Dims,
-	  typename std::enable_if<all_indices<Dims...>::value>* = nullptr>
-auto zeros(Dims... dims)
-{
-  return constants<T,sizeof...(Dims)>({static_cast<std::size_t>(dims)...}, 0);
-}
-
-/**
- * Create an array with the same dimensions filled with a constant
- * value.
- * \see zeros_like
- */
-template <typename T, typename Array>
-auto constants_like(const Array& a, const T&& value)
-{
-  return make_delayed<T>(a.dims(),
-			 [value](const auto&){ return value; });
-}
-
-/**
- * Create an array with the same dimensions filled with a constant
- * value.
- * \see zeros_like
- */
-/*template <typename T, ArrayIndex N, typename Concrete>
-auto constants_like(const AbstractArray<Concrete,T,N>& a, const T&& value)
-{
-  return make_delayed<T>(a.dims(), [value](auto&){ return value; });
-  }*/
-
-/**
- * Create an array with the same dimensions filled with zero values.
- * \see constants_like
- */
-template <typename Array>
-auto zeros_like(const Array& a)
-{
-  return constants_like<typename Array::dtype>(a, 0);
-}
-
-/**
- * Create an array with the same dimensions filled with zero values.
- * \see constants_like
- */
-template <typename T, typename Array>
-auto zeros_like(const Array& a)
-{
-  return constants_like<T,Array>(a, 0);
-}
-
-template <typename T>
-auto range(T stop)
-{
-  return make_delayed<T,1>({{static_cast<ArrayIndex>(stop)}},
-			   [](auto& path){ return path[0]; });
-}
-
-  template <typename T>
-  auto range(T start, T stop, T step=1)
-  {
-#ifndef NECOMI_NO_BOUND_CHECKS
-    if (stop <= start)
-      throw std::out_of_range("stop must be greater than start for ranges");
-    if (step <= 0)
-      throw std::out_of_range("step must be positive for ranges");
-#endif
-    auto size = static_cast<ArrayIndex>(std::ceil(static_cast<double>(stop-start)/step));
-    return make_delayed<T,1>({size},
-			     [start,step](auto& coords)
-			     { return start+step*coords[0]; });
-  }
-  
-  /**
-   * Return an array of evenly spaced floating point numbers.
-   * If the type of the boundaries is floating, the resulting array elements
-   * will be of that type. Otherwise, they will be double values.
-   */
-  template <typename T,
-	    typename U=typename std::conditional<std::is_floating_point<T>::value,
-						 T,double>::type,
-	    std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
-  auto linspace(T start, T stop, ArrayDimension size, bool endpoint=true)
-  {
-    auto step = static_cast<U>(stop - start)/(endpoint ? size - 1 : size);
-    return make_delayed<U,1>({size},
-			     [start,step](auto& coords)
-			     { return start+step*coords[0]; });
-  }
-
 
 template <std::size_t M, typename Array>
 auto reshape(const Array& a, const Dimensions<M>& d)
@@ -479,17 +319,6 @@ template <typename Array,
 auto roll(const Array& a, ArrayIndex shift)
 {
   return roll<Array>(a, shift, 0);
-}
-
-  /**
-   * Create an identity matrix.
-   */
-template <typename T=double>
-auto identity(ArrayDimension dim)
-{
-  return make_delayed<T,2>({dim,dim}, [](auto path) {
-      return path[0] == path[1];
-    });
 }
 
 // TODO: remove (stack() special case)

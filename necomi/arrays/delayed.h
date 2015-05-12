@@ -87,6 +87,45 @@ protected:
   Expr m_e;
 };
 
+
+template <typename T=double, std::size_t N=1, typename Expr>
+DelayedArray<T,N,Expr>
+make_delayed(const std::array<std::size_t,N>& dims, Expr fun)
+{
+  // TODO: pass dimensions by value since we copy them in the constructor
+  return DelayedArray<T,N,Expr>(dims, std::move(fun));
+}
+
+template <typename T, typename Expr,
+	  typename std::enable_if_t<is_callable<Expr,const std::array<std::size_t,1>&>::value>* = nullptr>
+auto make_delayed(std::size_t size, Expr fun)
+{
+  return DelayedArray<T,1,Expr>({size}, std::move(fun));
+}
+
+/// Converts any array into a delayed one.
+template <typename Array>
+auto delay(const Array& a)
+{
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
+							  [a](const auto& x)
+							  { return a(x); });
+}
+  
+/**
+ * Create a delayed array from an indexable one.
+ * The created array will have the same element type and array dimensions
+ * as the one in first argument, and will have its element values
+ * defined by the second argument.
+ */
+template <typename Array, typename Expr,
+	  typename std::enable_if_t<is_array<Array>::value>* = nullptr>
+auto make_delayed(const Array& a, Expr&& e)
+{
+  return DelayedArray<typename Array::dtype, Array::ndim, Expr>
+    (a.dims(), std::forward<Expr>(e));
+}
+
 } // namespace necomi
 
 // Local Variables:
