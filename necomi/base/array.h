@@ -318,6 +318,13 @@ namespace necomi
       this->operator=<Array<T,N>>(a);
     }
 
+    void operator=(const T& value)
+    {
+      this->map([&value](const auto&, auto& val) {
+	  val = value;
+	});
+    }
+
     /**
      * Construct a copy of an array.
      * All the elements are put in a contiguous region of memory
