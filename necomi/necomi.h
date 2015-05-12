@@ -11,6 +11,7 @@
 #include "traits/generic.h"
 
 // Core definitions
+#include "core/coordinates.h"
 #include "core/loops.h"
 #include "core/mpl.h"
 #include "core/shape.h"
@@ -23,11 +24,13 @@
 #include "arrays/vararray.h"
 
 // Array creation
+#include "delayed/arithmetic.h"
 #include "delayed/comparisons.h"
 #include "delayed/ranges.h"
 #include "delayed/transforms.h"
 
 // Numerics
+#include "numerics/exponents.h"
 #include "numerics/interpolation.h"
 #include "numerics/random.h"
 #include "numerics/statistics.h"
