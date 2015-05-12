@@ -68,7 +68,7 @@ public:
   template <typename ...Dims, typename Deleter,
 	    typename std::enable_if<sizeof...(Dims) == N && all_convertible<Dims..., dim_type>(),int>::type = 0>
   StridedArray(T* data, Deleter deleter, Dims ...dims)
-    : Array(data, dims_type{static_cast<ArrayIndex>(dims)...}, deleter)
+    : StridedArray(data, dims_type{static_cast<dim_type>(dims)...}, deleter)
   {}
 
   /**
@@ -116,7 +116,7 @@ public:
       return true;
 
     dim_type prev = 1;
-    for (std::ssize_t i = N - 1; i >= 0; i--) {
+    for (ssize_t i = N - 1; i >= 0; i--) {
       if (m_strides[i] != prev)
 	return false;
       prev *= this->m_dims[i];
@@ -146,7 +146,7 @@ public:
     std::array<dim_type,N-1> strides;
     std::copy(std::next(m_strides.cbegin()), m_strides.cend(), strides.begin());
 
-    Array<T,N-1> a(m_shared_data, &(m_data[index * m_strides[0]]), strides, dims);
+    StridedArray<T,N-1> a(m_shared_data, &(m_data[index * m_strides[0]]), strides, dims);
     
     return a;
   }
@@ -251,7 +251,7 @@ public:
   template <typename UnaryOperation>
   void map(UnaryOperation f)
   {
-    Coordinates<N> path;
+    dims_type path;
     for_looper<UnaryOperation,0,Array>(*this, path, f);
   }
     
@@ -263,7 +263,7 @@ public:
   template <typename ConstMapOperation>
   void map(ConstMapOperation f) const
   {
-    Coordinates<N> path;
+    dims_type path;
     const_for_looper<ConstMapOperation,0,Array<T,N>>(*this, path, f);
   }
 
