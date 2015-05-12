@@ -79,33 +79,6 @@ Coordinates<N> change_coordinate(const Coordinates<N>& coords,
   return c;
 }
 
-/**
- * Check if any element of an array of booleans or convertible to
- * booleans is false.
- * \see all()
- */
-template <typename Array,
-	  typename std::enable_if_t<std::is_convertible<typename Array::dtype, bool>::value>* = nullptr>
-bool any(const Array& a)
-{
-  std::array<ArrayIndex,Array::ndim> path;
-  auto p = [](bool val) { return val; };
-  return breakable_for_looper<decltype(p),0,Array>(a, path, p);
-}
-
-/**
- * Check that all elements of an array of booleans are true.
- * \see any()
- */
-template <typename Array,
-	  std::enable_if_t<std::is_convertible<typename Array::dtype, bool>::value>* = nullptr>
-bool all(const Array& a)
-{
-  std::array<ArrayIndex,Array::ndim> path;
-  auto p = [](bool val) { return !val; };
-  return !breakable_for_looper<decltype(p),0,Array>(a, path, p);
-}
-
 } // namespace necomi
 
 // Local Variables:

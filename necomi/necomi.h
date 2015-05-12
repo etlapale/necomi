@@ -21,6 +21,7 @@
 #include "arrays/vararray.h"
 
 // Array creation
+#include "delayed/comparisons.h"
 #include "delayed/ranges.h"
 
 // Numerics

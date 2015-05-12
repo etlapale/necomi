@@ -26,44 +26,6 @@ auto xmap(const Array& a, Function&& f)
 namespace delayed
 {
 
-/**
- * Compare two arrays element-wise.
- * This operator is disabled if the shapes do not match, to allow for
- * shape broadcasting by other operators.
- */
-template <typename Array1, typename Array2,
-	  typename std::enable_if_t<is_array<Array1>::value
-				    && is_array<Array2>::value>* = nullptr,
-	  typename std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
-auto operator==(const Array1& a, const Array2& b)
-{
-#ifndef NECOMI_NO_BOUND_CHECKS
-  // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot compare arrays of different dimensions");
-#endif
-  return make_delayed<bool,Array1::ndim>(a.dims(),
-					 [a,b] (const auto& coords) {
-					   return a(coords) == b(coords);
-					 });
-}
-
-template <typename Array1, typename Array2,
-	  typename std::enable_if_t<is_array<Array1>::value &&
-				    is_array<Array2>::value &&
-				    Array1::ndim==Array2::ndim>* = nullptr>
-auto operator!=(const Array1& a, const Array2& b)
-{
-#ifndef NECOMI_NO_BOUND_CHECKS
-  // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot compare arrays of different dimensions");
-#endif
-  return make_delayed<bool,Array1::ndim>(a.dims(),
-					 [a,b] (const auto& coords) {
-					   return a(coords) != b(coords);
-					 });
-}
 
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
@@ -215,53 +177,6 @@ auto operator+(const Array& a, const T& value)
   return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return a(coords) + value; });
 }
 
-template <typename Array, typename T,
-	  std::enable_if_t<is_indexable<Array>::value
-			   && ! is_array<T>::value>* = nullptr>
-auto operator>(const Array& a, const T& val)
-{
-  return make_delayed<bool,Array::ndim>(a.dims(), [a,val](auto& path) {
-      return a(path) > val;
-    });
-}
-
-template <typename Array, typename T,
-	  std::enable_if_t<is_indexable<Array>::value
-			   && ! is_array<T>::value>* = nullptr>
-auto operator<(const Array& a, const T& val)
-{
-  return make_delayed<bool,Array::ndim>(a.dims(), [a,val](auto& path) {
-      return a(path) < val;
-    });
-}
-
-  template <typename T, ArrayIndex N>
-  auto operator>(const Array<T,N>& a, const Array<T,N>& b)
-  {
-#ifndef NECOMI_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dims() != b.dims())
-      throw std::length_error("cannot sum arrays of different dimensions");
-#endif
-    auto fun = [a,b](auto& path) {
-        return a(path) > b(path);
-      };
-    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
-  }
-
-  template <typename T, ArrayIndex N>
-  auto operator<(const Array<T,N>& a, const Array<T,N>& b)
-  {
-#ifndef NECOMI_NO_BOUND_CHECKS
-    // Make sure the dimensions of a and b are the same
-    if (a.dims() != b.dims())
-      throw std::length_error("cannot sum arrays of different dimensions");
-#endif
-    auto fun = [a,b](auto& path) {
-        return a(path) < b(path);
-      };
-    return DelayedArray<bool,N,decltype(fun)>(a.dims(), fun);
-  }
 
 
 template <std::size_t M, typename Array>
