@@ -45,7 +45,7 @@ namespace necomi {
     // TODO: add some error handling here
   }
 
-  inline Array<unsigned char,3> png_load(std::istream&& is)
+  inline StridedArray<unsigned char,3> png_load(std::istream&& is)
   {
     // Read the PNG signature
     png_byte sig[8];
@@ -110,7 +110,7 @@ namespace necomi {
     }
     
     // Read the image
-    Array<unsigned char,3> a(height, width, channels);
+    StridedArray<unsigned char,3> a(height, width, channels);
 
     // Get the address of each row
     png_bytep rows[height];
@@ -126,12 +126,12 @@ namespace necomi {
     return a;
   }
 
-  inline Array<unsigned char,3> png_load(const std::string& filename)
+  inline StridedArray<unsigned char,3> png_load(const std::string& filename)
   {
     return png_load(std::ifstream(filename));
   }
 
-  inline void png_save(const Array<unsigned char,3>& a,
+  inline void png_save(const StridedArray<unsigned char,3>& a,
 		       std::ostream&& os)
   {
     auto ps = png_create_write_struct(PNG_LIBPNG_VER_STRING,
@@ -170,7 +170,7 @@ namespace necomi {
     png_destroy_write_struct(&ps, &pi);
   }
 
-  inline void png_save(const Array<unsigned char,3>& a,
+  inline void png_save(const StridedArray<unsigned char,3>& a,
 		       const std::string& filename)
   {
     png_save(a, std::ofstream(filename));

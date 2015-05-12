@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../base/array.h"
+#include "../arrays/stridedarray.h"
 
 #include <H5Cpp.h>
 
@@ -130,8 +130,8 @@ struct pred_type<unsigned long long>
  * The dataset dimensionality must be `N`.
  * \ingroup Codecs
  */
-template <typename T, ArrayIndex N>
-Array<T,N> hdf5_load(const char* filename, const char* dset_name)
+template <typename T, std::size_t N>
+StridedArray<T,N> hdf5_load(const char* filename, const char* dset_name)
 {
   // Open the file and its dataset
   H5File file(filename, H5F_ACC_RDONLY);
@@ -147,12 +147,12 @@ Array<T,N> hdf5_load(const char* filename, const char* dset_name)
   // Get the dimensions and copy them to an std::array
   hsize_t hdims[N];
   dspace.getSimpleExtentDims(hdims);
-  std::array<ArrayIndex,N> dims;
-  for (ArrayIndex i = 0; i < N; i++)
+  std::array<std::size_t,N> dims;
+  for (std::size_t i = 0; i < N; i++)
     dims[i] = hdims[i];
 
   // Create the array (allocates the data)
-  Array<T,N> a(dims);
+  StridedArray<T,N> a(dims);
 
   // Read the data from the dataset in the array
   PredType hptype = pred_type<T>::type();
@@ -169,10 +169,10 @@ Array<T,N> hdf5_load(const char* filename, const char* dset_name)
  *
  * \ingroup Codecs
  */
-template <typename T=double, ArrayIndex N>
+template <typename T=double, std::size_t N>
 DataSet hdf5_create_dataset(H5File& hf,
                             const char* dset_name,
-			    const Dimensions<N>& dims,
+			    const std::array<std::size_t,N>& dims,
                             PredType output_type = pred_type<T>::type())
 {
   // Dataset dimensions
@@ -194,8 +194,9 @@ DataSet hdf5_create_dataset(H5File& hf,
  * \note The current implementation creates a temporary copy of
  *       the array if the original one is not contiguous.
  */
-template <typename T, ArrayIndex N>
-void hdf5_store_slice(DataSet& dset, hsize_t slice, const Array<T,N>& a)
+template <typename T, std::size_t N>
+void hdf5_store_slice(DataSet& dset, hsize_t slice, const
+		      StridedArray<T,N>& a)
 {
   // Get the dataset dimensions
   auto dset_space = dset.getSpace();
@@ -227,8 +228,8 @@ void hdf5_store_slice(DataSet& dset, hsize_t slice, const Array<T,N>& a)
  * \note The current implementation creates a temporary copy of
  *       the array if the original one is not contiguous.
  */
-template <typename T, ArrayIndex N>
-void hdf5_save(H5File& hf, const char* dset_name, const Array<T,N>& a,
+template <typename T, std::size_t N>
+void hdf5_save(H5File& hf, const char* dset_name, const StridedArray<T,N>& a,
                PredType output_type = pred_type<T>::type())
 {
   // Dataset dimensions
@@ -249,8 +250,9 @@ void hdf5_save(H5File& hf, const char* dset_name, const Array<T,N>& a,
  * \ingroup Codecs
  * \warning If the HDF5 file already exists, it will be erased.
  */
-template <typename T, ArrayIndex N>
-void hdf5_save(const char* path, const char* dset, const Array<T,N>& a,
+template <typename T, std::size_t N>
+void hdf5_save(const char* path, const char* dset,
+	       const StridedArray<T,N>& a,
                PredType output_type = pred_type<T>::type())
 {
   // Create the HDF5 file

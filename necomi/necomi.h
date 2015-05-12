@@ -33,6 +33,14 @@
 #include "numerics/statistics.h"
 #include "numerics/trigonometrics.h"
 
+// Codecs
+#ifdef HAVE_HDF5
+#include "codecs/hdf5.h"
+#endif
+#ifdef HAVE_LIBPNG
+#include "codecs/png.h"
+#endif
+
 
 #if 0
 namespace necomi {
@@ -51,9 +59,7 @@ namespace necomi {
     return *this;
   }
 }
-#endif
 
-#if 0
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
@@ -61,19 +67,6 @@ namespace necomi {
 #include "funcs/numerics.h"
 
 #include "integrate/sde.h"
-
-/**
- * \defgroup Codecs Input/output functions
- *
- * Define input/output utilities to store arrays on disk or load them.
- */
-#ifdef HAVE_HDF5
-#include "codecs/hdf5.h"
-#endif
-
-#ifdef HAVE_LIBPNG
-#include "codecs/png.h"
-#endif
 
 //#include "codecs/inr.h"
 
