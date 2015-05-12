@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../core/loops.h"
 #include "../core/slices.h"
 #include "../traits/arrays.h"
 #include "dimarray.h"
@@ -251,8 +252,8 @@ public:
   template <typename UnaryOperation>
   void map(UnaryOperation f)
   {
-    dims_type path;
-    for_looper<UnaryOperation,0,Array>(*this, path, f);
+    dims_type coords;
+    for_looper<UnaryOperation,0,StridedArray<T,N>>(*this, coords, f);
   }
     
   /**
@@ -263,8 +264,8 @@ public:
   template <typename ConstMapOperation>
   void map(ConstMapOperation f) const
   {
-    dims_type path;
-    const_for_looper<ConstMapOperation,0,Array<T,N>>(*this, path, f);
+    dims_type coords;
+    const_for_looper<ConstMapOperation,0,StridedArray<T,N>>(*this, coords, f);
   }
 
   /**

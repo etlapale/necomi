@@ -10,6 +10,7 @@
 #include "traits/generic.h"
 
 // Core definitions
+#include "core/loops.h"
 #include "core/slices.h"
 
 // Default array classes
@@ -18,7 +19,8 @@
 //
 
 
-
+#if 0
+namespace necomi {
   /**
    * Divide each element of the array by a number.
    */
@@ -33,6 +35,8 @@
       });
     return *this;
   }
+}
+#endif
 
 
 /**
