@@ -1,11 +1,11 @@
-// necomi/integrate/sde.h – Elementary SDE solver
+// necomi/numerics/sde.h – Elementary SDE solver
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
 
-#include "../base/array.h"
+#include "../arrays/stridedarray.h"
 
 namespace necomi {
 
@@ -14,25 +14,25 @@ namespace necomi {
  * States are represented by immediate N-dimensional arrays, and
  * the diffusion term can include an arbitrary number of noises.
  */
-template <typename T, ArrayDimension N,
+template <typename T, std::size_t N,
 	  typename Drift, typename Diffusion, typename PRNG>
 class EulerMaruyama
 {
   // Make sure Drift and Diffusion objects have the correct return type.
-  static_assert(std::is_convertible<decltype((std::declval<Drift>())(std::declval<necomi::Array<T,N>>())),necomi::Array<T,N>>::value,
+  static_assert(std::is_convertible<decltype((std::declval<Drift>())(std::declval<necomi::StridedArray<T,N>>())),necomi::StridedArray<T,N>>::value,
 		"invalid Drift type for the EM SDE solver");
-  static_assert(std::is_convertible<decltype((std::declval<Diffusion>())(std::declval<necomi::Array<T,N>>())),necomi::Array<T,N+1>>::value,
+  static_assert(std::is_convertible<decltype((std::declval<Diffusion>())(std::declval<necomi::StridedArray<T,N>>())),necomi::StridedArray<T,N+1>>::value,
 		"invalid Diffusion type for the EM SDE solver");
 public:
   /**
    * Both drift and diffusion must be function objects taking the
-   * current state as argument, a const necomi::Array<T,N> instance,
+   * current state as argument, a const necomi::StridedArray<T,N> instance,
    * of dimensions given by \c dimensions [d1×…×dN].
    * The drift must return an array of the same dimensions, [d1×…×dN],
    * while the diffusion must return an array of adding an extra
    * dimension corresponding to the noises, [d1×…×dN×dnum_noises].
    */
-  EulerMaruyama(const Dimensions<N>& dimensions, ArrayIndex num_noises,
+  EulerMaruyama(const std::array<std::size_t,N>& dimensions, std::size_t num_noises,
                 Drift drift, Diffusion diffusion, PRNG& prng)
     : m_drift(drift), m_diffusion(diffusion),
       m_t(0), m_X(dimensions),
@@ -44,11 +44,10 @@ public:
 
   void step(T dt)
   {
-    using namespace delayed;
-    using namespace delayed::broadcasting;
+    using namespace broadcasting;
 
     auto Winc = std::sqrt(dt)*normal(m_num_noises, m_prng);
-    const Array<T,N>& X = m_X;
+    const StridedArray<T,N>& X = m_X;
     m_X += dt*m_drift(X) + sum(m_diffusion(X)*Winc, N-1);
 
     m_t += dt;
@@ -57,10 +56,10 @@ public:
   T t() const
   { return m_t; }
 
-  Array<T,N>& X()
+  StridedArray<T,N>& X()
   { return m_X; }
 
-  const Array<T,N>& X() const
+  const StridedArray<T,N>& X() const
   { return m_X; }
 
 protected:
@@ -69,9 +68,9 @@ protected:
   /** Current time. */
   T m_t;
   /** Current state. */
-  Array<T,N> m_X;
+  StridedArray<T,N> m_X;
   /** Number of Wiener process noises. */
-  ArrayDimension m_num_noises;
+  std::size_t m_num_noises;
   /** Pseudo random number generator */
   PRNG& m_prng;
 };
@@ -80,9 +79,9 @@ protected:
  * Wrapper to the EulerMaruyama constructor.
  * Allows to skip explicit template arguments.
  */
-template <typename T, ArrayDimension N,
+template <typename T, std::size_t N,
 	  typename Drift, typename Diffusion, typename PRNG>
-auto euler_maruyama(const Dimensions<N>& dims, ArrayIndex num_noises,
+auto euler_maruyama(const std::array<std::size_t,N>& dims, std::size_t num_noises,
 		    Drift drift, Diffusion diffusion,
 		    PRNG& prng)
 {

@@ -34,6 +34,7 @@
 #include "numerics/exponents.h"
 #include "numerics/interpolation.h"
 #include "numerics/random.h"
+#include "numerics/sde.h"
 #include "numerics/statistics.h"
 #include "numerics/trigonometrics.h"
 
@@ -50,7 +51,6 @@
 #if 0
 #include "codecs/inr.h"
 #include "filters/deriche.h"
-#include "numerics/sde.h"
 #endif
 
 // Local Variables:
