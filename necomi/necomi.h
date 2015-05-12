@@ -26,6 +26,7 @@
 // Numerics
 #include "numerics/interpolation.h"
 #include "numerics/random.h"
+#include "numerics/statistics.h"
 #include "numerics/trigonometrics.h"
 
 
