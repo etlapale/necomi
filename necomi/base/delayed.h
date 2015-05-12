@@ -148,6 +148,14 @@ auto delay(const Array& a)
 
   /**@}*/
 
+template <typename Array, typename Function,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto xmap(const Array& a, Function&& f)
+{
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(), std::move(f));
+}
+
+
 /**
  * Namespace to work with DelayedArrays.
  */

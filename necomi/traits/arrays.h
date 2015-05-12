@@ -1,20 +1,14 @@
-// necomi/base/concepts.h – Type-level utilities
+// necomi/traits/arrays.h – Compile-time array type checks
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
 
-#include "traits.h"
+#include "generic.h"
 
-/**
- * \defgroup Concepts Abstract library interfaces
- * Define checkers for the concepts used throughout the library.
- * @{
- */
+namespace necomi {
 
-namespace necomi
-{
   // Define had_dtype and has_ndim
   NECOMI_MAKE_HAS_TYPE_FIELD(dtype)
   
@@ -111,8 +105,6 @@ namespace necomi
 			     > {};
 
 } // namespace necomi
-
-/**@}*/
 
 // Local Variables:
 // mode: c++

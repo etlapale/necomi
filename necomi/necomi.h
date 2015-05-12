@@ -1,9 +1,36 @@
-// necomi/necomi.h – Catch-all header
+// necomi/necomi.h – Include all headers
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
+
+// Core functions
+#include "traits/arrays.h"
+#include "traits/generic.h"
+
+// Default array classes
+#include "arrays/stridedarray.h"
+
+//
+
+
+
+  /**
+   * Divide each element of the array by a number.
+   */
+  template <typename U,
+	    std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
+  Array<T,N>&
+  operator/=(const U& div)
+  {
+    this->map([&div](auto& path, T& val) {
+	(void) path;
+	val /= div;
+      });
+    return *this;
+  }
+
 
 /**
  * \defgroup core Core array library
@@ -41,3 +68,7 @@
  * Implement recursive filters such as Canny-Deriche or Gamma filters.
  */
 #include "filters/deriche.h"
+
+// Local Variables:
+// mode: c++
+// End:
