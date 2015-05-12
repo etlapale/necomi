@@ -25,6 +25,7 @@
 
 // Numerics
 #include "numerics/interpolation.h"
+#include "numerics/random.h"
 #include "numerics/trigonometrics.h"
 
 
@@ -51,11 +52,8 @@ namespace necomi {
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
-#include "base/dynarray.h"
 
 #include "funcs/numerics.h"
-#include "funcs/random.h"
-#include "funcs/trigonometrics.h"
 
 #include "integrate/sde.h"
 

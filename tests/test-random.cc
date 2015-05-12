@@ -13,7 +13,7 @@ TEST_CASE( "random number generation", "[random]" ) {
     std::mt19937_64 prng(rdss);
 
     // Create a array filled from a normal distribution
-    ArrayIndex size = 1e6;
+    std::size_t size = 1e6;
     double avg = 95, dev = 4.3;
     auto a = normal<double>(avg, dev, size, prng);
 
@@ -41,7 +41,7 @@ TEST_CASE( "random number generation", "[random]" ) {
     ok = std::is_same<decltype(b)::dtype, double>::value;
     REQUIRE( ok );
 
-    Dimensions<3> d = {5,3,7};
+    std::array<std::size_t, 3> d = {5,3,7};
     auto c = normal(d, prng);
     ok = std::is_same<decltype(c)::dtype, double>::value;
     REQUIRE( ok );

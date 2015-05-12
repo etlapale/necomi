@@ -1,4 +1,4 @@
-// necomi/funcs/random.h – Pseudo random number generation
+// necomi/numerics/random.h – Pseudo random number generation
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -7,7 +7,7 @@
 
 #include <random>
 
-#include "../base/array.h"
+#include "../arrays/stridedarray.h"
 
 namespace necomi
 {
@@ -54,13 +54,13 @@ protected:
  * Generate a one dimensional array filled with random numbers
  * following a normal distribution.
  */
-template <typename T, ArrayIndex N, typename PRNG>
-Array<T,N> normal(const T& mean, const T& deviation,
-		  const std::array<ArrayIndex,N>& dims,
-		  PRNG& prng)
+template <typename T, std::size_t N, typename PRNG>
+StridedArray<T,N> normal(const T& mean, const T& deviation,
+			 const std::array<std::size_t,N>& dims,
+			 PRNG& prng)
 {
   std::normal_distribution<T> dist(mean, deviation);
-  Array<T,N> a(dims);
+  StridedArray<T,N> a(dims);
 
   a.map([&dist,&prng](auto& path, auto& val) {
       (void) path;
@@ -83,8 +83,8 @@ constexpr auto normal(std::initializer_list<std::size_t> dims, PRNG& prng)
 */
 
 
-template <typename T=double, ArrayIndex N, typename PRNG>
-Array<T,N> normal(const Dimensions<N>& dims, PRNG& prng)
+template <typename T=double, std::size_t N, typename PRNG>
+StridedArray<T,N> normal(const std::array<std::size_t,N>& dims, PRNG& prng)
 {
   return normal<T,N,PRNG>(0, 1, dims, prng);
 }
@@ -95,14 +95,14 @@ Array<T,N> normal(const Dimensions<N>& dims, PRNG& prng)
  * following a normal distribution.
  */
 template <typename T, typename PRNG>
-Array<T,1> normal(const T& mean, const T& deviation,
-		  ArrayIndex size, PRNG& prng)
+StridedArray<T,1> normal(const T& mean, const T& deviation,
+			 std::size_t size, PRNG& prng)
 {
   return normal<T,1>(mean, deviation, {size}, prng);
 }
 
 template <typename T=double, typename PRNG>
-Array<T,1> normal(ArrayIndex size, PRNG& prng)
+StridedArray<T,1> normal(std::size_t size, PRNG& prng)
 {
   return normal<T,1>(0, 1, {size}, prng);
 }
@@ -111,14 +111,14 @@ Array<T,1> normal(ArrayIndex size, PRNG& prng)
  * Generate a one dimensional array filled with random floating point
  * numbers following a uniform distribution.
  */
-template <typename T, ArrayIndex N, typename PRNG>
-std::enable_if_t<std::is_floating_point<T>::value,Array<T,N>>
-uniform(const T& min, const T& max,
-	const std::array<ArrayIndex,N>& dims,
-	PRNG& prng)
+template <typename T, std::size_t N, typename PRNG,
+	  typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+StridedArray<T,N> uniform(const T& min, const T& max,
+			  const std::array<std::size_t,N>& dims,
+			  PRNG& prng)
 {
   std::uniform_real_distribution<T> dist(min, max);
-  Array<T,N> a(dims);
+  StridedArray<T,N> a(dims);
 
   a.map([&dist,&prng](auto& path, auto& val) {
       (void) path;
@@ -128,10 +128,10 @@ uniform(const T& min, const T& max,
   return a;
 }
 
-template <typename T, typename PRNG>
-std::enable_if_t<std::is_floating_point<T>::value,Array<T,1>>
-uniform(const T& min, const T& max,
-	ArrayDimension size, PRNG& prng)
+template <typename T, typename PRNG,
+	  typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+StridedArray<T,1> uniform(const T& min, const T& max,
+			  std::size_t size, PRNG& prng)
 {
   return uniform<T,1>(min, max, {size}, prng);
 }
