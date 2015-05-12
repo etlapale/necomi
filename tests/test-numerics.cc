@@ -2,7 +2,6 @@
 
 #include <necomi/necomi.h>
 using namespace necomi;
-using namespace necomi::delayed;
 
 static constexpr double float_tol = 1e-3;
 

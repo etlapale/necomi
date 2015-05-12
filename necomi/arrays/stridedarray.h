@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../core/loops.h"
+#include "../core/shape.h"
 #include "../core/slices.h"
 #include "../core/strides.h"
 
@@ -256,7 +257,7 @@ public:
   void map(UnaryOperation f)
   {
     dims_type coords;
-    for_looper<UnaryOperation,0,StridedArray<T,N>>(*this, coords, f);
+    for_looper<StridedArray<T,N>,0,UnaryOperation>(*this, coords, f);
   }
     
   /**
@@ -268,7 +269,7 @@ public:
   void map(ConstMapOperation f) const
   {
     dims_type coords;
-    const_for_looper<ConstMapOperation,0,StridedArray<T,N>>(*this, coords, f);
+    const_for_looper<StridedArray<T,N>,0,ConstMapOperation>(*this, coords, f);
   }
 
   /**

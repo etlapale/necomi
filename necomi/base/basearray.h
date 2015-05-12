@@ -80,18 +80,6 @@ Coordinates<N> change_coordinate(const Coordinates<N>& coords,
 }
 
 
-
-/**
- * Compute the size of an array (product of dimensions).
- */
-template <typename Array, typename dim_type=typename Array::dim_type>
-dim_type size(const Array& a)
-{
-  return std::accumulate(a.dims().cbegin(), a.dims().cend(), 1,
-			 std::multiplies<>());
-}
-
-
 /**
  * Sum all the elements of an array.
  * \warning This may overflow.

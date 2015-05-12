@@ -11,6 +11,7 @@
 
 // Core definitions
 #include "core/loops.h"
+#include "core/shape.h"
 #include "core/slices.h"
 #include "core/strides.h"
 
