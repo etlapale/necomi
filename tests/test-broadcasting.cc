@@ -2,13 +2,12 @@
 
 #include <necomi/necomi.h>
 using namespace necomi;
-using namespace necomi::delayed;
 
 
 TEST_CASE( "broadcasting", "[core]" ) {
   SECTION( "widen" ) {
     auto a = reshape(range(20), 4, 5);
-    Dimensions<3> dims{3,4,5};
+    std::array<std::size_t,3> dims{3,4,5};
     auto b = widen(dims, a);
 
     REQUIRE( b.dims() == dims );
@@ -20,7 +19,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
 
   SECTION( "right widening" ) {
     auto a = range(3);
-    Dimensions<2> dims{3,4};
+    std::array<std::size_t,2> dims{3,4};
     auto b = widen_right(dims, a);
 
     REQUIRE( b.dims() == dims );
@@ -34,7 +33,7 @@ TEST_CASE( "broadcasting", "[core]" ) {
   }
 
   SECTION( "broadcasting products" ) {
-    using namespace necomi::delayed::broadcasting;
+    using namespace necomi::broadcasting;
 
     auto a = range(4);
     auto b = reshape(range(8), 2, 4);
@@ -53,9 +52,9 @@ TEST_CASE( "broadcasting", "[core]" ) {
   }
 
   SECTION( "broadcasting heterogeneous arrays" ) {
-    using namespace necomi::delayed::broadcasting;
+    using namespace necomi::broadcasting;
 
-    auto a = immediate(range(4));
+    auto a = strided_array(range(4));
     auto b = reshape(range(8), 2, 4);
 
     auto c = a - b;

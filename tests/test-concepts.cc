@@ -1,7 +1,7 @@
 #include <iostream>
 #include "catch.hpp"
 
-#include <necomi/base/concepts.h>
+#include "../necomi/traits/arrays.h"
 using namespace necomi;
 
 
@@ -18,14 +18,14 @@ struct NotArray2
 // Missing element type
 struct NotArray3
 {
-  static constexpr ArrayDimension ndim = 0;
+  static constexpr std::size_t ndim = 0;
 };
 
 // Missing dimensions
 struct NotArray4
 {
   typedef char value_type;
-  static constexpr ArrayDimension ndim = 1;
+  static constexpr std::size_t ndim = 1;
 };
 
 // Minimal array definition
@@ -33,13 +33,18 @@ struct Array1
 {
   using dtype = double;
   enum { ndim = 1 };
-  Dimensions<ndim> dims() const { return Dimensions<ndim>(); };
+  using dim_type = std::size_t;
+  using dims_type = std::array<dim_type,ndim>;
+  
+  dims_type dims() const
+  { return std::array<std::size_t,ndim>(); };
 };
 
 // Minimal indexable array definition
 struct IndexableArray1 : Array1
 {
-  dtype operator()(const Coordinates<ndim>&) const { return 42; };
+  dtype operator()(const dims_type&) const
+  { return 42; };
 };
 
 TEST_CASE( "concepts", "[base]" ) {

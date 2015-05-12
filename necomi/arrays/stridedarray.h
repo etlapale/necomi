@@ -360,6 +360,18 @@ StridedArray<T, From::ndim> strided_array(const From& a)
 }
 
 
+template <typename T=double,
+	  typename ...Values,
+	  typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
+StridedArray<T,1> litarray(Values... values)
+{
+  StridedArray<T,1> a(sizeof...(Values));
+  std::initializer_list<T> vals = {static_cast<T>(values)...};
+  std::copy_n(vals.begin(), sizeof...(Values), a.data());
+  return a;
+}
+
+
 } // namespace necomi
 
 // Local Variables:

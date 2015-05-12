@@ -25,6 +25,7 @@
 
 // Array creation
 #include "delayed/arithmetic.h"
+#include "delayed/broadcasting.h"
 #include "delayed/comparisons.h"
 #include "delayed/ranges.h"
 #include "delayed/transforms.h"
@@ -44,39 +45,14 @@
 #include "codecs/png.h"
 #endif
 
-
+// Old uncleaned untested headers
 #if 0
-namespace necomi {
-  /**
-   * Divide each element of the array by a number.
-   */
-  template <typename U,
-	    std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
-  Array<T,N>&
-  operator/=(const U& div)
-  {
-    this->map([&div](auto& path, T& val) {
-	(void) path;
-	val /= div;
-      });
-    return *this;
-  }
-}
-
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
-
 #include "funcs/numerics.h"
-
 #include "integrate/sde.h"
-
-//#include "codecs/inr.h"
-
-/**
- * \defgroup filters Recursive filtering
- * Implement recursive filters such as Canny-Deriche or Gamma filters.
- */
+#include "codecs/inr.h"
 #include "filters/deriche.h"
 #endif
 

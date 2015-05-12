@@ -19,86 +19,9 @@
 
 namespace necomi
 {
-
-
-/**
- * Cumulative sum.
- */
-template <typename Indexable, typename T=typename Indexable::dtype>
-Array<T,Indexable::ndim> cumsum(const Indexable& a, ArrayIndex dim = 0)
-{
-  Array<T,Indexable::ndim> res(a.dims());
-  res.map([&res,dim,&a](auto& path, auto& valx) {
-      if (path[dim] == 0) {
-	valx = a(path);
-      }
-      else {
-	auto prev = path;
-	prev[dim]--;
-	valx = res(prev) + a(path);
-      }
-    });
-  return res;
-}
-
-template <typename Indexable, typename T=typename Indexable::dtype>
-Array<T,Indexable::ndim>& operator+=(Array<T,Indexable::ndim>& a,
-				     const Indexable& b)
-{
-#ifndef NECOMI_NO_BOUND_CHECKS
-  // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot increment with array of different dimensions");
-#endif
-  a.map([&b](auto& path, auto& val) {val += b(path);});
-  return a;
-}
-
-  template <typename T=double,
-	    typename ...Values,
-            typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
-  Array<T,1> litarray(Values... values)
-  {
-    Array<T,1> a(sizeof...(Values));
-    std::initializer_list<T> vals = {static_cast<T>(values)...};
-    std::copy_n(vals.begin(), sizeof...(Values), a.data());
-    return a;
-  }
-
-template <typename T, ArrayDimension N,
-	  typename Indexable, typename U=typename Indexable::dtype,
-	  std::enable_if_t<is_promotable<U,T>::value
-			   && N==Indexable::ndim>* = nullptr>
-Array<T,N>& operator*=(Array<T,N>& numerator, const Indexable& denominator)
-{
-  numerator.map([&denominator](auto& coords, auto& val) {
-      val *= denominator(coords);
-    });
-  return numerator;
-}
-
-template <typename T, ArrayDimension N,
-	  typename Indexable, typename U=typename Indexable::dtype,
-	  std::enable_if_t<is_promotable<U,T>::value
-			   && N==Indexable::ndim>* = nullptr>
-Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
-{
-  numerator.map([&denominator](auto& coords, auto& val) {
-      val /= denominator(coords);
-    });
-  return numerator;
-}
   
 namespace broadcasting
 {
-template <typename T, ArrayDimension N,
-	  typename Indexable, typename U=typename Indexable::dtype,
-	  std::enable_if_t<(N>Indexable::ndim) && is_promotable<U,T>::value>* = nullptr>
-Array<T,N>& operator/=(Array<T,N>& numerator, const Indexable& denominator)
-{
-  return necomi::operator/=(numerator,
-			    widen(numerator.dims(), denominator));
-}
 
 } // namespace broadcasting
 } // namespace necomi

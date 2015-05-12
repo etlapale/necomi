@@ -91,7 +91,7 @@ auto zip(const Array1& a, const Array2& b)
   
 template <typename Array, typename T=typename Array::dtype,
 	  typename dims_type = typename Array::dims_type>
-auto shifted(const Array& a, dims_type offset, T default_value = 0)
+auto shifted(const Array& a, std::array<ssize_t,Array::ndim> offset, T default_value = 0)
 {
   using dim_type = typename Array::dim_type;
   

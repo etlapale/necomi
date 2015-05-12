@@ -9,7 +9,7 @@ static const char* path = "test-hdf5.h5";
 
 TEST_CASE( "HDF5 storage", "[hdf5]" ) {
   SECTION( "save and load scalar" ) {
-    Array<int,0> a0;
+    StridedArray<int,0> a0;
     a0() = 94;
     hdf5_save(path, "a0", a0);
 
@@ -21,7 +21,7 @@ TEST_CASE( "HDF5 storage", "[hdf5]" ) {
   }
 
   SECTION( "save and load tensor" ) {
-    Array<int,3> a3(2,3,4);
+    StridedArray<int,3> a3(2,3,4);
     a3.map([](auto& path, auto& val) {
         val = path[0]*12 + path[1] * 4 + path[2];
       });

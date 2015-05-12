@@ -159,6 +159,61 @@ auto operator+(const Array& a, const T& value)
   return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return a(coords) + value; });
 }
 
+
+
+
+
+template <typename Indexable, typename T=typename Indexable::dtype>
+StridedArray<T,Indexable::ndim>& operator+=(StridedArray<T,Indexable::ndim>& a,
+				     const Indexable& b)
+{
+#ifndef NECOMI_NO_BOUND_CHECKS
+  // Make sure the dimensions of a and b are the same
+  if (a.dims() != b.dims())
+    throw std::length_error("cannot increment with array of different dimensions");
+#endif
+  a.map([&b](auto& path, auto& val) {val += b(path);});
+  return a;
+}
+
+template <typename T, std::size_t N,
+	  typename Indexable, typename U=typename Indexable::dtype,
+	  std::enable_if_t<is_promotable<U,T>::value
+			   && N==Indexable::ndim>* = nullptr>
+StridedArray<T,N>& operator*=(StridedArray<T,N>& numerator, const Indexable& denominator)
+{
+  numerator.map([&denominator](auto& coords, auto& val) {
+      val *= denominator(coords);
+    });
+  return numerator;
+}
+
+template <typename T, std::size_t N,
+	  typename Indexable, typename U=typename Indexable::dtype,
+	  std::enable_if_t<is_promotable<U,T>::value
+			   && N==Indexable::ndim>* = nullptr>
+StridedArray<T,N>& operator/=(StridedArray<T,N>& numerator, const Indexable& denominator)
+{
+  numerator.map([&denominator](auto& coords, auto& val) {
+      val /= denominator(coords);
+    });
+  return numerator;
+}
+
+/**
+ * Divide each element of the array by a number.
+ */
+template <typename T, std::size_t N, typename U,
+	  std::enable_if_t<is_promotable<U,T>::value>* = nullptr>
+StridedArray<T,N>&
+operator/=(StridedArray<T,N>& numerator, const U& div)
+{
+  numerator.map([&div](const auto&, T& val) {
+      val /= div;
+    });
+  return numerator;
+}
+
 } // namespace necomi
 
 // Local Variables:

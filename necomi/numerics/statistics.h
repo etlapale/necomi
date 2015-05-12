@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "../arrays/delayed.h"
+#include "../arrays/stridedarray.h"
+
 namespace necomi
 {
 
@@ -92,7 +95,7 @@ auto sum(const Array&a, dim_type dim)
       auto orig_path = add_coordinate(x, dim);
       // Sum all the elements in the dimension
       typename Array::dtype val = 0;
-      for (dim_type i = 0; i < a.dims()[dim]; i++) {
+      for (std::size_t i = 0; i < a.dims()[dim]; i++) {
 	orig_path[dim] = i;
 	val += a(orig_path);
       }
@@ -136,7 +139,7 @@ template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto variance(const Array& a, dim_type dim, bool bessel_correction)
 {
-  auto avg = immediate(average(a, dim));
+  auto avg = strided_array(average(a, dim));
   return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dims(), dim),
 			     [a,dim,avg,bessel_correction]
 			     (const auto& x)
@@ -145,7 +148,7 @@ auto variance(const Array& a, dim_type dim, bool bessel_correction)
 			       auto orig_path = add_coordinate(x, dim);
 			       // Sum the squared deviations to the mean
 			       typename Array::dtype val = 0;
-			       for (dim_type i = 0; i < a.dims()[dim]; i++) {
+			       for (std::size_t i = 0; i < a.dims()[dim]; i++) {
 				 orig_path[dim] = i;
 				 val += power<2>(a(orig_path) - avg(x));
 			       }
@@ -190,6 +193,28 @@ auto max(const Array& a, U value)
 							  [a,value=static_cast<typename Array::dtype>(value)]
 							  (const auto& coords) { return std::max(a(coords), value); });
   }
+
+
+
+/**
+ * Cumulative sum.
+ */
+template <typename Indexable, typename T=typename Indexable::dtype>
+StridedArray<T,Indexable::ndim> cumsum(const Indexable& a, std::size_t dim = 0)
+{
+  StridedArray<T,Indexable::ndim> res(a.dims());
+  res.map([&res,dim,&a](auto& path, auto& valx) {
+      if (path[dim] == 0) {
+	valx = a(path);
+      }
+      else {
+	auto prev = path;
+	prev[dim]--;
+	valx = res(prev) + a(path);
+      }
+    });
+  return res;
+}
 
 
 } // namespace necomi

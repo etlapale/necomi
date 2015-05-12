@@ -584,7 +584,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = reshape(range(24), 4, 2, 3);
 
     auto b = fix_dimension(a, 1, 1);
-    Coordinates<2> dims_b{4, 3};
+    std::array<std::size_t,2> dims_b{4, 3};
     REQUIRE( b.dims() == dims_b );
     REQUIRE( b(0,0) == 3 );
     REQUIRE( b(1,2) == 11 );
@@ -620,7 +620,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( !a.is_modifiable() );
     
     // modifiable delayed arrays are constructible
-    auto b = immediate(a);
+    auto b = strided_array(a);
     auto c = make_delayed<int>(b.dims(),
 			       [&b](auto& coords) -> int& {
 	return b(coords);

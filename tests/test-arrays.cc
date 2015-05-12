@@ -6,129 +6,129 @@ using namespace necomi;
 
 TEST_CASE( "basic array operations", "[base]" ) {
   SECTION( "remove coordinates" ) {
-    Coordinates<4> c = {1, 2, 3, 4};
+    std::array<std::size_t,4> c = {1, 2, 3, 4};
 
     auto c1 = remove_coordinate(c, 2);
-    Coordinates<3> d1 = {1, 2, 4};
+    std::array<std::size_t,3> d1 = {1, 2, 4};
     REQUIRE( c1 == d1 );
 
     auto c2 = remove_coordinate(c, 0);
-    Coordinates<3> d2 = {2, 3, 4};
+    std::array<std::size_t,3> d2 = {2, 3, 4};
     REQUIRE( c2 == d2 );
 
     auto c3 = remove_coordinate(c, 3);
-    Coordinates<3> d3 = {1, 2, 3};
+    std::array<std::size_t,3> d3 = {1, 2, 3};
     REQUIRE( c3 == d3 );
   }
 
   SECTION( "add coordinates" ) {
-    Coordinates<3> c = {1, 2, 3};
+    std::array<std::size_t,3> c = {1, 2, 3};
 
     auto c1 = add_coordinate(c, 2);
     c1[2] = 0;
-    Coordinates<4> d1 = {1, 2, 0, 3};
+    std::array<std::size_t,4> d1 = {1, 2, 0, 3};
     REQUIRE( c1 == d1 );
 
     auto c2 = add_coordinate(c, 0);
     c2[0] = 0;
-    Coordinates<4> d2 = {0, 1, 2, 3};
+    std::array<std::size_t,4> d2 = {0, 1, 2, 3};
     REQUIRE( c2 == d2 );
     REQUIRE( c2 != d1 );
 
     auto c3 = add_coordinate(c, 3);
     c3[3] = 0;
-    Coordinates<4> d3 = {1, 2, 3, 0};
+    std::array<std::size_t,4> d3 = {1, 2, 3, 0};
     REQUIRE( c3 == d3 );
     REQUIRE( c3 != d2 );
   }
   
   SECTION( "append coordinate" ) {
-    Coordinates<3> c = {1, 2, 3};
+    std::array<std::size_t,3> c = {1, 2, 3};
 
     auto c1 = append_coordinate(c, 7);
-    Coordinates<4> d1 = {1, 2, 3, 7};
+    std::array<std::size_t,4> d1 = {1, 2, 3, 7};
     REQUIRE( c1 == d1 );
   }
 
   SECTION( "concepts" ) {
-    Array<double,0> a0;
+    StridedArray<double,0> a0;
     REQUIRE( is_array<decltype(a0)>::value );
   }
 
   SECTION( "array sizes" ) {
-    Array<double,0> a0;
+    StridedArray<double,0> a0;
     REQUIRE( size(a0) == 1 );
 
-    Array<double,1> a1(127);
+    StridedArray<double,1> a1(127);
     REQUIRE( size(a1) == 127 );
 
-    Array<double,2> a2(3,4);
+    StridedArray<double,2> a2(3,4);
     REQUIRE( size(a2) == 3*4 );
 
-    Array<double,5> a5(8,1,7,2,9);
+    StridedArray<double,5> a5(8,1,7,2,9);
     REQUIRE( size(a5) == 8*1*7*2*9 );
   }
 
   SECTION( "array dimensions" ) {
-    Array<double,0> a0;
+    StridedArray<double,0> a0;
     REQUIRE( a0.ndim == 0 );
     REQUIRE( size(a0) == 1 );
 
-    Array<double,1> a1(127);
+    StridedArray<double,1> a1(127);
     REQUIRE( a1.ndim == 1 );
     REQUIRE( a1.dim(0) == 127 );
 
-    Array<double,2> a2(3,4);
+    StridedArray<double,2> a2(3,4);
     REQUIRE( a2.ndim == 2 );
     REQUIRE( a2.dim(0) == 3 );
     REQUIRE( a2.dim(1) == 4 );
 
-    Array<double,5> a5(8,1,7,2,9);
+    StridedArray<double,5> a5(8,1,7,2,9);
     REQUIRE( a5.ndim == 5 );
     REQUIRE( a5.dim(1) == 1 );
     REQUIRE( a5.dim(4) == 9 );
   }
 
   SECTION( "array strides" ) {
-    Array<double,0> a0;
+    StridedArray<double,0> a0;
     REQUIRE( a0.strides().empty() );
 
-    Array<double,1> a1(127);
+    StridedArray<double,1> a1(127);
     REQUIRE( a1.strides().size() == 1);
     REQUIRE( a1.strides()[0] == 1 );
 
-    Array<double,2> a2(3,4);
+    StridedArray<double,2> a2(3,4);
     REQUIRE( a2.strides().size() == 2 );
     REQUIRE( a2.strides()[0] == 4 );
     REQUIRE( a2.strides()[1] == 1 );
 
-    Array<double,5> a5(8,1,7,2,9);
+    StridedArray<double,5> a5(8,1,7,2,9);
     REQUIRE( a5.strides().size() == 5 );
     REQUIRE( a5.strides()[1] == 1*7*2*9 );
     REQUIRE( a5.strides()[4] == 1 );
   }
 
   SECTION( "indices" ) {
-    Array<double,0> a0;
+    StridedArray<double,0> a0;
     REQUIRE( index(a0) == 0 );
 
-    Array<double,1> a1(127);
+    StridedArray<double,1> a1(127);
     REQUIRE( index(a1, 4) == 4 );
     REQUIRE( index(a1, 86) == 86 );
 
-    Array<double,2> a2(3,4);
+    StridedArray<double,2> a2(3,4);
     REQUIRE( index(a2, 0, 2) == 2 );
     REQUIRE( index(a2, 1, 3) == 7 );
     REQUIRE( index(a2, 2, 1) == 9 );
   }
 
   SECTION( "data access" ) {
-    Array<int,0> a0;
+    StridedArray<int,0> a0;
     a0() = 123;
     REQUIRE( a0() == 123 );
     REQUIRE( a0.data()[0] == 123 );
 
-    Array<int,1> a1(127);
+    StridedArray<int,1> a1(127);
     a1(32) = 123;
     a1(69) = 456;
     REQUIRE( a1(32) == 123 );
@@ -136,7 +136,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( a1.data()[32] == 123 );
     REQUIRE( a1.data()[69] == 456 );
 
-    Array<double,2> a2(3,4);
+    StridedArray<double,2> a2(3,4);
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );
@@ -152,20 +152,20 @@ TEST_CASE( "basic array operations", "[base]" ) {
       for (unsigned int j = 0; j < width; j++)
         data[j+i*width] = j+i*width;
 
-    Array<double,2> a(data, [](double*){}, height, width);
+    StridedArray<double,2> a(data, [](double*){}, height, width);
     REQUIRE( a(3,2) == 2+3*width );
     REQUIRE( a(5,7) == 7+5*width );
 
     delete [] data;
 
     const char* str = "Hello world!";
-    Array<char,1> b(const_cast<char*>(str), [](char*){}, 12);
+    StridedArray<char,1> b(const_cast<char*>(str), [](char*){}, 12);
     REQUIRE( b(0) == 'H' );
     REQUIRE( b(6) == 'w' );
   }
 
   SECTION( "slicing" ) {
-    Array<int,1> a1(127);
+    StridedArray<int,1> a1(127);
     for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     auto a1s = a1[45];
@@ -173,7 +173,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( size(a1s) == 1);
     REQUIRE( a1s() == 45 );
 
-    Array<int,2> a2(3,4);
+    StridedArray<int,2> a2(3,4);
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     auto a2s = a2[2];
@@ -218,19 +218,19 @@ TEST_CASE( "basic array operations", "[base]" ) {
         val += 1;
       });
 
-    Array<int,0> a0;
+    StridedArray<int,0> a0;
     a0() = 123;
     a0.map(incr);
     REQUIRE( a0() == 124 );
     
-    Array<int,1> a1(127);
+    StridedArray<int,1> a1(127);
     for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     a1.map(incr);
     REQUIRE( a1(43) == 44 );
     REQUIRE( a1(120) == 121 );
 
-    Array<int,3> a3(2,3,4);
+    StridedArray<int,3> a3(2,3,4);
     a3.map([](auto& path, auto& val) {
         val = path[0]*12 + path[1]*4 + path[2];
       });
@@ -242,7 +242,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "copies" ) {
-    Array<int,0> a0;
+    StridedArray<int,0> a0;
     a0() = 123;
 
     auto a0v(a0);
@@ -260,7 +260,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "inplace mappping" ) {
-    Array<int,3> a(2,3,4);
+    StridedArray<int,3> a(2,3,4);
     a.map([](auto& path, auto& val) {
         val = path[0]*12 + path[1] * 4 + path[2];
       });
@@ -275,7 +275,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "contiguity check" ) {
-    Array<int,3> a(2,3,4);
+    StridedArray<int,3> a(2,3,4);
     REQUIRE( a.contiguous() );
 
     auto b = a[1];
@@ -283,7 +283,6 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
 
   SECTION( "cumulative sum" ) {
-    using namespace delayed;
     auto a = range(1,7);
     auto b = cumsum(a);
 
@@ -326,17 +325,15 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( strides[0] == strides2[0] );
     REQUIRE( strides[1] == strides2[1] );
 
-    auto path = index_to_path(17, strides);
+    auto path = index_to_coords(17, strides);
     REQUIRE( path.size() == 2 );
     REQUIRE( path[0] == 3 );
     REQUIRE( path[1] == 2 );
   }
 
   SECTION( "increment operator" ) {
-    using namespace necomi::delayed;
-    
-    Array<int,2> a = reshape(range(20), 4, 5);
-    Array<int,2> b = 3 * reshape(range(20), 4, 5);
+    StridedArray<int,2> a = reshape(range(20), 4, 5);
+    StridedArray<int,2> b = 3 * reshape(range(20), 4, 5);
     
     a += b;
     REQUIRE( a(0,0) == 0 );
@@ -360,15 +357,13 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
   
   SECTION( "copy to a slice" ) {
-    using namespace necomi::delayed;
-
-    auto a = immediate(reshape(range(24), 6,4));
+    auto a = strided_array(reshape(range(24), 6,4));
     auto a0 = a[0];
     REQUIRE( a0(0) == 0 );
     REQUIRE( a0(1) == 1 );
     REQUIRE( a0(2) == 2 );
     
-    auto b = immediate(range(8,12));
+    auto b = strided_array(range(8,12));
     a[0] = b;
 
     REQUIRE( a0(1) == 9 );
@@ -381,12 +376,10 @@ TEST_CASE( "basic array operations", "[base]" ) {
   }
   
   SECTION( "immediate behavior" ) {
-    using namespace necomi::delayed;
-
-    auto a = immediate(range(24));
+    auto a = strided_array(range(24));
 
     // Ensure that immediate always returns a copy
-    auto b = immediate(a);
+    auto b = strided_array(a);
     REQUIRE( a(2) == b(2) );
     b(2) = 42;
     REQUIRE( a(2) == 2 );
