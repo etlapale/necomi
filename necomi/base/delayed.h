@@ -325,6 +325,24 @@ auto operator+(const Array1& a, const Array2& b)
 				       });
 }
 
+template <typename T, typename Array,
+	  typename C = typename std::common_type<typename Array::dtype>::type,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<T>::value>* = nullptr>
+auto operator+(const T& value, const Array& a)
+{
+  return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return value + a(coords); });
+}
+
+template <typename T, typename Array,
+	  typename C = typename std::common_type<typename Array::dtype>::type,
+	  std::enable_if_t<is_indexable<Array>::value
+			   && ! is_array<T>::value>* = nullptr>
+auto operator+(const Array& a, const T& value)
+{
+  return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return a(coords) + value; });
+}
+
 template <typename Array, typename T,
 	  std::enable_if_t<is_indexable<Array>::value
 			   && ! is_array<T>::value>* = nullptr>
