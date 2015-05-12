@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../core/slices.h"
 #include "../traits/arrays.h"
 #include "dimarray.h"
 
@@ -53,7 +54,7 @@ public:
   /**
    * Create a shared view of the given array.
    */
-  StridedArray(const Array<T,N>& src)
+  StridedArray(const StridedArray<T,N>& src)
     : Parent(src.m_dims)
     , m_strides(src.m_strides)
     , m_shared_data(src.m_shared_data)
@@ -93,14 +94,13 @@ public:
   {
   }
 
-  /**
-   * Create an immediate array initialized from a delayed one.
-   */
-  template <typename Expr>
-  StridedArray(const DelayedArray<T,N,Expr>& a)
-    : Array(a.dims())
+  template <typename Array,
+	    std::enable_if_t<is_indexable<Array>::value
+			     && Array::ndim == N
+			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
+  StridedArray(const Array& a)
+    : StridedArray(a.dims())
   {
-    // TODO: remove or generalize that!
     this->operator=(a);
   }
 
@@ -176,7 +176,7 @@ public:
   /**
    * Return a restricted view on the array.
    */
-  StridedArray<T,N> slice(const Slice<N>& s) const
+  StridedArray<T,N> slice(const Slice<dim_type, N>& s) const
   {
     StridedArray<T,N> a(*this);
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -219,10 +219,10 @@ public:
     start[dim] = val;
     size[dim] = 1;
       
-    return this->slice(Slice<N>(start, size, strides));
+    return this->slice(Slice<dim_type, N>(start, size, strides));
   }
 
-  StridedArray<T,N> operator()(const Slice<N>& s) const
+  StridedArray<T,N> operator()(const Slice<dim_type, N>& s) const
   { return this->slice(s); }
 
   /// Return a raw pointer to the data associated with the array.

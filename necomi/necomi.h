@@ -5,9 +5,12 @@
 
 #pragma once
 
-// Core functions
+// Type traits
 #include "traits/arrays.h"
 #include "traits/generic.h"
+
+// Core definitions
+#include "core/slices.h"
 
 // Default array classes
 #include "arrays/stridedarray.h"
