@@ -12,10 +12,12 @@
 // Core definitions
 #include "core/loops.h"
 #include "core/slices.h"
+#include "core/strides.h"
 
 // Default array classes
 #include "arrays/delayed.h"
 #include "arrays/stridedarray.h"
+#include "arrays/vararray.h"
 
 //
 

@@ -7,7 +7,10 @@
 
 #include "../core/loops.h"
 #include "../core/slices.h"
+#include "../core/strides.h"
+
 #include "../traits/arrays.h"
+
 #include "dimarray.h"
 
 namespace necomi {
