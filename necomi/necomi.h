@@ -25,6 +25,7 @@
 
 // Numerics
 #include "numerics/interpolation.h"
+#include "numerics/trigonometrics.h"
 
 
 #if 0
