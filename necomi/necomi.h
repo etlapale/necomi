@@ -38,6 +38,9 @@
 #include "numerics/statistics.h"
 #include "numerics/trigonometrics.h"
 
+// Filters
+#include "filters/deriche.h"
+
 // Codecs
 #include "codecs/streams.h"
 #ifdef HAVE_HDF5
@@ -50,7 +53,6 @@
 // Old uncleaned untested headers
 #if 0
 #include "codecs/inr.h"
-#include "filters/deriche.h"
 #endif
 
 // Local Variables:

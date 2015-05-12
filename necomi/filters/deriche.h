@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../base/array.h"
+#include "../arrays/stridedarray.h"
 
 /**
  * \file deriche.h Canny-Deriche recursive filtering
@@ -31,12 +31,12 @@ namespace necomi
     SECOND_DERIVATIVE,
   };
   
-template <typename T, ArrayIndex N, ArrayIndex K>
+template <typename T, std::size_t N, std::size_t K>
 std::enable_if_t<K<N && 0<N && std::is_floating_point<T>::value,void>
-inner_loop(std::array<ArrayIndex,N>& path,
-           ArrayIndex dim,
+inner_loop(std::array<std::size_t,N>& path,
+           std::size_t dim,
            bool cond,
-           Array<T,N>& a, T* y,
+           StridedArray<T,N>& a, T* y,
            T a0, T a1, T a2, T a3,
            T b1, T b2)
 {
@@ -48,7 +48,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
                         a, y, a0, a1, a2, a3, b1, b2);
   }
   else {
-    for (ArrayIndex i = 0; i < dims[K]; i++) {
+    for (std::size_t i = 0; i < dims[K]; i++) {
       path[K] = i;
       inner_loop<T,N,K+1>(path, dim, cond,
                           a, y, a0, a1, a2, a3, b1, b2);
@@ -56,12 +56,12 @@ inner_loop(std::array<ArrayIndex,N>& path,
   }
 }
 
-template <typename T, ArrayIndex N, ArrayIndex K>
+template <typename T, std::size_t N, std::size_t K>
 std::enable_if_t<K==N && 0<N && std::is_floating_point<T>::value,void>
-inner_loop(std::array<ArrayIndex,N>& path,
-           ArrayIndex dim,
+inner_loop(std::array<std::size_t,N>& path,
+           std::size_t dim,
            bool cond,
-           Array<T,N>& a, T* y,
+           StridedArray<T,N>& a, T* y,
            T a0, T a1, T a2, T a3,
            T b1, T b2)
 {
@@ -79,7 +79,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
     double coefp = (a0+a1)/(1+b1+b2);
     yb = yp = coefp * xp;
   }
-  for (ArrayIndex i = 0; i < ddim; i++) {
+  for (std::size_t i = 0; i < ddim; i++) {
     T xc = *ima;
     ima += stride;
     T yc = *(y++) = a0*xc + a1*xp - b1*yp - b2*yb;
@@ -114,11 +114,11 @@ inner_loop(std::array<ArrayIndex,N>& path,
    * \param cond  Whether borders values are taken into account or ignored.
    * \ingroup filters
    */
-  template <typename T, ArrayIndex N,
+  template <typename T, std::size_t N,
 	    typename std::enable_if_t< 0<N
                 && std::is_floating_point<T>::value>* = nullptr>
-  Array<T,N>&
-  deriche(Array<T,N>& a, ArrayIndex dim, T sigma,
+  StridedArray<T,N>&
+  deriche(StridedArray<T,N>& a, std::size_t dim, T sigma,
 	  DericheOrder order=DericheOrder::BLUR,
 	  bool cond=true)
   {
@@ -167,7 +167,7 @@ inner_loop(std::array<ArrayIndex,N>& path,
     break;
   }
 
-  std::array<ArrayIndex,N> path;
+  std::array<std::size_t,N> path;
   T y[dims[dim]];
 
   inner_loop<T,N,0>(path, dim, cond, a, y, a0, a1, a2, a3, b1, b2);
@@ -175,11 +175,11 @@ inner_loop(std::array<ArrayIndex,N>& path,
   return a;
 }
 
-template <typename T, ArrayIndex N,
+template <typename T, std::size_t N,
 	  typename std::enable_if_t< 0<N
 	      && std::is_floating_point<T>::value>* = nullptr>
-Array<T,N>&&
-deriche(Array<T,N>&& a, ArrayIndex dim, T sigma,
+StridedArray<T,N>&&
+deriche(StridedArray<T,N>&& a, std::size_t dim, T sigma,
 	DericheOrder order=DericheOrder::BLUR,
 	bool cond=true)
 {
@@ -192,18 +192,18 @@ deriche(Array<T,N>&& a, ArrayIndex dim, T sigma,
    * Filter an array using Canny-Deriche along all its dimensions.
    * \ingroup filters
    */
-  template <typename T, ArrayIndex N,
+  template <typename T, std::size_t N,
 	    std::enable_if_t<0<N && std::is_floating_point<T>::value>* = nullptr>
-  Array<T,N>& deriche(Array<T,N>& a, double sigma, DericheOrder order=DericheOrder::BLUR)
+  StridedArray<T,N>& deriche(StridedArray<T,N>& a, double sigma, DericheOrder order=DericheOrder::BLUR)
   {
-    for (ArrayIndex i = 0; i < N; i++)
+    for (std::size_t i = 0; i < N; i++)
       deriche<T,N>(a, i, sigma,order);
     return a;
   }
     
     template <typename A,
 	      std::enable_if_t<0<A::ndim && std::is_floating_point<typename A::dtype>::value>* = nullptr>
-	      Array<typename A::dtype,A::ndim> deriche(const A& a, double sigma,
+	      StridedArray<typename A::dtype,A::ndim> deriche(const A& a, double sigma,
 		     DericheOrder order=DericheOrder::BLUR)
   {
     auto x = immediate(a);
