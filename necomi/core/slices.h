@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include "../traits/generic.h"
 
 namespace necomi
 {
@@ -14,7 +15,7 @@ class Slice
 {
 public:
   using dims_type = std::array<dim_type,N>;
-  
+
   Slice(const dims_type& start,
 	const dims_type& size,
 	const dims_type& strides)
@@ -39,6 +40,15 @@ public:
     }
   }
 
+  template <typename T,
+	    std::enable_if_t<is_promotable<T,dim_type>::value>* = nullptr>
+  Slice(const Slice<T,N>& s)
+  {
+    std::copy_n(s.start().cbegin(), N, m_start.begin());
+    std::copy_n(s.size().cbegin(), N, m_start.size());
+    std::copy_n(s.strides().cbegin(), N, m_start.strides());
+  }
+
   const dims_type& start() const
   { return m_start; }
 
@@ -54,7 +64,7 @@ protected:
   dims_type m_strides;
 };
 
-template <typename dim_type, typename dims_type, dim_type N>
+template <typename dim_type, dim_type N>
 Slice<dim_type,N+1> operator,(const Slice<dim_type,N>& a,
 			      const Slice<dim_type,1>& b)
 {
@@ -70,7 +80,7 @@ Slice<dim_type,N+1> operator,(const Slice<dim_type,N>& a,
   return Slice<dim_type,N+1>(args);
 }
 
-template <typename dim_type>
+template <typename dim_type=std::size_t>
 Slice<dim_type,1>
 slice(dim_type start, dim_type size, dim_type stride=1)
 {

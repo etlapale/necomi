@@ -6,20 +6,20 @@ using namespace necomi;
 
 TEST_CASE( "slices", "[base]" ) {
   SECTION( "creating 1D slices" ) {
-    Slice<1> s1a(1, 3);
+    Slice<std::size_t, 1> s1a(1, 3);
     REQUIRE( s1a.start().size() == 1 );
     REQUIRE( s1a.start()[0] == 1 );
     REQUIRE( s1a.size()[0] == 3 );
     REQUIRE( s1a.strides()[0] == 1 );
 
-    Slice<1> s1c(4, 8, 2);
+    Slice<std::size_t, 1> s1c(4, 8, 2);
     REQUIRE( s1c.start()[0] == 4 );
     REQUIRE( s1c.size()[0] == 8 );
     REQUIRE( s1c.strides()[0] == 2 );
   }
 
   SECTION( "creating 2D slices" ) {
-    Slice<2> s2 = (Slice<1>(1,3) , Slice<1>(1,2));
+    Slice<std::size_t, 2> s2 = (Slice<std::size_t, 1>(1,3) , Slice<std::size_t, 1>(1,2));
 
     REQUIRE( s2.start().size() == 2 );
     REQUIRE( s2.start()[0] == 1 );
@@ -43,7 +43,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "slice from initializer lists" ) {
-    Slice<2> s2({{{{1,3}}, {{1,2}}}});
+    Slice<std::size_t, 2> s2({{{{1,3}}, {{1,2}}}});
 
     REQUIRE( s2.start()[0] == 1 );
     REQUIRE( s2.start()[1] == 1 );
@@ -54,7 +54,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "slicing an immediate array" ) {
-    Array<int,2> a(4, 5);
+    StridedArray<int,2> a(4, 5);
     a.map([](auto& path, auto& val) { val = path[0]*5 + path[1]; });
     REQUIRE( a(0,0) == 0 );
     REQUIRE( a(1,1) == 6 );
@@ -77,7 +77,7 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "double slicing" ) {
-    Array<int,2> a(4, 5);
+    StridedArray<int,2> a(4, 5);
     a.map([](auto& path, auto& val) { val = path[0]*5 + path[1]; });
     auto b = a.slice((slice(1,3),slice(1,4)));
     auto c = b.slice((slice(0,3),slice(2,2)));
@@ -98,13 +98,11 @@ TEST_CASE( "slices", "[base]" ) {
   }
 
   SECTION( "slicing with stride" ) {
-    using namespace necomi::delayed;
-    
-    Array<int,1> a(100);
+    StridedArray<int,1> a(100);
     a.map([](auto& path, auto& val) { val = path[0]; });
 
     auto evens = a.slice(slice(0,49,2));
-    Array<int,1> b(49);
+    StridedArray<int,1> b(49);
     b.map([](auto& path, auto& val) { val = 2*path[0]; });
     REQUIRE( all(evens == b) );
     REQUIRE( ! any(evens != b) );
@@ -112,7 +110,7 @@ TEST_CASE( "slices", "[base]" ) {
 
   SECTION(" out of bounds slicing" ) {
 
-    Array<int,1> a(7);
+    StridedArray<int,1> a(7);
     bool exception_thrown = false;
     try {
       a.slice(slice(0, 8));
@@ -139,8 +137,6 @@ TEST_CASE( "slices", "[base]" ) {
   }
   
   SECTION(" slice for dimension" ) {
-    using namespace necomi::delayed;
-    
     auto a = immediate(reshape(range(24), 2, 4, 3));
     REQUIRE( a(0,2,1) == 7 );
     REQUIRE( a(1,2,2) == 20 );
