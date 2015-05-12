@@ -59,7 +59,7 @@ template <typename dims_type,
 dims_type index_to_coords(dim_type idx, const dims_type& strides)
 {
   dims_type res;
-  for (dim_type i = 0; i < strides.size(); i++) {
+  for (auto i = 0UL; i < strides.size(); i++) {
     res[i] = idx / strides[i];
     idx %= strides[i];
   }

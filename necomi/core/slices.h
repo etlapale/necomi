@@ -45,8 +45,8 @@ public:
   Slice(const Slice<T,N>& s)
   {
     std::copy_n(s.start().cbegin(), N, m_start.begin());
-    std::copy_n(s.size().cbegin(), N, m_start.size());
-    std::copy_n(s.strides().cbegin(), N, m_start.strides());
+    std::copy_n(s.size().cbegin(), N, m_size.begin());
+    std::copy_n(s.strides().cbegin(), N, m_strides.begin());
   }
 
   const dims_type& start() const
