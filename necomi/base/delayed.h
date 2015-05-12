@@ -7,92 +7,11 @@
 
 #include <random>
 
-#include "array.h"
-#include "concepts.h"
+//#include "array.h"
+//#include "concepts.h"
 
 namespace necomi
 {
-template <typename T, ArrayIndex N> class Array;
-
-/**
- * Represent an array expression.
- * Make sure to register each dependency with add_reference.
- */
-template <typename T, ArrayDimension N, typename Expr>
-class DelayedArray : public DimArray<std::size_t,N>
-{
-public:
-  using dim_type = std::size_t;
-  using dims_type = std::array<dim_type, N>;
-  using dtype = T;
-  enum { ndim = N };
-  
-  template <typename U, ArrayIndex M, typename Expr2> friend class DelayedArray;
-  
-  DelayedArray(const std::array<ArrayIndex,N>& dims, Expr e)
-    : DimArray<std::size_t,N>(dims)
-    , m_e(std::move(e))
-  {
-    static_assert(is_callable<Expr,const Coordinates<N>&>::value,
-		  "function wrapped in delayed array has invalid arguments");
-    static_assert(std::is_convertible<typename std::result_of<Expr(const Coordinates<N>&)>::type,T>::value,
-		  "function wrapped in delayed array has invalid return type");
-  }
-  
-  /**
-   * Indicates whether the wrapped function returns references.
-   */
-  static constexpr bool is_modifiable()
-  {
-    return std::is_convertible<
-      typename std::result_of<Expr(const Coordinates<N>&)>::type,
-                              T&>::value;
-  }
-  
-  typedef typename std::conditional<is_modifiable(), T&, T>::type ReturnType;
-
-  /**
-   * Return the value of a single element.
-   */
-  template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(), T>
-  operator()(Indices... indices) const
-  {
-    std::array<ArrayIndex,N> idx{static_cast<ArrayIndex>(indices)...};
-    return this->operator()(idx);
-  }
-
-  template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices)==N && all_indices<Indices...>(), ReturnType>
-  operator()(Indices... indices)
-  {
-    std::array<ArrayIndex,N> idx{static_cast<ArrayIndex>(indices)...};
-    return this->operator()(idx);
-  }
-
-  /**
-   * Return the value of a single element.
-   */
-  T operator()(const std::array<ArrayIndex,N>& path) const
-  {
-    return m_e(path);
-  }
-
-  ReturnType operator()(const std::array<ArrayIndex,N>& path)
-  {
-    return m_e(path);
-  }
-
-  template <typename ConstMapOperation>
-  void map(ConstMapOperation f) const
-  {
-    Coordinates<N> path;
-    const_for_looper<ConstMapOperation,0,Array<T,N>>(*this, path, f);
-  }
-
-protected:
-  Expr m_e;
-};
 
   template <typename T=double, ArrayDimension N=1, typename Expr>
   DelayedArray<T,N,Expr>

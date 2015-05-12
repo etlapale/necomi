@@ -14,6 +14,7 @@
 #include "core/slices.h"
 
 // Default array classes
+#include "arrays/delayed.h"
 #include "arrays/stridedarray.h"
 
 //
@@ -38,11 +39,7 @@ namespace necomi {
 }
 #endif
 
-
-/**
- * \defgroup core Core array library
- * Define the base Array objects and its core functionalities.
- */
+#if 0
 #include "base/array.h"
 #include "base/broadcasting.h"
 #include "base/delayed.h"
@@ -75,6 +72,7 @@ namespace necomi {
  * Implement recursive filters such as Canny-Deriche or Gamma filters.
  */
 #include "filters/deriche.h"
+#endif
 
 // Local Variables:
 // mode: c++
