@@ -38,6 +38,7 @@
 #include "numerics/trigonometrics.h"
 
 // Codecs
+#include "codecs/streams.h"
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
@@ -47,9 +48,6 @@
 
 // Old uncleaned untested headers
 #if 0
-#include "base/array.h"
-#include "base/broadcasting.h"
-#include "base/delayed.h"
 #include "funcs/numerics.h"
 #include "integrate/sde.h"
 #include "codecs/inr.h"

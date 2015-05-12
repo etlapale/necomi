@@ -1,4 +1,4 @@
-// necomi/base/streams.h – Pretty printers for necomi data types
+// necomi/codecs/streams.h – Pretty printers for necomi data types
 //
 // Copyright © 2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
@@ -8,10 +8,11 @@
 #include <iterator>
 #include <ostream>
 
-#include "traits.h"
+#include "../traits/arrays.h"
 
-namespace necomi
-{
+namespace necomi {
+namespace streams {
+
 /**
  * Print array coordinates or dimensions on an output stream.
  */
@@ -41,15 +42,15 @@ std::ostream& operator<<(std::ostream& os, const Array& a)
 {
   os << "[";
   for (auto i = 0UL; i < a.dim(0)-1; i++)
-    os << necomi::delayed::slice(a,i) << ", ";
+    os << necomi::slice(a,i) << ", ";
   if (a.dim(0) > 0)
-    os << necomi::delayed::slice(a,a.dim(0)-1);
+    os << necomi::slice(a,a.dim(0)-1);
   return os << "]";
 }
 
+} // namespace streams
 } // namespace necomi
 
-// namespace necomi
 // Local Variables:
 // mode: c++
 // End:
