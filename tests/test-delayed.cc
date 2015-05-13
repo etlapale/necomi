@@ -778,4 +778,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( ! same_dimensions(a,g) );
     REQUIRE( ! same_dimensions(g,a) );
   }
+
+  SECTION( "delayed power" ) {
+
+    auto a = zeros(3,7) + 2;
+    auto b = power<3>(a);
+
+    REQUIRE( size(b) == size(a) );
+    REQUIRE( b(0,0) == 8 );
+    REQUIRE( b(1,1) == 8 );
+  }
 }

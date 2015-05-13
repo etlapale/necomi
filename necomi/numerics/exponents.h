@@ -49,23 +49,23 @@ auto exp(const Array& a)
 							 });
 }
   
-template <unsigned N, typename T>
-std::enable_if_t<N==0,T>
-power(T)
+template <unsigned N, typename T,
+	  std::enable_if_t<N==0>* = nullptr>
+auto power(T)
 {
   return 1;
 }
 
-template <unsigned N, typename T>
-std::enable_if_t<N==1,T>
-power(T val)
+template <unsigned N, typename T,
+	  std::enable_if_t<N==1>* = nullptr>
+auto power(T val)
 {
   return val;
 }
   
-template <unsigned N, typename T>
-std::enable_if_t<1<N,T>
-power(T val)
+template <unsigned N, typename T,
+	  std::enable_if_t<1<N>* = nullptr>
+auto power(T val)
 {
   return val * power<N-1>(val);
 }
