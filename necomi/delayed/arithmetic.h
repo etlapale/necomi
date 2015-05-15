@@ -9,6 +9,18 @@
 
 namespace necomi {
 
+
+template <typename Array,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto operator-(const Array& a)
+{
+  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
+				      [a](const auto& coords) {
+					return -a(coords);
+				      });
+}
+
+
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
 auto operator*(const Array1& a, const Array2& b)
@@ -63,7 +75,7 @@ auto operator/(const Array1& a, const Array2& b)
 
 template <typename Array, typename U,
 	  std::enable_if_t<is_indexable<Array>::value
-			   && ! is_array<U>::valu>* = nullptr>
+			   && ! is_array<U>::value>* = nullptr>
 auto operator/(U value, const Array& a)
 {
   using C = typename std::common_type<typename Array::dtype, U>::type;

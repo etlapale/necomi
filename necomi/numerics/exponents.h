@@ -96,6 +96,25 @@ auto ggd(const Array& a, typename Array::dtype alpha, typename Array::dtype mu=0
   
 }
 
+
+template <unsigned beta, typename Array1, typename Array2,
+	  typename std::enable_if_t<std::is_floating_point<typename Array1::dtype>::value
+				    && std::is_floating_point<typename Array2::dtype>::value>* = nullptr>
+auto ggd(const Array1& a, const Array2& alpha, typename Array1::dtype mu=0)
+{
+  /*return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
+			   [a,alpha,mu]
+			   (const auto& coords) {
+			     return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
+			     });*/
+  
+  using namespace necomi::broadcasting;
+  //auto num = abs(a-mu);
+  //auto foo = num  / alpha;
+  //return a;
+  return exp(-power<beta>(abs(a - mu)/alpha));
+}
+
 template <typename Array>
 auto norm_angle_diff(const Array& a)
 {
