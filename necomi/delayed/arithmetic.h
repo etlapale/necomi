@@ -5,19 +5,17 @@
 
 #pragma once
 
-#include "../arrays/delayed.h"
+#include <functional>
+
+#include "maps.h"
 
 namespace necomi {
-
 
 template <typename Array,
 	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
 auto operator-(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-				      [a](const auto& coords) {
-					return -a(coords);
-				      });
+  return map(a, std::negate<>());
 }
 
 
@@ -41,10 +39,7 @@ template <typename U, typename Array,
 			   && ! is_indexable<U>::value>* = nullptr>
 auto operator*(const Array& a, U value)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return a(x)*value; });
+  return map(a, [value](const auto& x) { return x*value; });
 }
 
 template <typename U, typename Array,
@@ -52,10 +47,7 @@ template <typename U, typename Array,
 			   && ! is_indexable<U>::value>* = nullptr>
 auto operator*(U value, const Array& a)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return value*a(x); });
+  return map(a, [value](const auto& x) { return value*x; });
 }
 
 template <typename Array1, typename Array2,

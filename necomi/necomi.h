@@ -23,10 +23,11 @@
 #include "arrays/stridedarray.h"
 #include "arrays/vararray.h"
 
-// Array creation
+// Delayed array creation
 #include "delayed/arithmetic.h"
 #include "delayed/broadcasting.h"
 #include "delayed/comparisons.h"
+#include "delayed/maps.h"
 #include "delayed/ranges.h"
 #include "delayed/transforms.h"
 
