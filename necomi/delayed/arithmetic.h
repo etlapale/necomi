@@ -110,10 +110,7 @@ template <typename Array, typename U,
 			   && ! is_array<U>::value>* = nullptr>
 auto operator-(U value, const Array& a)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return value - a(x); });
+  return map(a, [value](const auto& x) { return value - x; });
 }
 
 template <typename Array, typename U,
@@ -121,10 +118,8 @@ template <typename Array, typename U,
 			   && ! is_array<U>::value>* = nullptr>
 auto operator-(const Array& a, U value)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return a(x) - value; });
+  
+  return map(a, [value](const auto& x) { return x - value; });
 }
 
 template <typename Array1, typename Array2,
@@ -146,24 +141,21 @@ auto operator+(const Array1& a, const Array2& b)
 }
 
 template <typename T, typename Array,
-	  typename C = typename std::common_type<typename Array::dtype>::type,
 	  std::enable_if_t<is_indexable<Array>::value
 			   && ! is_array<T>::value>* = nullptr>
 auto operator+(const T& value, const Array& a)
 {
-  return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return value + a(coords); });
+  return map(a, [value](const auto& x) { return value + x; });
 }
 
 template <typename T, typename Array,
-	  typename C = typename std::common_type<typename Array::dtype>::type,
 	  std::enable_if_t<is_indexable<Array>::value
 			   && ! is_array<T>::value>* = nullptr>
 auto operator+(const Array& a, const T& value)
 {
-  return make_delayed<C, Array::ndim>(a.dims(), [value,a](const auto& coords) { return a(coords) + value; });
+  
+  return map(a, [value](const auto& x) { return x + value; });
 }
-
-
 
 
 
