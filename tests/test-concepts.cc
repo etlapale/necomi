@@ -1,5 +1,5 @@
 #include <iostream>
-#include "catch.hpp"
+#include "Catch/include/catch.hpp"
 
 #include "../necomi/traits/arrays.h"
 using namespace necomi;

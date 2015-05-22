@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "catch.hpp"
+#include "Catch/include/catch.hpp"
 
 #include <necomi/necomi.h>
 using namespace necomi;
