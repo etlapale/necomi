@@ -142,12 +142,12 @@ auto stack(const Array& a, const Arrays&... as)
 /**
  * Concatenate arrays.
  */
-template <typename Array, typename ...Arrays>
-auto concat(const Array& a, const Arrays&... as)
+template <typename Array, typename ...Arrays,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto concat(std::size_t d, const Array& a, const Arrays&... as)
 {
   static_assert(same_dimensionality<Array, Arrays...>::value,
 		"concatenated arrays must have the same dimensionality");
-  auto d = 0UL;	// Dimension along which to concatenate
 #ifndef NECOMI_NO_BOUND_CHECKS
   if (! almost_same_dimensions(d, a, as...))
     throw std::length_error("concatenated arrays must have almost the same dimensions");
@@ -179,6 +179,13 @@ auto concat(const Array& a, const Arrays&... as)
 				       // Return the element
 				       return choose_array<0,Array,Arrays...>::at(j, c, a, as...);
 				     });
+}
+
+template <typename Array, typename ...Arrays,
+	  typename std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto concat(const Array& a, const Arrays&... as)
+{
+  return concat(0, a, as...);
 }
 
 // TODO: remove, special case of fix_dimension
