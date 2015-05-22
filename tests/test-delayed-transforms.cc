@@ -18,7 +18,14 @@ TEST_CASE( "transformations", "[delayed]" ) {
     REQUIRE( c(3) == 38 );
     REQUIRE( c(7) == 38 );
 
-    auto d = constants({7}, 42);
-    //auto e = concat(a, b, a, d, 0);
+    auto d = concat(a, b, a);
+    REQUIRE( d.ndim == 1 );
+    REQUIRE( d.dim(0) == 11 );
+    REQUIRE( d(0) == 67 );
+    REQUIRE( d(2) == 67 );
+    REQUIRE( d(3) == 38 );
+    REQUIRE( d(7) == 38 );
+    REQUIRE( d(8) == 67 );
+    REQUIRE( d(10) == 67 );
   }
 }

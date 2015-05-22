@@ -142,27 +142,43 @@ auto stack(const Array& a, const Arrays&... as)
 /**
  * Concatenate arrays.
  */
-template <typename Array1, typename Array2>
-auto concat(const Array1& a, const Array2& b)
+template <typename Array, typename ...Arrays>
+auto concat(const Array& a, const Arrays&... as)
 {
-  static_assert(same_dimensionality<Array1, Array2>::value,
-		"concatenated arrays must have the same number of dimensions");
+  static_assert(same_dimensionality<Array, Arrays...>::value,
+		"concatenated arrays must have the same dimensionality");
   auto d = 0UL;	// Dimension along which to concatenate
 #ifndef NECOMI_NO_BOUND_CHECKS
-  if (! almost_same_dimensions(d, a, b))
+  if (! almost_same_dimensions(d, a, as...))
     throw std::length_error("concatenated arrays must have almost the same dimensions");
 #endif
-  
-  using T = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
 
-  return make_delayed<T,Array1::ndim>(change_coordinate(a.dims(), d, a.dim(d) + b.dim(d)), [d,a,b](const auto& coords) {
-      auto i = coords[d];
-      if (i < a.dim(d))
-	return a(change_coordinate(coords, d, i));
-      else
-	return b(change_coordinate(coords, d, i-a.dim(d)));
-    });
+  using T = typename std::common_type<typename Array::dtype,
+				      typename Arrays::dtype...>::type;
+
+  std::array<std::size_t, 1+sizeof...(Arrays)> ns{a.dim(d), as.dim(d)...};
+  // Total size of the dimension along which to concatenate
+  auto n = std::accumulate(ns.cbegin(), ns.cend(), 0);
+  // Cumulative array to find the correct array for a given coordinate
+  std::array<std::size_t, 1+sizeof...(Arrays)> cumsum;
+  std::partial_sum(ns.cbegin(), ns.cend(), cumsum.begin());
+  
+  return make_delayed<T,Array::ndim>(change_coordinate(a.dims(), d, n),
+				     [d,cumsum,a,as...](const auto& coords) {
+				       auto i = coords[d];
+				       // Search in which array the element is
+				       std::size_t j;
+				       for (j = 0; j < cumsum.size(); j++)
+					 if (i < cumsum[j])
+					   break;
+
+				       // Get element coordinates in the subarray
+				       auto c = change_coordinate(coords, d, i - (j > 0 ? cumsum[j-1] : 0));
+				       
+				       // TODO: throw except on out of range
+				       // Return the element
+				       return choose_array<0,Array,Arrays...>::at(j, c, a, as...);
+				     });
 }
 
 // TODO: remove, special case of fix_dimension
