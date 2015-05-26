@@ -42,6 +42,9 @@ struct choose_array<I>
   { throw std::range_error("invalid array chosen"); }
 };
 
+template <typename T>
+class DebugType;
+
 } // namespace necomi
 
 // Local Variables:

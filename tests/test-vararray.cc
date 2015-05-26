@@ -68,9 +68,6 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
   }
 
   SECTION( "convert from and to VarArray" ) {
-    auto a = reshape(range(20), 4, 5);
-    //auto b = 
-
     VarArray<int> a0;
     a0() = 123;
 
@@ -80,6 +77,11 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     StridedArray<int,0> s0 = a0;
     REQUIRE( s0() == 123 );
     s0 = b0;
-    REQUIRE( s0() == 456 );    
+    REQUIRE( s0() == 456 );
+    
+    auto a = reshape(range(20), 4, 5);
+    //auto b = var_array(a);
+    //VarArray<int>
+    DebugType<decltype(a)> x;
   }
 }
