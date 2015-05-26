@@ -7,6 +7,9 @@
 
 #include <vector>
 
+#include "../core/shape.h"
+#include "../traits/arrays.h"
+
 namespace necomi
 {
 
@@ -38,6 +41,17 @@ public:
     , m_shared_data(a.m_shared_data)
     , m_data(a.m_data)
   {
+  }
+
+  template <typename Array,
+	    std::enable_if_t<is_indexable<Array>::value
+			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
+  VarArray(const Array& a)
+    : VarArray(to_vector<dim_type>(a.dims()))
+  {
+    for_each(*this, [&a](const auto& coords, auto& value){
+	value = a(to_array<typename Array::dim_type, Array::ndim>(coords));
+      });
   }
 
   dim_type ndim() const

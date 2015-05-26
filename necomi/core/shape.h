@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
 #include <functional>
 #include <numeric>
+#include <vector>
 
 namespace necomi {
 
@@ -23,8 +26,21 @@ dim_type size(const Array& a)
 template <typename T, std::size_t N, typename Container>
 std::array<T,N> to_array(const Container& c)
 {
+#ifndef NECOMI_NO_BOUND_CHECKS
+  if (c.size() != N)
+    throw std::length_error("cannot convert a size N container to a size M array with N!=M");
+#endif
   std::array<T,N> res;
   std::copy_n(c.cbegin(), N, res.begin());
+  return res;
+}
+
+template <typename T, typename Container>
+std::vector<T> to_vector(const Container& c)
+{
+  std::vector<T> res;
+  res.resize(c.size());
+  std::copy_n(c.cbegin(), c.size(), res.begin());
   return res;
 }
 

@@ -81,7 +81,6 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     
     auto a = reshape(range(20), 4, 5);
     //auto b = var_array(a);
-    //VarArray<int>
-    DebugType<decltype(a)> x;
+    VarArray<int> b = a;
   }
 }
