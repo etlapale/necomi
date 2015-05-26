@@ -106,6 +106,13 @@ protected:
   T* m_data;
 }; // class VarArray
 
+template <typename Array,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+VarArray<typename Array::dtype> var_array(const Array& a)
+{
+  return VarArray<typename Array::dtype>(a);
+}
+
 } // namespace necomi
 
 // Local Variables:
