@@ -65,6 +65,21 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     }
     REQUIRE( exception_thrown );
 #endif // NECOMI_NO_BOUND_CHECKS
+  }
 
+  SECTION( "convert from and to VarArray" ) {
+    auto a = reshape(range(20), 4, 5);
+    //auto b = 
+
+    VarArray<int> a0;
+    a0() = 123;
+
+    VarArray<int> b0;
+    b0() = 456;
+
+    StridedArray<int,0> s0 = a0;
+    REQUIRE( s0() == 123 );
+    s0 = b0;
+    REQUIRE( s0() == 456 );    
   }
 }

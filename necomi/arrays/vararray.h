@@ -40,6 +40,9 @@ public:
   {
   }
 
+  dim_type ndim() const
+  { return m_dims.size(); }
+
   const dims_type& dims() const
   { return m_dims; }
 

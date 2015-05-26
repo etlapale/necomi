@@ -20,6 +20,14 @@ dim_type size(const Array& a)
 			 std::multiplies<>());
 }
 
+template <typename T, std::size_t N, typename Container>
+std::array<T,N> to_array(const Container& c)
+{
+  std::array<T,N> res;
+  std::copy_n(c.cbegin(), N, res.begin());
+  return res;
+}
+
 } // namespace necomi
 
 // Local Variables:

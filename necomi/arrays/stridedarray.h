@@ -111,6 +111,17 @@ public:
     this->operator=(a);
   }
 
+  template <typename Array,
+	    std::enable_if_t<has_dtype<Array>::value
+			     && ! has_ndim<Array>::value
+			     && has_dims<Array>::value
+			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
+  StridedArray(const Array& a)
+    : StridedArray(to_array<dim_type, ndim>(a.dims()))
+  {
+    this->operator=(a);
+  }
+
   const dims_type& strides() const
   { return m_strides; }
 
@@ -290,6 +301,27 @@ public:
 #endif
     this->map([&a](auto& path, auto& val) {
 	val = a(path);
+      });
+  }
+
+  template <typename Array,
+	    std::enable_if_t<has_dtype<Array>::value
+			     && ! has_ndim<Array>::value
+			     && has_dims<Array>::value
+			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
+  void operator=(const Array& a)
+  {
+#ifndef NECOMI_NO_BOUND_CHECKS
+    // Make sure the dimensions of a and b are the same
+    if (ndim != a.ndim())
+      throw std::length_error("cannot copy from array of different dimensionality");
+    if (! std::equal(this->dims().cbegin(), this->dims().cend(),
+		     a.dims().cbegin()))
+      throw std::length_error("cannot copy from array of different dimensions");
+#endif
+    this->map([&a](const auto& coords, auto& val) {
+	typename Array::dims_type acoords(coords.cbegin(), coords.cend());
+	val = a(acoords);
       });
   }
 
