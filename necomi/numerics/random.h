@@ -120,8 +120,23 @@ StridedArray<T,N> uniform(const T& min, const T& max,
   std::uniform_real_distribution<T> dist(min, max);
   StridedArray<T,N> a(dims);
 
-  a.map([&dist,&prng](auto& path, auto& val) {
-      (void) path;
+  a.map([&dist,&prng](const auto&, auto& val) {
+      val = dist(prng);
+    });
+
+  return a;
+}
+
+template <typename T, std::size_t N, typename PRNG,
+	  typename std::enable_if_t<std::is_integral<T>::value>* = nullptr>
+StridedArray<T,N> uniform(const T& min, const T& max,
+			  const std::array<std::size_t,N>& dims,
+			  PRNG& prng)
+{
+  std::uniform_int_distribution<T> dist(min, max);
+  StridedArray<T,N> a(dims);
+
+  a.map([&dist,&prng](const auto&, auto& val) {
       val = dist(prng);
     });
 
@@ -129,12 +144,14 @@ StridedArray<T,N> uniform(const T& min, const T& max,
 }
 
 template <typename T, typename PRNG,
-	  typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+	  typename std::enable_if_t<std::is_floating_point<T>::value
+				    || std::is_integral<T>::value>* = nullptr>
 StridedArray<T,1> uniform(const T& min, const T& max,
 			  std::size_t size, PRNG& prng)
 {
   return uniform<T,1>(min, max, {size}, prng);
 }
+
 
 } // namespace necomi
 
