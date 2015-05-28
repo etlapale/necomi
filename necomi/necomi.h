@@ -31,6 +31,9 @@
 #include "delayed/ranges.h"
 #include "delayed/transforms.h"
 
+// Algorithms
+#include "algorithms/sort.h"
+
 // Numerics
 #include "numerics/exponents.h"
 #include "numerics/interpolation.h"
