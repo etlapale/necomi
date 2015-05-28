@@ -9,37 +9,6 @@
 
 namespace necomi {
 
-/**
- * Create a delayed array from the absolute values of another.
- * \param a	An \ref IndexableArray "indexable array".
- */
-template <typename IndexableArray,
-	  typename std::enable_if_t<is_indexable<IndexableArray>::value>* = nullptr>
-auto abs(const IndexableArray& a)
-{
-  using dims_type = typename IndexableArray::dims_type;
-  
-  return make_delayed(a.dims(), [a](const dims_type& coords)
-		      { return std::abs(a(coords)); });
-}
-
-/**
- * Norms available to function \ref norm.
- */
-enum class Norm {
-  /** Maximum of the absolute values. */
-  Infinity
-};
-
-template <typename IndexableArray>
-auto norm(const IndexableArray& a, Norm norm)
-{
-  switch (norm) {
-  case Norm::Infinity:
-    return max(abs(a));
-  }
-}
-
 template <typename Array>
 auto exp(const Array& a)
 {
@@ -139,6 +108,7 @@ auto round(const Array& a)
 			     return std::round(a(coords));
 			   });
 }
+
 } // namespace necomi
 
 // Local Variables:
