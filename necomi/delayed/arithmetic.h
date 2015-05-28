@@ -88,7 +88,9 @@ auto operator/(const Array& a, U value)
 }
 
 template <typename Array1, typename Array2,
-	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<is_indexable<Array1>::value
+				    && is_indexable<Array2>::value
+				    && Array1::ndim==Array2::ndim>* = nullptr>
 auto operator-(const Array1& a, const Array2& b)
 {
   using C = typename std::common_type<typename Array1::dtype,
