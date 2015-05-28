@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "../core/iterators.h"
 #include "../core/loops.h"
 #include "../core/shape.h"
 #include "../core/slices.h"
@@ -356,6 +357,19 @@ public:
 	a(path) = v;
       });
     return a;
+  }
+
+
+  // Iterator interface
+
+  ArrayIterator<StridedArray<T,N>> begin()
+  {
+    return ArrayIterator<StridedArray<T,N>>(*this);
+  }
+
+  ArrayIterator<StridedArray<T,N>> end()
+  {
+    return ArrayIterator<StridedArray<T,N>>(*this, this->dims());
   }
   
 protected:
