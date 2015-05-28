@@ -69,6 +69,8 @@ template <typename dims_type,
 	  typename dim_type = typename dims_type::value_type>
 dims_type strided_index_to_coords(dim_type idx, const dims_type& strides)
 {
+  // TODO: check ranges
+  
   dims_type res;
   for (auto i = 0UL; i < strides.size(); i++) {
     res[i] = idx / strides[i];

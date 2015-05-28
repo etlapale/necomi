@@ -369,7 +369,10 @@ public:
 
   ArrayIterator<StridedArray<T,N>> end()
   {
-    return ArrayIterator<StridedArray<T,N>>(*this, this->dims());
+    dims_type coords = this->dims();
+    for (auto i = 0UL; i < ndim - 1; i++)
+      coords[i]--;
+    return ArrayIterator<StridedArray<T,N>>(*this, coords);
   }
   
 protected:

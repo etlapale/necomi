@@ -31,6 +31,15 @@ TEST_CASE( "iterators", "[core]" ) {
     REQUIRE( n == 7 );
   }
 
+  SECTION( "bidirectional iterator" ) {
+    auto a = strided_array(reshape(range(6), 3, 2));
+    auto it = a.end();
+    --it;
+    REQUIRE( *it == 5 );
+    --it; --it;
+    REQUIRE( *it == 3 );
+  }
+
   SECTION( "STL sorts" ) {
     auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
     //std::sort(a.begin(), a.end());

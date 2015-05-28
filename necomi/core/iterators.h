@@ -32,6 +32,11 @@ public:
     // TODO: check that coords are in range
   }
 
+  dims_type coords() const
+  {
+    return m_coords;
+  }
+
   dtype& operator*()
   {
     return m_array(m_coords);
@@ -51,10 +56,29 @@ public:
     return *this;
   }
 
+  ArrayIterator<Array>& operator--()
+  {
+    for (long i = ndim-1; i >= 0; i--) {
+      if (m_coords[i] > 0) {
+        m_coords[i]--;
+        break;
+      }
+      else {
+        m_coords[i] = m_array.dim(i) - 1;
+      }
+    }
+    return *this;
+  }
+
   bool operator!=(const ArrayIterator<Array>& other) const
   {
     return &m_array != &other.m_array
       || m_coords != other.m_coords;
+  }
+
+  bool operator==(const ArrayIterator<Array>& other) const
+  {
+    return ! this->operator!=(other);
   }
 
   std::ptrdiff_t operator-(const ArrayIterator<Array>& other) const
@@ -63,6 +87,16 @@ public:
     auto dims = m_array.dims();
     return static_cast<std::ptrdiff_t>(strided_index(dims, m_coords))
       - static_cast<std::ptrdiff_t>(strided_index(dims, other.m_coords));
+  }
+
+  ArrayIterator<Array> operator+(std::ptrdiff_t offset) const
+  {
+    ArrayIterator<Array> other(m_array);
+    auto dims = m_array.dims();
+    auto current_idx = static_cast<std::ptrdiff_t>(strided_index(dims, m_coords));
+    // TODO: check for negative values
+    other.m_coords = strided_index_to_coords(dims, current_idx + offset);
+    return other;
   }
 protected:
   Array& m_array;
