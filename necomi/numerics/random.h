@@ -153,6 +153,40 @@ StridedArray<T,1> uniform(const T& min, const T& max,
 }
 
 
+
+/**
+ * Generate a one dimensional array filled with random floating point
+ * numbers following a uniform distribution.
+ */
+template <typename T, std::size_t N, typename PRNG,
+	  typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+StridedArray<T,N> betarnd(const T& alpha, const T& beta,
+			  const std::array<std::size_t,N>& dims,
+			  PRNG& prng)
+{
+  std::gamma_distribution<T> xd(alpha, 1);
+  std::gamma_distribution<T> yd(beta, 1);
+  StridedArray<T,N> a(dims);
+
+  a.map([&xd,&yd,&prng](const auto&, auto& val) {
+      auto x = xd(prng);
+      val = x / (x + yd(prng));
+    });
+
+  return a;
+}
+
+template <typename T, typename PRNG,
+	  typename std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+StridedArray<T,1> betarnd(const T& alpha, const T& beta,
+			  std::size_t size, PRNG& prng)
+{
+  return betarnd<T,1>(alpha, beta, {size}, prng);
+}
+
+
+
+
 } // namespace necomi
 
 // Local Variables:
