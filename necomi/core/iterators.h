@@ -81,6 +81,12 @@ public:
     return ! this->operator!=(other);
   }
 
+  bool operator<(const ArrayIterator<Array>& other) const
+  {
+    // Check arrays
+    return m_coords < other.m_coords;
+  }
+
   std::ptrdiff_t operator-(const ArrayIterator<Array>& other) const
   {
     // TODO: throw exception when arrays mismatch
@@ -97,6 +103,11 @@ public:
     // TODO: check for negative values
     other.m_coords = strided_index_to_coords(dims, current_idx + offset);
     return other;
+  }
+  
+  ArrayIterator<Array> operator-(std::ptrdiff_t offset) const
+  {
+    return this->operator+(-offset);
   }
 protected:
   Array& m_array;
