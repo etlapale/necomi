@@ -48,6 +48,7 @@
 
 // Codecs
 #include "codecs/streams.h"
+#include "codecs/txt.h"
 #ifdef HAVE_HDF5
 #include "codecs/hdf5.h"
 #endif
