@@ -46,7 +46,7 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );
-    REQUIRE( a2(2,3) == index(a2, 2, 3) );
+    REQUIRE( a2(2,3) == strided_index(a2, 2, 3) );
 
 #ifndef NECOMI_NO_BOUND_CHECKS
     exception_thrown = false;

@@ -110,16 +110,16 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "indices" ) {
     StridedArray<double,0> a0;
-    REQUIRE( index(a0) == 0 );
+    REQUIRE( strided_index(a0) == 0 );
 
     StridedArray<double,1> a1(127);
-    REQUIRE( index(a1, 4) == 4 );
-    REQUIRE( index(a1, 86) == 86 );
+    REQUIRE( strided_index(a1, 4) == 4 );
+    REQUIRE( strided_index(a1, 86) == 86 );
 
     StridedArray<double,2> a2(3,4);
-    REQUIRE( index(a2, 0, 2) == 2 );
-    REQUIRE( index(a2, 1, 3) == 7 );
-    REQUIRE( index(a2, 2, 1) == 9 );
+    REQUIRE( strided_index(a2, 0, 2) == 2 );
+    REQUIRE( strided_index(a2, 1, 3) == 7 );
+    REQUIRE( strided_index(a2, 2, 1) == 9 );
   }
 
   SECTION( "data access" ) {
@@ -140,7 +140,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     REQUIRE( a2(1,2) == 6 );
-    REQUIRE( a2(2,3) == index(a2, 2, 3) );
+    REQUIRE( a2(2,3) == strided_index(a2, 2, 3) );
   }
 
   SECTION( "creation from existing data" ) {
@@ -325,7 +325,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     REQUIRE( strides[0] == strides2[0] );
     REQUIRE( strides[1] == strides2[1] );
 
-    auto path = index_to_coords(17, strides);
+    auto path = strided_index_to_coords(17, strides);
     REQUIRE( path.size() == 2 );
     REQUIRE( path[0] == 3 );
     REQUIRE( path[1] == 2 );

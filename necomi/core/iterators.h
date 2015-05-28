@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include "strides.h"
+
 namespace necomi
 {
 
@@ -52,6 +55,14 @@ public:
   {
     return &m_array != &other.m_array
       || m_coords != other.m_coords;
+  }
+
+  std::ptrdiff_t operator-(const ArrayIterator<Array>& other) const
+  {
+    // TODO: throw exception when arrays mismatch
+    auto strides = default_strides(m_array.dims());
+    return static_cast<std::ptrdiff_t>(strided_index(*this, m_coords))
+      - static_cast<std::ptrdiff_t>(strided_index(other, m_coords));
   }
 protected:
   Array& m_array;

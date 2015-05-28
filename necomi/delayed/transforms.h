@@ -29,7 +29,7 @@ auto reshape(const Array& a, const std::array<std::size_t,M>& d)
 			     (auto& path)
 	       { auto idx = std::inner_product(path.cbegin(), path.cend(),
 					       new_strides.cbegin(), 0);
-		 auto old_coords = index_to_coords(idx, old_strides);
+		 auto old_coords = strided_index_to_coords(idx, old_strides);
 		 return a(old_coords); });
 }
 

@@ -64,10 +64,10 @@ public:
   { return m_dims[i]; }
 
   T& operator()(const dims_type& coords)
-  { return m_data[index(*this, coords)]; }
+  { return m_data[strided_index(*this, coords)]; }
   
   const T& operator()(const dims_type& coords) const
-  { return m_data[index(*this, coords)]; }
+  { return m_data[strided_index(*this, coords)]; }
 
   template <typename ...Coords,
 	    std::enable_if_t<all_convertible<Coords...,dim_type>::value>* = nullptr>
@@ -79,7 +79,7 @@ public:
 #endif // NECOMI_NO_BOUND_CHECKS
     
     // TODO check indices for out of bounds
-    return m_data[index(*this, coords...)];
+    return m_data[strided_index(*this, coords...)];
   }
 
   /// Return a raw pointer to the data associated with the array.
