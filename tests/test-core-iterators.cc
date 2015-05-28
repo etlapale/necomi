@@ -42,6 +42,9 @@ TEST_CASE( "iterators", "[core]" ) {
 
   SECTION( "STL sorts" ) {
     auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
-    //std::sort(a.begin(), a.end());
+    std::sort(a.begin(), a.end());
+    auto b = litarray<int>(2,  8, 25, 27, 44, 59, 61, 67, 72, 74);
+    REQUIRE( all(a == b) );
+    REQUIRE( a(1) == 8 );
   }
 }

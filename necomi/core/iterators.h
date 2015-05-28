@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
 #include "strides.h"
 
 namespace necomi
@@ -13,6 +14,8 @@ namespace necomi
 
 template <typename Array>
 class ArrayIterator
+  : public std::iterator<std::random_access_iterator_tag,
+			 typename Array::dtype>
 {
 public:
   using dim_type = typename Array::dim_type;
@@ -30,6 +33,13 @@ public:
     , m_coords(coords)
   {
     // TODO: check that coords are in range
+  }
+
+  ArrayIterator<Array>& operator=(const ArrayIterator<Array>& other)
+  {
+    m_array = other.m_array;
+    m_coords = other.m_coords;
+    return *this;
   }
 
   dims_type coords() const
@@ -99,9 +109,10 @@ public:
   {
     ArrayIterator<Array> other(m_array);
     auto dims = m_array.dims();
+    auto strides = default_strides(dims);
     auto current_idx = static_cast<std::ptrdiff_t>(strided_index(dims, m_coords));
     // TODO: check for negative values
-    other.m_coords = strided_index_to_coords(dims, current_idx + offset);
+    other.m_coords = strided_index_to_coords(current_idx + offset, strides);
     return other;
   }
   
