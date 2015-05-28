@@ -20,13 +20,19 @@ TEST_CASE( "iterators", "[core]" ) {
   }
 
   SECTION( "random access iterator" ) {
+    auto a = reshape(range(20), 4, 5);
+    
+    auto i = ArrayIterator<decltype(a)>(a, {2, 3});
+    auto j = ArrayIterator<decltype(a)>(a, {1,1});
 
-    //auto a = reshape(range(20), 4, 5);
-    //auto i = ArrayIterator<decltype(a)>(a, {2, 3});
+    auto m = j - i;
+    auto n = i - j;
+    REQUIRE( m == -n );
+    REQUIRE( n == 7 );
   }
 
   SECTION( "STL sorts" ) {
-    //auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
+    auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
     //std::sort(a.begin(), a.end());
   }
 }

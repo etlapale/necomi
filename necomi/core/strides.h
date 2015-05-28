@@ -31,12 +31,23 @@ DimsType default_strides(const DimsType& dims)
 /// Convert element coordinates in address offset.
 template <typename Array,
 	  typename dims_type = typename Array::dims_type,
-	  std::enable_if_t<std::is_same<dims_type, typename Array::dims_type>::value>* = nullptr>
+	  std::enable_if_t<has_strides<Array>::value
+			   && std::is_same<dims_type, typename Array::dims_type>::value>* = nullptr>
 std::size_t strided_index(const Array& a, const dims_type& coords)
 {
   // TODO static/dynamic check on a.ndim
   return std::inner_product(coords.cbegin(), coords.cend(),
 			    a.strides().cbegin(), 0);
+}
+
+
+/// Convert element coordinates in address offset.
+template <typename dims_type,
+	  std::enable_if_t<! has_strides<dims_type>::value>* = nullptr>
+std::size_t strided_index(const dims_type& dims, const dims_type& coords)
+{
+  return std::inner_product(coords.cbegin(), coords.cend(),
+			    default_strides(dims).cbegin(), 0);
 }
 
 template <typename Array, typename ...Coords,

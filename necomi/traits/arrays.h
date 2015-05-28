@@ -25,8 +25,16 @@ struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim>>::type>
 template <typename T, typename = void>
 struct has_dims : std::false_type {};
   
-template <typename T> struct has_dims<T, decltype(&T::dims, void())> : std::true_type {};
+template <typename T> struct has_dims<T, decltype(&T::dims, void())>
+  : std::true_type {};
+
+template <typename T, typename = void>
+struct has_strides : std::false_type {};
   
+template <typename T> struct has_strides<T, decltype(&T::strides, void())>
+  : std::true_type {};
+
+
 /**
  * \anchor Array
  *
