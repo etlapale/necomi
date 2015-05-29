@@ -80,7 +80,8 @@ Slice<dim_type,N+1> operator,(const Slice<dim_type,N>& a,
   return Slice<dim_type,N+1>(args);
 }
 
-template <typename dim_type=std::size_t>
+template <typename dim_type=std::size_t,
+	  std::enable_if_t<! is_array<dim_type>::value>* = nullptr>
 Slice<dim_type,1>
 slice(dim_type start, dim_type size, dim_type stride=1)
 {
