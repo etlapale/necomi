@@ -18,4 +18,12 @@ TEST_CASE( "sort", "[algorithms]" ) {
     for (auto x = 0UL; x < a.dim(0); x++)
       REQUIRE( j(x)[0] == x );
   }
+
+  SECTION( "permute" ) {
+    auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
+    auto i = sort_indices(a);
+    auto b = permute(a, i);
+    for (auto j = 1UL; j < b.dim(0); j++)
+      REQUIRE( b(j-1) <= b(j) );
+  }
 }
