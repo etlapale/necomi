@@ -8,6 +8,7 @@
 #include <iterator>
 #include <ostream>
 
+#include "../delayed/transforms.h"
 #include "../traits/arrays.h"
 
 namespace necomi {
