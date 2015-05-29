@@ -41,6 +41,25 @@ auto sin(const Array& a)
     });
 }
 
+
+template <typename Array1, typename Array2,
+	  std::enable_if_t<is_indexable<Array1>::value
+			   && is_indexable<Array2>::value
+			   && Array1::ndim == Array2::ndim>* = nullptr>
+auto atan2(const Array1& ys, const Array2& xs)
+{
+#ifndef NECOMI_NO_BOUND_CHECKS
+  if (xs.dims() != ys.dims())
+    throw std::length_error("atan2 can only process same dimension arrays");
+#endif
+  // TODO: check xs and ys dims
+  return make_delayed<>(xs.dims(), [xs,ys] (const auto& coords) {
+      using std::atan2;
+      return atan2(ys(coords), xs(coords));
+    });
+}
+
+
 template <typename T,
 	  std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
 constexpr T radians(T angle)
