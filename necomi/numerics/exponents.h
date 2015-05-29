@@ -84,9 +84,11 @@ auto ggd(const Array1& a, const Array2& alpha, typename Array1::dtype mu=0)
   return exp(-power<beta>(abs(a - mu)/alpha));
 }
 
+
 template <typename Array>
 auto norm_angle_diff(const Array& a)
 {
+  // TODO: Rewrite with fmod, remainder or rem
   return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
 			   [a](const auto& coords){
 							    typename Array::dtype x = a(coords);
@@ -99,15 +101,36 @@ auto norm_angle_diff(const Array& a)
 			   });
 }
 
-
-template <typename Array>
-auto round(const Array& a)
+template <typename T,
+	  std::enable_if_t<std::is_floating_point<T>::value>* = nullptr>
+T gaussian(T x, T mu=0, T sigma=1)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a](const auto& coords) {
-			     return std::round(a(coords));
-			   });
+  return std::exp(-power<2>(x-mu)/(2*power<2>(sigma)))
+    / (sigma*std::sqrt(2*M_PI));
 }
+
+
+template <typename Array,
+	  typename std::enable_if_t<std::is_floating_point<typename Array::dtype>::value>* = nullptr>
+auto gaussian(const Array& a, typename Array::dtype mu=0, typename Array::dtype sigma=1)
+{
+  return make_delayed(a.dims(), [a,mu,sigma](const auto& coords) {
+      return gaussian(a(coords), mu, sigma);
+    });
+}
+
+
+template <typename T, typename U, typename V>
+auto gaussian(T x, U mu, V sigma)
+{
+  using namespace std;
+  using namespace necomi;
+
+  return exp(-power<2>(x-mu)/(2*power<2>(sigma)))
+    / (sigma*std::sqrt(2*M_PI));
+}
+
+
 
 } // namespace necomi
 
