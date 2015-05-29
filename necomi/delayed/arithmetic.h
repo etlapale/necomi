@@ -6,7 +6,9 @@
 #pragma once
 
 #include <functional>
+#include <sstream>
 
+#include "../codecs/streams.h"
 #include "maps.h"
 
 namespace necomi {
@@ -87,6 +89,7 @@ auto operator/(const Array& a, U value)
 				     { return a(x)/value; });
 }
 
+
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<is_indexable<Array1>::value
 				    && is_indexable<Array2>::value
@@ -98,8 +101,13 @@ auto operator-(const Array1& a, const Array2& b)
   
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot sum arrays of different dimensions");
+  if (a.dims() != b.dims()) {
+    std::ostringstream msg;
+    msg << "cannot subtract arrays of different dimensions (";
+    copy_dims(a.dims(), msg) << " != ";
+    copy_dims(b.dims(), msg) << ")";
+    throw std::length_error(msg.str());
+  }
 #endif
   return make_delayed<C, Array1::ndim>(a.dims(),
 				       [a,b](const auto& coords) {
@@ -133,8 +141,13 @@ auto operator+(const Array1& a, const Array2& b)
   
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot sum arrays of different dimensions");
+  if (a.dims() != b.dims()) {
+    std::ostringstream msg;
+    msg << "cannot sum arrays of different dimensions (";
+    copy_dims(a.dims(), msg) << " != ";
+    copy_dims(b.dims(), msg) << ")";
+    throw std::length_error(msg.str());
+  }
 #endif
   return make_delayed<C, Array1::ndim>(a.dims(),
 				       [a,b](const auto& coords) {
