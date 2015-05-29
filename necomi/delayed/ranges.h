@@ -40,10 +40,9 @@ auto zeros(Dims... dims)
  * \see zeros_like
  */
 template <typename T, typename Array>
-auto constants_like(const Array& a, const T&& value)
+auto constants_like(const Array& a, T value)
 {
-  return make_delayed<T>(a.dims(),
-			 [value](const auto&){ return value; });
+  return make_delayed<T>(a.dims(), [value](const auto&){ return value; });
 }
 
 /**
