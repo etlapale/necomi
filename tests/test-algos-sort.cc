@@ -21,9 +21,15 @@ TEST_CASE( "sort", "[algorithms]" ) {
 
   SECTION( "permute" ) {
     auto a = litarray<int>(74, 67, 27, 44,  2,  8, 61, 59, 25, 72);
-    auto i = sort_indices(a);
-    auto b = permute(a, i);
+    auto idx = sort_indices(a);
+    
+    auto b = permute(a, idx);
     for (auto j = 1UL; j < b.dim(0); j++)
       REQUIRE( b(j-1) <= b(j) );
+
+    std::reverse(idx.begin(), idx.end());
+    auto c = permute(a, idx);
+    for (auto j = 1UL; j < b.dim(0); j++)
+      REQUIRE( c(j-1) >= c(j) );
   }
 }
