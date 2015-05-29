@@ -48,8 +48,18 @@ std::ostream& operator<<(std::ostream& os, const Array& a)
     os << necomi::slice(a,a.dim(0)-1);
   return os << "]";
 }
-
 } // namespace streams
+
+
+template <typename Dims, typename OutputIt>
+OutputIt& copy_dims(const Dims& dims, OutputIt& d_first)
+{
+  std::copy(dims.cbegin(), dims.cend()-1,
+	    std::ostream_iterator<typename Dims::value_type>(d_first, "×"));
+  d_first << *(dims.cend()-1);
+  return d_first;
+}
+
 } // namespace necomi
 
 // Local Variables:
