@@ -31,6 +31,16 @@ auto floor(const Array& a)
 		      { return std::floor(a(coords)); });
 }
 
+
+template <typename Array,
+	  typename std::enable_if_t<is_indexable<Array>::value
+				    && std::is_floating_point<typename Array::dtype>::value>* = nullptr>
+auto round(const Array& a)
+{
+  return make_delayed(a.dims(), [a](const auto& coords)
+	              { return std::round(a(coords)); });
+}
+
 } // namespace necomi
 
 // Local Variables:
