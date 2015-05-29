@@ -410,6 +410,11 @@ StridedArray<T, From::ndim> strided_array(const From& a)
   return strided_array<T,From>(a);
 }
 
+template <typename From, typename T=typename From::dtype>
+StridedArray<T, From::ndim> strided(const From& a)
+{
+  return strided_array<T,From>(a);
+}
 
 template <typename T=double,
 	  typename ...Values,
