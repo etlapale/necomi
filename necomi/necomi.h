@@ -38,6 +38,7 @@
 #include "numerics/basic.h"
 #include "numerics/exponents.h"
 #include "numerics/interpolation.h"
+#include "numerics/nearest-int.h"
 #include "numerics/random.h"
 #include "numerics/sde.h"
 #include "numerics/statistics.h"
