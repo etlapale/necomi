@@ -32,6 +32,7 @@
 #include "delayed/transforms.h"
 
 // Algorithms
+#include "algorithms/modif.h"
 #include "algorithms/sort.h"
 
 // Numerics
