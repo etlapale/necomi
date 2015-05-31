@@ -63,7 +63,7 @@ template <InterpolationMethod method, typename U=double,
 	  typename std::enable_if_t<
 	    std::is_arithmetic<U>::value &&
 	    method==InterpolationMethod::NearestNeighbor>* = nullptr>
-  U interpolation(const Array& a, U x)
+U interpolation(const Array& a, U x)
 {
   static_assert(Array::ndim == 1,
 		"nearest-neighbor interpolation only available for one-dimensional arrays");
@@ -180,16 +180,16 @@ auto scaled_interpolation(const Array1& a,
 {
   static_assert(Array1::ndim == 1,
 		"linear interpolation only available for one-dimensional arrays");
-  return make_delayed<typename Array1::dtype, Array2::ndim>(xvals.dims(),
-							    [xmin,xmax,a,xvals]
-							    (const auto& coords) {
-							      typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, size(a), xvals(coords));
-							      auto x0 = static_cast<std::size_t>(x);
-							      auto y0 = a(x0);
-							      auto y1 = a(x0 + 1);
-
-							      return y0 + (y1 - y0)*(x - x0);
-							    });
+  return make_delayed<>(xvals.dims(),
+			[xmin,xmax,a,xvals]
+			(const auto& coords) {
+			  typename Array2::dtype x = rescale<typename Array2::dtype>(xmin, xmax, 0, size(a), xvals(coords));
+			  auto x0 = static_cast<std::size_t>(x);
+			  auto y0 = a(x0);
+			  auto y1 = a(x0 + 1);
+			  
+			  return y0 + (y1 - y0)*(x - x0);
+			});
 }
  
 /**
