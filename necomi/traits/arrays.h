@@ -112,7 +112,16 @@ template <typename T>
 struct is_indexable<T, std::enable_if_t<is_array<T>::value,void>>
   : std::integral_constant<bool,
 			   is_callable<const T,const typename T::dims_type&>::value>
-  {};
+{};
+
+template <typename T, typename = void>
+struct is_modifiable : std::false_type {};
+
+template <typename T>
+struct is_modifiable<T, std::enable_if_t<is_indexable<T>::value,void>>
+  : std::integral_constant<bool,
+			   std::is_convertible<typename std::result_of<T(const typename T::dims_type&)>::type, typename T::dtype&>::value>
+			   {};
 
 } // namespace necomi
 
