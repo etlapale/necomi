@@ -173,8 +173,29 @@ auto operator+(const Array& a, const T& value)
 }
 
 
+template <typename Array1, typename Array2,
+	  std::enable_if_t<is_indexable<Array1>::value
+			   && is_indexable<Array2>::value
+			   /*&& is_modifiable<Array1>::value*/>* = nullptr>
+Array1& operator+=(Array1& a, const Array2& b)
+{
+  static_assert(Array1::ndim == Array2::ndim,
+		"can only add arrays with same dimensionality");
+  
+#ifndef NECOMI_NO_BOUND_CHECKS
+  // Make sure the dimensions of a and b are the same
+  if (a.dims() != b.dims())
+    throw std::length_error("cannot increment with array of different dimensions");
+#endif
 
-template <typename Indexable, typename T=typename Indexable::dtype>
+  a.map([&b](const auto& coords, auto& val) {val += b(coords);});
+  
+  return a;
+}
+
+#if 0
+template <typename Indexable,
+	  typename T=typename Indexable::dtype>
 StridedArray<T,Indexable::ndim>& operator+=(StridedArray<T,Indexable::ndim>& a,
 				     const Indexable& b)
 {
@@ -186,6 +207,7 @@ StridedArray<T,Indexable::ndim>& operator+=(StridedArray<T,Indexable::ndim>& a,
   a.map([&b](auto& path, auto& val) {val += b(path);});
   return a;
 }
+#endif
 
 template <typename T, std::size_t N,
 	  typename Indexable, typename U=typename Indexable::dtype,

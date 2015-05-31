@@ -11,13 +11,13 @@ namespace necomi {
 
 template <typename Array, typename Function,
 	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
-auto map(const Array& a, Function&& f)
+auto map(const Array& a, Function f)
 {
   // Extract the return type of the function mapped to each element
   using C = decltype(f(std::declval<typename Array::dtype>()));
   // Create a new delayed array mapping the function to each element
   return make_delayed<C, Array::ndim>(a.dims(),
-				      [a,f=std::move(f)](const auto& coords)
+				      [a,f](const auto& coords)
 				      { return f(a(coords)); });
 }
 

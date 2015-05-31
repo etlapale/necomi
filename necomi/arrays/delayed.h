@@ -76,13 +76,6 @@ public:
     return m_e(coords);
   }
 
-  template <typename ConstMapOperation>
-  void map(ConstMapOperation f) const
-  {
-    dims_type coords;
-    const_for_looper<DelayedArray<T,N,Expr>,0,ConstMapOperation>(*this, coords, f);
-  }
-
 protected:
   Expr m_e;
 };

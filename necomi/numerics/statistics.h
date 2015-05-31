@@ -19,7 +19,7 @@ template <typename Array, typename T=typename Array::dtype>
 T sum(const Array& a)
 {
   T total = 0;
-  a.map([&](auto&, auto val) { total += val; });
+  for_each(a, [&](const auto&, auto val) { total += val; });
   return total;
 }
 
@@ -35,12 +35,12 @@ dims_type argmax(const Array& a)
   auto max_val = a(max_coords);
 
   // Search for the maximal value
-  a.map([&a,&max_coords,&max_val](const auto& coords, auto val)
-	{ if (val > max_val) {
-	    max_val = val;
-	    max_coords = coords;
-	  }
-	});
+  for_each(a, [&a,&max_coords,&max_val](const auto& coords, auto val)
+	   { if (val > max_val) {
+	       max_val = val;
+	       max_coords = coords;
+	     }
+	   });
 
   return max_coords;
 }
@@ -164,7 +164,7 @@ auto variance(const Array& a, bool bessel_correction)
 		"statistics on arrays require floating elements");
   auto avg = average(a);
   typename Array::dtype res = 0;
-  a.map([avg,&res](auto&, auto val) {
+  for_each(a, [avg,&res](const auto&, auto val) {
       res += power<2>(val - avg);
     });
   return res / (bessel_correction ? size(a) - 1 : size(a));
