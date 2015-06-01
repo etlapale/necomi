@@ -204,12 +204,13 @@ auto slice(Array a, std::size_t i)
 }
 
 
-template <typename Array>
-auto fix_dimension2(Array& a, std::size_t dim, std::size_t val)
+template <typename Array,
+	  std::enable_if_t<is_modifiable<Array>::value>* = nullptr>
+auto fix_dimension(Array& a, std::size_t dim, std::size_t val)
 {
   return make_delayed(remove_coordinate(a.dims(), dim),
-		      [a,dim,val] (const auto& coords) {
-			DebugType<decltype(a(add_coordinate(coords, dim, val)))> da;
+		      [a,dim,val] (const auto& coords) mutable
+		          -> typename Array::dtype &  {
 			return a(add_coordinate(coords, dim, val));
 		      });
 }
