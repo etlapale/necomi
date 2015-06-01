@@ -23,8 +23,7 @@ auto widen(const std::array<std::size_t,M>& dims, const Array& a)
     if (a.dims()[i] != dims[i+M-Array::ndim])
       throw std::length_error("cannot broadcast arrays to different dimensions");
 #endif
-  return make_delayed<typename Array::dtype,M>(dims,
-					       [a](const auto& coords) {
+  return make_delayed(dims, [a](const auto& coords) {
       std::array<std::size_t,Array::ndim> old_coords;
       std::copy(coords.cbegin()+(M-Array::ndim), coords.cend(),
 		old_coords.begin());
@@ -45,11 +44,11 @@ auto widen_right(const std::array<std::size_t,M>& dims, const Array& a)
     if (a.dims()[i] != dims[i])
       throw std::length_error("cannot right-broadcast arrays to different dimensions");
 #endif
-  return make_delayed<typename Array::dtype, M>(dims,
-						[a](const auto& coords) {
+  return make_delayed(dims, [a](const auto& coords) {
       std::array<std::size_t,Array::ndim> coords_a;
       std::copy_n(coords.cbegin(), Array::ndim, coords_a.begin());
-      return a(coords_a); });
+      return a(coords_a);
+    });
 }
 
 namespace broadcasting {

@@ -24,13 +24,12 @@ auto reshape(const Array& a, const std::array<std::size_t,M>& d)
 #endif
     auto old_strides = default_strides(a.dims());
     auto new_strides = default_strides(d);
-    return make_delayed<typename Array::dtype,M>(d,
-			     [a,old_strides,new_strides]
-			     (auto& path)
-	       { auto idx = std::inner_product(path.cbegin(), path.cend(),
-					       new_strides.cbegin(), 0);
-		 auto old_coords = strided_index_to_coords(idx, old_strides);
-		 return a(old_coords); });
+    return make_delayed(d, [a,old_strides,new_strides](const auto& path) {
+	auto idx = std::inner_product(path.cbegin(), path.cend(),
+				      new_strides.cbegin(), 0);
+	auto old_coords = strided_index_to_coords(idx, old_strides);
+	return a(old_coords);
+      });
 }
 
 template <typename Array, typename ...Dimensions,
@@ -54,12 +53,10 @@ auto roll(const Array& a, dim_type shift, dim_type dim)
     throw std::out_of_range("invalid rolling dimension");
 #endif
   auto sz = a.dims()[dim];
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a,sz,dim,shift]
-			   (auto coords) {
-			     coords[dim] = (coords[dim] + sz - shift) % sz;
-			     return a(coords);
-			   });
+  return make_delayed(a.dims(), [a,sz,dim,shift] (auto coords) {
+      coords[dim] = (coords[dim] + sz - shift) % sz;
+      return a(coords);
+    });
 }
 
 template <typename Array, typename dim_type = typename Array::dim_type,
@@ -79,14 +76,11 @@ auto zip(const Array1& a, const Array2& b)
   if (a.dims() != b.dims())
     throw std::length_error("cannot zip arrays of different dimensions");
 #endif
-  using T = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
-  return make_delayed<T,Array1::ndim+1>(append_coordinate(a.dims(), 2),
-			     [a,b]
-			     (auto& coords) {
-					  auto c = remove_coordinate(coords, Array1::ndim);
-			       return coords[Array1::ndim] == 0 ? a(c) : b(c);
-			     });
+  return make_delayed(append_coordinate(a.dims(), 2),
+		      [a,b](const auto& coords) {
+			auto c = remove_coordinate(coords, Array1::ndim);
+			return coords[Array1::ndim] == 0 ? a(c) : b(c);
+		      });
 }
   
 template <typename Array, typename T=typename Array::dtype,
@@ -95,7 +89,7 @@ auto shifted(const Array& a, std::array<ssize_t,Array::ndim> offset, T default_v
 {
   using dim_type = typename Array::dim_type;
   
-  return make_delayed<T,Array::ndim>(a.dims(),
+  return make_delayed(a.dims(),
 	[a=a,offset=std::move(offset),
          default_value=std::move(default_value)]
 	(const auto& coords) {
@@ -133,7 +127,8 @@ auto stack(const Array& a, const Arrays&... as)
   using T = typename std::common_type<typename Array::dtype,
 				      typename Arrays::dtype...>::type;
 
-  return make_delayed<T,Array::ndim+1>(prepend_coordinate(a.dims(), sizeof...(Arrays)+1), [a,as...] (const auto& coords) {
+  return make_delayed(prepend_coordinate(a.dims(), sizeof...(Arrays)+1),
+		      [a,as...](const auto& coords) {
       auto c = remove_coordinate(coords, 0);
       return choose_array<0,Array,Arrays...>::at(coords[0], c, a, as...);
     });							   
@@ -163,22 +158,22 @@ auto concat(std::size_t d, const Array& a, const Arrays&... as)
   std::array<std::size_t, 1+sizeof...(Arrays)> cumsum;
   std::partial_sum(ns.cbegin(), ns.cend(), cumsum.begin());
   
-  return make_delayed<T,Array::ndim>(change_coordinate(a.dims(), d, n),
-				     [d,cumsum,a,as...](const auto& coords) {
-				       auto i = coords[d];
-				       // Search in which array the element is
-				       std::size_t j;
-				       for (j = 0; j < cumsum.size(); j++)
-					 if (i < cumsum[j])
-					   break;
-
-				       // Get element coordinates in the subarray
-				       auto c = change_coordinate(coords, d, i - (j > 0 ? cumsum[j-1] : 0));
-				       
-				       // TODO: throw except on out of range
-				       // Return the element
-				       return choose_array<0,Array,Arrays...>::at(j, c, a, as...);
-				     });
+  return make_delayed(change_coordinate(a.dims(), d, n),
+		      [d,cumsum,a,as...](const auto& coords) {
+			auto i = coords[d];
+			// Search in which array the element is
+			std::size_t j;
+			for (j = 0; j < cumsum.size(); j++)
+			  if (i < cumsum[j])
+			    break;
+			
+			// Get element coordinates in the subarray
+			auto c = change_coordinate(coords, d, i - (j > 0 ? cumsum[j-1] : 0));
+			
+			// TODO: throw except on out of range
+			// Return the element
+			return choose_array<0,Array,Arrays...>::at(j, c, a, as...);
+		      });
 }
 
 template <typename Array, typename ...Arrays,
@@ -201,20 +196,31 @@ auto slice(Array a, std::size_t i)
   if (i >= a.dim(0))
     throw std::range_error("slice index is too large");
 #endif
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), 0), [a,i] (const auto& coords) {
-      auto c = prepend_coordinate(coords, i);
-      return a(c);
-    });
+  return make_delayed(remove_coordinate(a.dims(), 0),
+		      [a,i](const auto& coords) {
+			auto c = prepend_coordinate(coords, i);
+			return a(c);
+		      });
+}
+
+
+template <typename Array>
+auto fix_dimension2(Array& a, std::size_t dim, std::size_t val)
+{
+  return make_delayed(remove_coordinate(a.dims(), dim),
+		      [a,dim,val] (const auto& coords) {
+			DebugType<decltype(a(add_coordinate(coords, dim, val)))> da;
+			return a(add_coordinate(coords, dim, val));
+		      });
 }
 
 template <typename Array>
 auto fix_dimension(const Array& a, std::size_t dim, std::size_t val)
 {
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), dim),
-			     [a,dim,val]
-			     (const auto& coords) {
-			       return a(add_coordinate(coords, dim, val));
-			     });
+  return make_delayed(remove_coordinate(a.dims(), dim),
+		      [a,dim,val] (const auto& coords) {
+			return a(add_coordinate(coords, dim, val));
+		      });
 }
 
 } // namespace necomi

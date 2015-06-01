@@ -35,10 +35,9 @@ TEST_CASE( "PNG storage", "[codecs]" ) {
     auto img = png_load(baboon_path);
 
     // Rotate the image
-    auto new_img =
-      make_delayed<unsigned char>(img.dims(), [&img](auto& path) {
-	  return img(path[1], path[0], path[2]);
-	});
+    auto new_img = make_delayed(img.dims(), [&img](const auto& path) {
+	return img(path[1], path[0], path[2]);
+      });
     // Save a copy
     png_save(new_img, "rotated-baboon.png");
   }

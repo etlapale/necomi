@@ -90,17 +90,18 @@ template <typename Array, typename dim_type = typename Array::dim_type,
 	  typename std::enable_if<Array::ndim!=0>::type* = nullptr>
 auto sum(const Array&a, dim_type dim)
 {
-  return make_delayed<typename Array::dtype,Array::ndim-1>(remove_coordinate(a.dims(), dim), [a,dim] (auto& x) {
-      // Path in the original array
-      auto orig_path = add_coordinate(x, dim);
-      // Sum all the elements in the dimension
-      typename Array::dtype val = 0;
-      for (std::size_t i = 0; i < a.dims()[dim]; i++) {
-	orig_path[dim] = i;
-	val += a(orig_path);
-      }
-      return val;
-    });
+  return make_delayed(remove_coordinate(a.dims(), dim),
+		      [a,dim] (const auto& x) {
+			// Path in the original array
+			auto orig_path = add_coordinate(x, dim);
+			// Sum all the elements in the dimension
+			typename Array::dtype val = 0;
+			for (std::size_t i = 0; i < a.dims()[dim]; i++) {
+			  orig_path[dim] = i;
+			  val += a(orig_path);
+			}
+			return val;
+		      });
 }
 
 /**
@@ -140,20 +141,20 @@ template <typename Array, typename dim_type = typename Array::dim_type,
 auto variance(const Array& a, dim_type dim, bool bessel_correction)
 {
   auto avg = strided_array(average(a, dim));
-  return make_delayed<typename Array::dtype, Array::ndim-1>(remove_coordinate(a.dims(), dim),
-			     [a,dim,avg,bessel_correction]
-			     (const auto& x)
-			     {
-			       // Path in the original array
-			       auto orig_path = add_coordinate(x, dim);
-			       // Sum the squared deviations to the mean
-			       typename Array::dtype val = 0;
-			       for (std::size_t i = 0; i < a.dims()[dim]; i++) {
-				 orig_path[dim] = i;
-				 val += power<2>(a(orig_path) - avg(x));
-			       }
-			       return val / (bessel_correction ? a.dim(dim) - 1 : a.dim(dim));
-			     });
+  return make_delayed(remove_coordinate(a.dims(), dim),
+		      [a,dim,avg,bessel_correction]
+		      (const auto& x)
+		      {
+			// Path in the original array
+			auto orig_path = add_coordinate(x, dim);
+			// Sum the squared deviations to the mean
+			typename Array::dtype val = 0;
+			for (std::size_t i = 0; i < a.dims()[dim]; i++) {
+			  orig_path[dim] = i;
+			  val += power<2>(a(orig_path) - avg(x));
+			}
+			return val / (bessel_correction ? a.dim(dim) - 1 : a.dim(dim));
+		      });
 }
 
 template <typename Array,
@@ -189,9 +190,11 @@ template <typename Array, typename U,
 	  typename std::enable_if_t<is_promotable<U,typename Array::dtype>::value>* = nullptr>
 auto max(const Array& a, U value)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-							  [a,value=static_cast<typename Array::dtype>(value)]
-							  (const auto& coords) { return std::max(a(coords), value); });
+  return make_delayed(a.dims(),
+		      [a,value=static_cast<typename Array::dtype>(value)]
+		      (const auto& coords) {
+			return std::max(a(coords), value);
+		      });
   }
 
 

@@ -200,7 +200,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "delayed one-liner" ) {
-    auto a = make_delayed<int,2>({{11,21}}, [](auto&) { return 42; });
+    auto a = make_delayed<2>({{11,21}}, [](const auto&) { return 42; });
     REQUIRE( a.ndim == 2 );
     REQUIRE( a.dim(0) == 11 );
     REQUIRE( a(3,7) == 42 );
@@ -208,7 +208,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "infer make_delayed size template argument" ) {
     std::array<std::size_t,2> dims{{11,21}};
-    auto a = make_delayed<int>(dims, [](auto&) { return 42; });
+    auto a = make_delayed(dims, [](const auto&) { return 42; });
     REQUIRE( a.dims().size() == 2 );
     REQUIRE( a.dims()[0] == 11 );
     REQUIRE( a(3,7) == 42 );
@@ -329,7 +329,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
 
   SECTION( "absolute value" ) {
-    auto a = abs(range(5) - 2);
+    auto a = abs(range(5L) - 2);
     REQUIRE( a(0) == 2 );
     REQUIRE( a(1) == 1 );
     REQUIRE( a(2) == 0 );
@@ -389,7 +389,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   }
   
   SECTION( "1D delayed array function" ) {
-    auto a = make_delayed<double>(13, [](auto& coords){ return coords[0]; });
+    auto a = make_delayed<1>({13}, [](const auto& coords){
+	return static_cast<double>(coords[0]);
+      });
     REQUIRE( a.dim(0) == 13 );
     REQUIRE( a(0) == 0 );
     REQUIRE( a(3) == 3 );
@@ -621,11 +623,10 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     // modifiable delayed arrays are constructible
     auto b = strided_array(a);
-    auto c = make_delayed<int>(b.dims(),
-			       [&b](auto& coords) -> int& {
+    auto c = make_delayed(b.dims(), [&b](const auto& coords) -> int& {
 	return b(coords);
       });
-    REQUIRE( c.is_modifiable() );
+    REQUIRE( is_modifiable<decltype(c)>::value );
     
     // change modifiable delayed array
     REQUIRE( b(3) == 3 );

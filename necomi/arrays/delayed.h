@@ -81,11 +81,11 @@ protected:
 };
 
 
-template <typename T=double, std::size_t N=1, typename Expr>
+template <std::size_t N, typename Expr,
+	  typename T = typename std::result_of<Expr(const std::array<std::size_t,N>&)>::type>
 DelayedArray<T,N,Expr>
 make_delayed(const std::array<std::size_t,N>& dims, Expr fun)
 {
-  // TODO: pass dimensions by value since we copy them in the constructor
   return DelayedArray<T,N,Expr>(dims, std::move(fun));
 }
 
@@ -100,9 +100,7 @@ auto make_delayed(std::size_t size, Expr fun)
 template <typename Array>
 auto delay(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-							  [a](const auto& x)
-							  { return a(x); });
+  return make_delayed(a.dims(), [a](const auto& x) {return a(x); });
 }
   
 /**

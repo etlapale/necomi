@@ -12,10 +12,9 @@ namespace necomi {
 template <typename Array>
 auto exp(const Array& a)
 {
-  return make_delayed<typename Array::dtype,Array::ndim>(a.dims(),
-							 [a] (auto& x) {
-							   return std::exp(a(x));
-							 });
+  return make_delayed(a.dims(), [a](const auto& x) {
+      return std::exp(a(x));
+    });
 }
   
 template <unsigned N, typename T,
@@ -43,11 +42,12 @@ auto power(T val)
  * Square root.
  */
 template <typename Array,
-	  std::enable_if_t<is_array<Array>::value>* = nullptr>
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
 auto sqrt(const Array& a)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a] (const auto& x) { return std::sqrt(a(x)); });
+  return make_delayed(a.dims(), [a](const auto& x) {
+      return std::sqrt(a(x));
+    });
 }
 
 /**
@@ -57,11 +57,9 @@ template <unsigned beta, typename Array,
 	  typename std::enable_if_t<std::is_floating_point<typename Array::dtype>::value>* = nullptr>
 auto ggd(const Array& a, typename Array::dtype alpha, typename Array::dtype mu=0)
 {
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a,alpha,mu]
-			   (const auto& coords) {
-			     return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
-			   });
+  return make_delayed(a.dims(), [a,alpha,mu](const auto& coords) {
+      return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));
+    });
   
 }
 
@@ -89,16 +87,15 @@ template <typename Array>
 auto norm_angle_diff(const Array& a)
 {
   // TODO: Rewrite with fmod, remainder or rem
-  return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
-			   [a](const auto& coords){
-							    typename Array::dtype x = a(coords);
-			     if (x >= -180 && x <= 180)
-			       return x;
-			     if (x > 180)
-			       return 360 - x;
-			     else // x < -180
-			       return -x-360;
-			   });
+  return make_delayed(a.dims(), [a](const auto& coords) {
+      typename Array::dtype x = a(coords);
+      if (x >= -180 && x <= 180)
+	return x;
+      if (x > 180)
+	return 360 - x;
+      else // x < -180
+	return -x-360;
+    });
 }
 
 template <typename T,

@@ -30,10 +30,9 @@ auto operator*(const Array1& a, const Array2& b)
   if (a.dims() != b.dims())
     throw std::length_error("cannot multiply arrays of different dimensions");
 #endif
-  using C = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
-  return make_delayed<C,Array1::ndim>(a.dims(),
-				      [a,b] (const auto& x) { return a(x) * b(x); });
+  return make_delayed(a.dims(), [a,b](const auto& x) {
+      return a(x) * b(x);
+    });
 }
 
 template <typename U, typename Array,
@@ -61,10 +60,9 @@ auto operator/(const Array1& a, const Array2& b)
   if (a.dims() != b.dims())
     throw std::length_error("cannot divide arrays of different dimensions");
 #endif
-  using C = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
-  return make_delayed<C,Array1::ndim>(a.dims(),
-				      [a,b] (const auto& x) { return a(x) / b(x); });
+  return make_delayed(a.dims(), [a,b](const auto& x) {
+      return a(x) / b(x);
+    });
 }
 
 template <typename Array, typename U,
@@ -72,10 +70,9 @@ template <typename Array, typename U,
 			   && ! is_array<U>::value>* = nullptr>
 auto operator/(U value, const Array& a)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return value/a(x); });
+  return make_delayed(a.dims(), [a,value](const auto& x) {
+      return value/a(x);
+    });
 }
 
 template <typename Array, typename U,
@@ -83,10 +80,9 @@ template <typename Array, typename U,
 			   && ! is_array<U>::value>* = nullptr>
 auto operator/(const Array& a, U value)
 {
-  using C = typename std::common_type<typename Array::dtype, U>::type;
-  return make_delayed<C,Array::ndim>(a.dims(),
-				     [a,value] (const auto& x)
-				     { return a(x)/value; });
+  return make_delayed(a.dims(), [a,value](const auto& x) {
+      return a(x)/value;
+    });
 }
 
 
@@ -96,9 +92,6 @@ template <typename Array1, typename Array2,
 				    && Array1::ndim==Array2::ndim>* = nullptr>
 auto operator-(const Array1& a, const Array2& b)
 {
-  using C = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
-  
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dims() != b.dims()) {
@@ -109,10 +102,9 @@ auto operator-(const Array1& a, const Array2& b)
     throw std::length_error(msg.str());
   }
 #endif
-  return make_delayed<C, Array1::ndim>(a.dims(),
-				       [a,b](const auto& coords) {
-					 return a(coords) - b(coords);
-				       });
+  return make_delayed(a.dims(), [a,b](const auto& coords) {
+      return a(coords) - b(coords);
+    });
 }
 
 template <typename Array, typename U,
@@ -136,9 +128,6 @@ template <typename Array1, typename Array2,
 	  typename std::enable_if_t<Array1::ndim==Array2::ndim>* = nullptr>
 auto operator+(const Array1& a, const Array2& b)
 {
-  using C = typename std::common_type<typename Array1::dtype,
-				      typename Array2::dtype>::type;
-  
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same
   if (a.dims() != b.dims()) {
@@ -149,10 +138,9 @@ auto operator+(const Array1& a, const Array2& b)
     throw std::length_error(msg.str());
   }
 #endif
-  return make_delayed<C, Array1::ndim>(a.dims(),
-				       [a,b](const auto& coords) {
-					 return a(coords) + b(coords);
-				       });
+  return make_delayed(a.dims(), [a,b](const auto& coords) {
+      return a(coords) + b(coords);
+    });
 }
 
 template <typename T, typename Array,
@@ -174,9 +162,8 @@ auto operator+(const Array& a, const T& value)
 
 
 template <typename Array1, typename Array2,
-	  std::enable_if_t<is_indexable<Array1>::value
-			   && is_indexable<Array2>::value
-			   /*&& is_modifiable<Array1>::value*/>* = nullptr>
+	  std::enable_if_t<is_modifiable<Array1>::value
+			   && is_indexable<Array2>::value>* = nullptr>
 Array1& operator+=(Array1& a, const Array2& b)
 {
   static_assert(Array1::ndim == Array2::ndim,
@@ -188,26 +175,10 @@ Array1& operator+=(Array1& a, const Array2& b)
     throw std::length_error("cannot increment with array of different dimensions");
 #endif
 
-  a.map([&b](const auto& coords, auto& val) {val += b(coords);});
+  for_each(a, [&b](const auto& coords, auto& val) {val += b(coords);});
   
   return a;
 }
-
-#if 0
-template <typename Indexable,
-	  typename T=typename Indexable::dtype>
-StridedArray<T,Indexable::ndim>& operator+=(StridedArray<T,Indexable::ndim>& a,
-				     const Indexable& b)
-{
-#ifndef NECOMI_NO_BOUND_CHECKS
-  // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot increment with array of different dimensions");
-#endif
-  a.map([&b](auto& path, auto& val) {val += b(path);});
-  return a;
-}
-#endif
 
 template <typename T, std::size_t N,
 	  typename Indexable, typename U=typename Indexable::dtype,

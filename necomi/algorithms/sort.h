@@ -40,10 +40,10 @@ auto permute(const Array1& a, const Array2& idx)
     throw std::length_error("array to be permuted and its indices must have the same dimensions");
 #endif
 
-  return make_delayed<typename Array1::dtype,Array1::ndim>(a.dims(),
-							   [a,idx](const auto& coords) {
-							     return a(idx(coords));
-							   });
+  return make_delayed(a.dims(),
+		      [a,idx](const auto& coords) {
+			return a(idx(coords));
+		      });
 }
 
 } // namespace necomi

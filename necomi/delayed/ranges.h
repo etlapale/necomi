@@ -12,11 +12,10 @@ namespace necomi {
 /**
  * Create an array filled with a constant value.
  */
-template <typename T=double, std::size_t N=1,
-	  typename dims_type = std::array<std::size_t,N>>
-auto constants(const dims_type& dims, T value)
+template <std::size_t N=1, typename T>
+auto constants(const std::array<std::size_t,N>& dims, T value)
 {
-  return make_delayed<T>(dims, [value](auto&){ return value; });
+  return make_delayed(dims, [value](auto&){ return value; });
 }
   
 template <typename T=double, std::size_t N,
@@ -31,7 +30,8 @@ template <typename T=double,
 	  typename std::enable_if<all_convertible<Dims...,std::size_t>::value>* = nullptr>
 auto zeros(Dims... dims)
 {
-  return constants<T,sizeof...(Dims)>({static_cast<std::size_t>(dims)...}, 0);
+  std::array<std::size_t,sizeof...(Dims)> d{static_cast<std::size_t>(dims)...};
+  return constants(d, static_cast<T>(0));
 }
 
 /**
@@ -42,7 +42,7 @@ auto zeros(Dims... dims)
 template <typename T, typename Array>
 auto constants_like(const Array& a, T value)
 {
-  return make_delayed<T>(a.dims(), [value](const auto&){ return value; });
+  return make_delayed(a.dims(), [value](const auto&){ return value; });
 }
 
 /**
@@ -66,13 +66,6 @@ auto zeros_like(const Array& a)
 }
 
 template <typename T>
-auto range(T stop)
-{
-  return make_delayed<T,1>({{static_cast<std::size_t>(stop)}},
-			   [](const auto& coords){ return coords[0]; });
-}
-
-template <typename T>
 auto range(T start, T stop, T step=1)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -82,26 +75,36 @@ auto range(T start, T stop, T step=1)
     throw std::out_of_range("step must be positive for ranges");
 #endif
   auto size = static_cast<std::size_t>(std::ceil(static_cast<double>(stop-start)/step));
-  return make_delayed<T,1>({size},
-			   [start,step](auto& coords)
-			   { return start+step*coords[0]; });
+  return make_delayed(std::array<std::size_t,1>{size},
+		      [start,step](const auto& coords) {
+			return static_cast<T>(start+step*coords[0]);
+		      });
 }
-  
+
+
+template <typename T>
+auto range(T stop)
+{
+  std::array<std::size_t,1> dims{static_cast<std::size_t>(stop)};
+  return make_delayed(dims, [](const auto& coords){
+      return static_cast<T>(coords[0]);
+    });
+}
+
+
 /**
  * Return an array of evenly spaced floating point numbers.
  * If the type of the boundaries is floating, the resulting array elements
  * will be of that type. Otherwise, they will be double values.
  */
-template <typename T,
-	  typename U=typename std::conditional<std::is_floating_point<T>::value,
-					       T,double>::type,
-	  std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
+template <typename T>
 auto linspace(T start, T stop, std::size_t size, bool endpoint=true)
 {
+  using U = typename std::conditional<std::is_floating_point<T>::value, T, double>::type;
   auto step = static_cast<U>(stop - start)/(endpoint ? size - 1 : size);
-  return make_delayed<U,1>({size},
-			   [start,step](auto& coords)
-			   { return start+step*coords[0]; });
+  return make_delayed(std::array<size_t,1>{size},
+		      [start,step](const auto& coords)
+		      { return static_cast<U>(start+step*coords[0]); });
 }
 
 /**
@@ -111,9 +114,10 @@ template <typename T=double>
 auto identity(std::size_t dim)
 {
   // TODO: generalize (prod(coords) = 1)
-  return make_delayed<T,2>({dim,dim}, [](auto coords) {
-      return coords[0] == coords[1];
-    });
+  return make_delayed(std::array<std::size_t,2>{dim,dim},
+		      [](const auto& coords) {
+			return coords[0] == coords[1];
+		      });
 }
 
 } // namespace necomi
