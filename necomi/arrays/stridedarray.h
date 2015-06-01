@@ -6,12 +6,15 @@
 #pragma once
 
 #include <memory>
+#include <sstream>
 
 #include "../core/iterators.h"
 #include "../core/loops.h"
 #include "../core/shape.h"
 #include "../core/slices.h"
 #include "../core/strides.h"
+
+#include "../codecs/streams.h"
 
 #include "../traits/arrays.h"
 
@@ -297,8 +300,13 @@ public:
   {
 #ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
-    if (this->dims() != a.dims())
-      throw std::length_error("cannot copy from array with different dimensions");
+    if (this->dims() != a.dims()) {
+      std::ostringstream msg;
+      msg << "cannot copy from indexable array of different dimensions (";
+      copy_dims(this->dims(), msg) << " != ";
+      copy_dims(a.dims(), msg) << ")";
+      throw std::length_error(msg.str());
+    }
 #endif
     this->map([&a](auto& path, auto& val) {
 	val = a(path);
@@ -315,10 +323,10 @@ public:
 #ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
     if (ndim != a.ndim())
-      throw std::length_error("cannot copy from array of different dimensionality");
+      throw std::length_error("cannot copy from variadic array of different dimensionality");
     if (! std::equal(this->dims().cbegin(), this->dims().cend(),
 		     a.dims().cbegin()))
-      throw std::length_error("cannot copy from array of different dimensions");
+      throw std::length_error("cannot copy from variadic array of different dimensions");
 #endif
     this->map([&a](const auto& coords, auto& val) {
 	typename Array::dims_type acoords(coords.cbegin(), coords.cend());
