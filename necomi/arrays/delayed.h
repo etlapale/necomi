@@ -5,15 +5,16 @@
 
 #pragma once
 
+#include "../traits/arrays.h"
 #include "dimarray.h"
 
 namespace necomi
 {
+
 /**
  * Represent an array expression.
- * Make sure to register each dependency with add_reference.
  */
-template <typename T, std::size_t N, typename Expr>
+template <typename T, std::size_t N, typename Expr, typename CExpr=Expr>
 class DelayedArray : public DimArray<std::size_t,N>
 {
 public:
@@ -21,101 +22,92 @@ public:
   using dims_type = std::array<dim_type, N>;
   using dtype = T;
   enum { ndim = N };
-  
-  template <typename U, dim_type M, typename Expr2> friend class DelayedArray;
-  
-  DelayedArray(const dims_type& dims, Expr e)
+
+  DelayedArray(const dims_type& dims, Expr e, CExpr ce)
     : DimArray<dim_type,N>(dims)
     , m_e(std::move(e))
+    , m_ce(ce)
   {
     static_assert(is_callable<Expr,const dims_type&>::value,
 		  "function wrapped in delayed array has invalid arguments");
     static_assert(std::is_convertible<typename std::result_of<Expr(const dims_type&)>::type,T>::value,
 		  "function wrapped in delayed array has invalid return type");
   }
-  
-  /**
-   * Indicates whether the wrapped function returns references.
-   */
-  static constexpr bool is_modifiable()
-  {
-    return std::is_convertible<
-      typename std::result_of<Expr(const dims_type&)>::type,
-      T&>::value;
-  }
-  
-  typedef typename std::conditional<is_modifiable(), T&, T>::type ReturnType;
 
-  /**
-   * Return the value of a single element.
-   */
-  template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices)==N && all_convertible<Indices..., dim_type>(), T>
-    operator()(Indices... indices) const
+  template <typename ...Indices,
+	    typename std::enable_if_t<sizeof...(Indices)==N
+                      && all_convertible<Indices..., dim_type>()>* = nullptr>
+  decltype(auto) operator()(Indices... indices) const
   {
     dims_type idx{static_cast<dim_type>(indices)...};
     return this->operator()(idx);
   }
-
-  template <typename ...Indices>
-  std::enable_if_t<sizeof...(Indices)==N && all_convertible<Indices..., dim_type>(), ReturnType>
-    operator()(Indices... indices)
+  
+  template <typename ...Indices,
+	    typename std::enable_if_t<sizeof...(Indices)==N
+                      && all_convertible<Indices..., dim_type>()>* = nullptr>
+  decltype(auto) operator()(Indices... indices)
   {
     dims_type idx{static_cast<dim_type>(indices)...};
     return this->operator()(idx);
   }
-
-  /// Return the value of a single element.
-  T operator()(const dims_type& coords) const
+  
+  decltype(auto) operator()(const dims_type& coords) const
   {
-    return m_e(coords);
+    return m_ce(coords);
+    //return const_cast<typename std::add_lvalue_reference<typename std::add_const<typename std::remove_reference<decltype(m_t())>::type>::type>::type>(m_t());
   }
 
-  ReturnType operator()(const dims_type& coords)
+  decltype(auto) operator()(const dims_type& coords)
   {
     return m_e(coords);
   }
 
 protected:
   Expr m_e;
+  CExpr m_ce;
 };
 
 
-template <std::size_t N, typename Expr,
-	  typename T = typename std::result_of<Expr(const std::array<std::size_t,N>&)>::type>
-DelayedArray<T,N,Expr>
-make_delayed(const std::array<std::size_t,N>& dims, Expr fun)
+template <std::size_t N, typename Expr>
+auto make_delayed(const std::array<std::size_t,N>& dims, Expr fun)
 {
-  return DelayedArray<T,N,Expr>(dims, std::move(fun));
+  using namespace std;
+  using T = typename remove_reference<typename result_of<Expr(const array<size_t,N>&)>::type>::type;
+  return DelayedArray<T,N,Expr,Expr>(dims, fun, fun);
 }
 
-template <typename T, typename Expr,
-	  typename std::enable_if_t<is_callable<Expr,const std::array<std::size_t,1>&>::value>* = nullptr>
-auto make_delayed(std::size_t size, Expr fun)
+template <std::size_t N, typename Expr, typename CExpr>
+auto make_delayed(const std::array<std::size_t,N>& dims, Expr fun, CExpr cfun)
 {
-  return DelayedArray<T,1,Expr>({size}, std::move(fun));
+  using namespace std;
+  using T = typename remove_reference<typename result_of<Expr(const array<size_t,N>&)>::type>::type;
+  return DelayedArray<T,N,Expr,CExpr>(dims, fun, cfun);
 }
 
-/// Converts any array into a delayed one.
+
+template <typename Array>
+auto delay(Array& a)
+{
+  return make_delayed(a.dims(),
+		      [a](const auto& x) mutable -> decltype(auto) {
+			return a(x);
+		      },
+		      [a](const auto& x) -> decltype(auto) {
+			return a(x);
+		      });
+}
+
+
 template <typename Array>
 auto delay(const Array& a)
 {
-  return make_delayed(a.dims(), [a](const auto& x) {return a(x); });
+  return make_delayed(a.dims(),
+		      [a](const auto& x) -> decltype(auto) {
+			return a(x);
+		      });
 }
-  
-/**
- * Create a delayed array from an indexable one.
- * The created array will have the same element type and array dimensions
- * as the one in first argument, and will have its element values
- * defined by the second argument.
- */
-template <typename Array, typename Expr,
-	  typename std::enable_if_t<is_array<Array>::value>* = nullptr>
-auto make_delayed(const Array& a, Expr&& e)
-{
-  return DelayedArray<typename Array::dtype, Array::ndim, Expr>
-    (a.dims(), std::forward<Expr>(e));
-}
+
 
 } // namespace necomi
 

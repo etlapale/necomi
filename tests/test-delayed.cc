@@ -9,11 +9,11 @@ using namespace necomi;
 
 static constexpr double float_tol = 1e-2;
 
-static double my_constant_function(const std::array<std::size_t,2>& path)
+/*static double my_constant_function(const std::array<std::size_t,2>& path)
 {
   (void) path;
   return 42.0;
-}
+  }*/
 
 TEST_CASE( "delayed arrays", "[core]" ) {
 
@@ -190,14 +190,15 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(3) == a(3) );
   }
 
+  /*
   SECTION( "delayed from standalone function" ) {
     std::array<std::size_t,2> dimensions{{11,21}};
-    DelayedArray<int,2,double(&)(const std::array<std::size_t,2>&)>
+    DelayedArray<int,2,decltype(my_constant_function)>
       a(dimensions, my_constant_function);
     StridedArray<int,2> b = a;
     REQUIRE( a(1,1) == b(1,1) );
     REQUIRE( b(4,2) == 42 );
-  }
+    }*/
 
   SECTION( "delayed one-liner" ) {
     auto a = make_delayed<2>({{11,21}}, [](const auto&) { return 42; });
@@ -619,7 +620,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     // some delayed arrays are immutable
     auto a = range<int>(24);
-    REQUIRE( !a.is_modifiable() );
+    REQUIRE( !is_modifiable<decltype(a)>::value );
     
     // modifiable delayed arrays are constructible
     auto b = strided_array(a);
@@ -771,5 +772,31 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( size(b) == size(a) );
     REQUIRE( b(0,0) == 8 );
     REQUIRE( b(1,1) == 8 );
+  }
+
+  SECTION( "modifiable delayed arrays" ) {
+
+    auto a = strided(reshape(range(15), 3, 5));
+    auto b = delay(a);
+    
+    REQUIRE( a(1,2) == b(1,2) );
+    
+    int& x = a(1,2);
+    REQUIRE( x == 7 );
+    int& y = b(1,2);
+    REQUIRE( x == y );
+    
+    y = 42;
+    REQUIRE( x == 42 );
+    
+    for_each(b, [](const auto&, const auto& val) { (void) val; });
+    
+    const auto& c = b;
+    
+    using B = decltype(b);
+    //using C = decltype(b);
+    
+    REQUIRE( is_modifiable<B>::value );
+    //REQUIRE( ! is_modifiable<C>::value ); // TODO
   }
 }
