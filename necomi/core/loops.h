@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "../traits/arrays.h"
+#include "../core/mpl.h"
 
 namespace necomi {
 
@@ -30,10 +31,10 @@ for_looper(Array& a, typename Array::dims_type& coords, UnaryOperation f)
 
 template <typename Array, typename UnaryOperation,
 	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
-void for_each(Array& a, UnaryOperation&& op)
+void for_each(Array& a, UnaryOperation op)
 {
   typename Array::dims_type coords;
-  for_looper<Array,0,UnaryOperation>(a, coords, std::move(op));
+  for_looper<Array,0,UnaryOperation>(a, coords, op);
 }
 
 template <typename Array, typename UnaryOperation,
