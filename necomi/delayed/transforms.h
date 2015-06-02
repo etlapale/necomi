@@ -124,9 +124,6 @@ auto stack(const Array& a, const Arrays&... as)
     throw std::length_error("stacked arrays must have the same dimensions");
 #endif
 		
-  using T = typename std::common_type<typename Array::dtype,
-				      typename Arrays::dtype...>::type;
-
   return make_delayed(prepend_coordinate(a.dims(), sizeof...(Arrays)+1),
 		      [a,as...](const auto& coords) {
       auto c = remove_coordinate(coords, 0);
@@ -147,9 +144,6 @@ auto concat(std::size_t d, const Array& a, const Arrays&... as)
   if (! almost_same_dimensions(d, a, as...))
     throw std::length_error("concatenated arrays must have almost the same dimensions");
 #endif
-
-  using T = typename std::common_type<typename Array::dtype,
-				      typename Arrays::dtype...>::type;
 
   std::array<std::size_t, 1+sizeof...(Arrays)> ns{a.dim(d), as.dim(d)...};
   // Total size of the dimension along which to concatenate
