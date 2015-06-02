@@ -36,6 +36,7 @@
 #include "algorithms/sort.h"
 
 // Numerics
+#include "numerics/arithmetics.h"
 #include "numerics/basic.h"
 #include "numerics/exponents.h"
 #include "numerics/interpolation.h"
