@@ -48,4 +48,27 @@ TEST_CASE( "transformations", "[delayed]" ) {
     REQUIRE( p(1,1) == 4 );
     REQUIRE( p(2,8) == 19 );
   }
+
+  SECTION( "fix_dimension" ) {
+
+    auto a = strided(reshape(range(15), 3, 5));
+    
+    auto b = fix_dimension(a, 1, 1);
+    REQUIRE( b(0) == 1 );
+    REQUIRE( b(1) == 6 );
+    REQUIRE( b(2) == 11 );
+
+    auto& b1 = b(1);
+    b1 = 42;
+    REQUIRE( b(1) == 42 );
+
+    REQUIRE( sum(a,0)(1) == 54 );
+    //REQUIRE( sum(b) == 54 );
+
+    auto c = delay(a);
+    //DebugType<decltype(c(0,0))> dc00;
+    //for_each(c, [](const auto&, int& x) {std::cout << x << ' ';});
+    //std::cout << std::endl;
+    //std::cout << sum(b) << std::endl;
+  }
 }
