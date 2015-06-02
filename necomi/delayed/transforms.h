@@ -204,7 +204,11 @@ auto fix_dimension(Array& a, std::size_t dim, std::size_t val)
 {
   return make_delayed(remove_coordinate(a.dims(), dim),
 		      [a,dim,val] (const auto& coords) mutable
-		          -> typename Array::dtype &  {
+		          -> decltype(auto)  {
+			return a(add_coordinate(coords, dim, val));
+		      },
+		      [a,dim,val] (const auto& coords)
+		          -> decltype(auto)  {
 			return a(add_coordinate(coords, dim, val));
 		      });
 }
