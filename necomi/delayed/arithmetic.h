@@ -161,49 +161,6 @@ auto operator+(const Array& a, const T& value)
 }
 
 
-template <typename Array1, typename Array2,
-	  std::enable_if_t<is_modifiable<Array1>::value
-			   && is_indexable<Array2>::value>* = nullptr>
-Array1& operator+=(Array1& a, const Array2& b)
-{
-  static_assert(Array1::ndim == Array2::ndim,
-		"can only add arrays with same dimensionality");
-  
-#ifndef NECOMI_NO_BOUND_CHECKS
-  // Make sure the dimensions of a and b are the same
-  if (a.dims() != b.dims())
-    throw std::length_error("cannot increment with array of different dimensions");
-#endif
-
-  for_each(a, [&b](const auto& coords, auto& val) {val += b(coords);});
-  
-  return a;
-}
-
-template <typename T, std::size_t N,
-	  typename Indexable, typename U=typename Indexable::dtype,
-	  std::enable_if_t<is_promotable<U,T>::value
-			   && N==Indexable::ndim>* = nullptr>
-StridedArray<T,N>& operator*=(StridedArray<T,N>& numerator, const Indexable& denominator)
-{
-  numerator.map([&denominator](auto& coords, auto& val) {
-      val *= denominator(coords);
-    });
-  return numerator;
-}
-
-template <typename T, std::size_t N,
-	  typename Indexable, typename U=typename Indexable::dtype,
-	  std::enable_if_t<is_promotable<U,T>::value
-			   && N==Indexable::ndim>* = nullptr>
-StridedArray<T,N>& operator/=(StridedArray<T,N>& numerator, const Indexable& denominator)
-{
-  numerator.map([&denominator](auto& coords, auto& val) {
-      val /= denominator(coords);
-    });
-  return numerator;
-}
-
 /**
  * Divide each element of the array by a number.
  */
