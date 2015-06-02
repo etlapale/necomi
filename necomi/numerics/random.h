@@ -6,6 +6,7 @@
 #pragma once
 
 #include <random>
+#include <type_traits>
 
 #include "../arrays/stridedarray.h"
 
@@ -54,20 +55,16 @@ protected:
  * Generate a one dimensional array filled with random numbers
  * following a normal distribution.
  */
-template <typename T, std::size_t N, typename PRNG>
-StridedArray<T,N> normal(const T& mean, const T& deviation,
+template <typename T, typename U, std::size_t N, typename PRNG,
+	  typename V = typename std::common_type<T,U>::type,
+	  typename W = typename std::conditional<std::is_floating_point<V>::value, V, double>::type>
+StridedArray<W,N> normal(const T& mean, const U& deviation,
 			 const std::array<std::size_t,N>& dims,
 			 PRNG& prng)
 {
-  std::normal_distribution<T> dist(mean, deviation);
-  StridedArray<T,N> a(dims);
-
-  a.map([&dist,&prng](auto& path, auto& val) {
-      (void) path;
-      val = dist(prng);
-    });
-
-  return a;
+  std::normal_distribution<W> dist(mean, deviation);
+    StridedArray<W,N> a(dims);
+  return transform(a, [&dist,&prng](auto){ return dist(prng); });
 }
 
 
@@ -84,9 +81,9 @@ constexpr auto normal(std::initializer_list<std::size_t> dims, PRNG& prng)
 
 
 template <typename T=double, std::size_t N, typename PRNG>
-StridedArray<T,N> normal(const std::array<std::size_t,N>& dims, PRNG& prng)
+auto normal(const std::array<std::size_t,N>& dims, PRNG& prng)
 {
-  return normal<T,N,PRNG>(0, 1, dims, prng);
+  return normal<T>(0, 1, dims, prng);
 }
 
 
@@ -94,17 +91,16 @@ StridedArray<T,N> normal(const std::array<std::size_t,N>& dims, PRNG& prng)
  * Generate a one dimensional array filled with random numbers
  * following a normal distribution.
  */
-template <typename T, typename PRNG>
-StridedArray<T,1> normal(const T& mean, const T& deviation,
-			 std::size_t size, PRNG& prng)
+template <typename T, typename U, typename PRNG>
+auto normal(const T& mean, const U& deviation, std::size_t size, PRNG& prng)
 {
-  return normal<T,1>(mean, deviation, {size}, prng);
+  return normal<T,U,1>(mean, deviation, {size}, prng);
 }
 
 template <typename T=double, typename PRNG>
 StridedArray<T,1> normal(std::size_t size, PRNG& prng)
 {
-  return normal<T,1>(0, 1, {size}, prng);
+  return normal<T,T,1>(0, 1, {size}, prng);
 }
 
 /**

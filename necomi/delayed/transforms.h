@@ -197,7 +197,6 @@ auto slice(Array a, std::size_t i)
 		      });
 }
 
-
 template <typename Array,
 	  std::enable_if_t<is_modifiable<Array>::value>* = nullptr>
 auto fix_dimension(Array& a, std::size_t dim, std::size_t val)
