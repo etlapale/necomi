@@ -80,6 +80,30 @@ struct enable_if_type { typedef R type; };
 
 } // namespace necomi
 
+
+template <typename T>
+struct remove_const_keep_reference
+{
+  using type = T;
+};
+
+template <typename T>
+struct remove_const_keep_reference<const T>
+{
+  using type = T;
+};
+
+template <typename T>
+struct remove_const_keep_reference<const T&>
+{
+  using type = T&;
+};
+
+
+template <typename T>
+using remove_const_keep_reference_t
+  = typename remove_const_keep_reference<T>::type;
+
 // Local Variables:
 // mode: c++
 // End:
