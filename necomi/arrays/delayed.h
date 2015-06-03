@@ -30,7 +30,7 @@ public:
   {
     static_assert(is_callable<Expr,const dims_type&>::value,
 		  "function wrapped in delayed array has invalid arguments");
-    static_assert(std::is_convertible<typename std::result_of<Expr(const dims_type&)>::type,T>::value,
+    static_assert(std::is_convertible<element_type_t<DelayedArray<T,N,Expr>>,T>::value,
 		  "function wrapped in delayed array has invalid return type");
   }
 
@@ -60,6 +60,9 @@ public:
 
   decltype(auto) operator()(const dims_type& coords)
   {
+    //DebugType<const_element_type> dce;
+
+    //return const_cast<>(static_cast<const DelayedArray<T,N,Expr,CExpr>&>(*this)(coords));
     return m_e(coords);
   }
 

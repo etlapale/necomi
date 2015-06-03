@@ -35,6 +35,18 @@ template <typename T> struct has_strides<T, decltype(&T::strides, void())>
   : std::true_type {};
 
 
+
+template <typename T>
+struct element_type
+{
+  using type = std::result_of_t<T(const typename T::dims_type&)>;
+};
+
+template <typename T>
+using element_type_t = typename element_type<T>::type;
+
+
+
 template <typename T>
 struct is_array
   : std::integral_constant<bool,
