@@ -179,6 +179,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
       });
     // Delay the immediate array
     auto b = delay(a);
+
     REQUIRE( a(0) == b(0) );
     REQUIRE( a(5) == b(5) );
 
@@ -783,6 +784,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     int& x = a(1,2);
     REQUIRE( x == 7 );
+
     int& y = b(1,2);
     REQUIRE( x == y );
     
@@ -794,9 +796,17 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     const auto& c = b;
     
     using B = decltype(b);
-    //using C = decltype(b);
+    using C = decltype(c);
     
     REQUIRE( is_modifiable<B>::value );
-    //REQUIRE( ! is_modifiable<C>::value ); // TODO
+    REQUIRE( ! is_modifiable<C>::value ); // TODO
+
+    const int k = 93;
+    auto d = make_delayed(a.dims(), [&k] (const auto&) -> const int& {
+	return k;
+      });
+
+    //DebugType<typename decltype(d)::elem_type> dde;
+    //DebugType<typename decltype(d)::const_elem_type> dce;
   }
 }

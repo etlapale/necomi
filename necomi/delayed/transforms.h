@@ -180,7 +180,7 @@ auto concat(const Array& a, const Arrays&... as)
 // TODO: remove, special case of fix_dimension
 
 template <typename Array,
-	  std::enable_if_t<is_array<Array>::value>* = nullptr>
+	  typename std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto slice(Array a, std::size_t i)
 {
   static_assert(Array::ndim >= 1,
@@ -198,25 +198,12 @@ auto slice(Array a, std::size_t i)
 }
 
 template <typename Array,
-	  std::enable_if_t<is_modifiable<Array>::value>* = nullptr>
+	  typename std::enable_if_t<is_indexable<Array>::value>* = nullptr>
 auto fix_dimension(Array& a, std::size_t dim, std::size_t val)
 {
-  return make_delayed(remove_coordinate(a.dims(), dim),
-		      [a,dim,val] (const auto& coords) mutable
-		          -> decltype(auto)  {
-			return a(add_coordinate(coords, dim, val));
-		      },
+  return make_delayed(a, remove_coordinate(a.dims(), dim),
 		      [a,dim,val] (const auto& coords)
 		          -> decltype(auto)  {
-			return a(add_coordinate(coords, dim, val));
-		      });
-}
-
-template <typename Array>
-auto fix_dimension(const Array& a, std::size_t dim, std::size_t val)
-{
-  return make_delayed(remove_coordinate(a.dims(), dim),
-		      [a,dim,val] (const auto& coords) {
 			return a(add_coordinate(coords, dim, val));
 		      });
 }

@@ -11,10 +11,7 @@
 namespace necomi
 {
 
-/**
- * Represent an array expression.
- */
-template <typename T, std::size_t N, typename Expr, typename CExpr=Expr>
+template <typename T, std::size_t N, typename Expr, bool modifiable=false>
 class DelayedArray : public DimArray<std::size_t,N>
 {
 public:
@@ -22,15 +19,15 @@ public:
   using dims_type = std::array<dim_type, N>;
   using dtype = T;
   enum { ndim = N };
+  using Self = DelayedArray<T,N,Expr,modifiable>;
 
-  DelayedArray(const dims_type& dims, Expr e, CExpr ce)
+  DelayedArray(const dims_type& dims, Expr e)
     : DimArray<dim_type,N>(dims)
     , m_e(std::move(e))
-    , m_ce(ce)
   {
     static_assert(is_callable<Expr,const dims_type&>::value,
-		  "function wrapped in delayed array has invalid arguments");
-    static_assert(std::is_convertible<element_type_t<DelayedArray<T,N,Expr>>,T>::value,
+		  "function wrapped in delayed array takes invalid arguments");
+    static_assert(std::is_convertible<element_type_t<Self>,T>::value,
 		  "function wrapped in delayed array has invalid return type");
   }
 
@@ -54,61 +51,68 @@ public:
   
   decltype(auto) operator()(const dims_type& coords) const
   {
-    return m_ce(coords);
-    //return const_cast<typename std::add_lvalue_reference<typename std::add_const<typename std::remove_reference<decltype(m_t())>::type>::type>::type>(m_t());
+    return m_e(coords);
   }
 
-  decltype(auto) operator()(const dims_type& coords)
-  {
-    //DebugType<const_element_type> dce;
 
-    //return const_cast<>(static_cast<const DelayedArray<T,N,Expr,CExpr>&>(*this)(coords));
-    return m_e(coords);
+  using const_elem_type = decltype(std::declval<const Expr>()(std::declval<const dims_type&>()));
+  using elem_type = remove_const_keep_reference_t<const_elem_type>;
+
+  template <typename Dims,
+	    typename std::enable_if_t<modifiable
+				      && std::is_same<Dims, dims_type>::value
+				      && std::is_reference<elem_type>::value>* = nullptr>
+  decltype(auto) operator()(const Dims& coords)
+  {
+    return const_cast<elem_type>(static_cast<const Self*>(this)->operator()(coords));
+  }
+
+  template <typename Dims,
+	    typename std::enable_if_t<modifiable
+				      && std::is_same<Dims, dims_type>::value
+				      && ! std::is_reference<elem_type>::value>* = nullptr>
+  decltype(auto) operator()(const Dims& coords)
+  {
+    return static_cast<elem_type>(static_cast<const Self*>(this)->operator()(coords));
   }
 
 protected:
   Expr m_e;
-  CExpr m_ce;
 };
 
+
+
+template <typename Array, std::size_t N, typename Expr,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto make_delayed(Array&, const std::array<std::size_t,N>& dims, Expr fun)
+{
+  constexpr bool modifiable = is_modifiable<Array>::value;
+  using T = std::remove_reference_t<decltype(fun(dims))>;
+  return DelayedArray<T,N,Expr,modifiable>(dims, fun);
+}
+
+template <typename Array, typename Expr,
+	  std::enable_if_t<is_indexable<Array>::value>* = nullptr>
+auto make_delayed(Array& a, Expr fun)
+{
+  constexpr bool modifiable = is_modifiable<Array>::value;
+  using T = std::remove_reference_t<decltype(fun(a.dims()))>;
+  return DelayedArray<T,Array::ndim,Expr,modifiable>(a.dims(), fun);
+}
 
 template <std::size_t N, typename Expr>
 auto make_delayed(const std::array<std::size_t,N>& dims, Expr fun)
 {
-  using namespace std;
-  using T = typename remove_reference<typename result_of<Expr(const array<size_t,N>&)>::type>::type;
-  return DelayedArray<T,N,Expr,Expr>(dims, fun, fun);
+  using T = std::remove_reference_t<decltype(fun(dims))>;
+  return DelayedArray<T,N,Expr,false>(dims, fun);
 }
-
-template <std::size_t N, typename Expr, typename CExpr>
-auto make_delayed(const std::array<std::size_t,N>& dims, Expr fun, CExpr cfun)
-{
-  using namespace std;
-  using T = typename remove_reference<typename result_of<Expr(const array<size_t,N>&)>::type>::type;
-  return DelayedArray<T,N,Expr,CExpr>(dims, fun, cfun);
-}
-
 
 template <typename Array>
 auto delay(Array& a)
 {
-  return make_delayed(a.dims(),
-		      [a](const auto& x) mutable -> decltype(auto) {
-			return a(x);
-		      },
-		      [a](const auto& x) -> decltype(auto) {
-			return a(x);
-		      });
-}
-
-
-template <typename Array>
-auto delay(const Array& a)
-{
-  return make_delayed(a.dims(),
-		      [a](const auto& x) -> decltype(auto) {
-			return a(x);
-		      });
+  return make_delayed(a, [a](const auto& x) -> decltype(auto) {
+      return a(x);
+    });
 }
 
 
