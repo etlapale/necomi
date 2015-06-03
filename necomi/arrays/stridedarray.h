@@ -424,15 +424,20 @@ StridedArray<T, From::ndim> strided(const From& a)
   return strided_array<T,From>(a);
 }
 
-template <typename T=double,
-	  typename ...Values,
-	  typename std::enable_if_t<all_convertible<T,Values...>::value>* = nullptr>
-StridedArray<T,1> litarray(Values... values)
+template <typename T>
+StridedArray<T,1> litarray(const std::initializer_list<T>& lst)
 {
-  StridedArray<T,1> a(sizeof...(Values));
-  std::initializer_list<T> vals = {static_cast<T>(values)...};
-  std::copy_n(vals.begin(), sizeof...(Values), a.data());
+  StridedArray<T,1> a(lst.size());
+  std::copy_n(lst.begin(), lst.size(), a.data());
   return a;
+}
+
+template <typename ...T>
+auto litarray(T... values)
+{
+  using U = typename std::common_type<T...>::type;
+  std::initializer_list<U> lst{static_cast<U>(values)...};
+  return litarray(lst);
 }
 
 
