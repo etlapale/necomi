@@ -48,14 +48,14 @@ public:
    */
   template <typename ...Dims,
 	    typename std::enable_if_t<sizeof...(Dims) == N && all_convertible<Dims..., dim_type>::value>* = nullptr>
-  StridedArray(Dims ...dims)
+  explicit StridedArray(Dims ...dims)
     : StridedArray(dims_type{static_cast<dim_type>(dims)...})
   {}
 
   /**
    * Create a new multi-dimensional array with uninitialized elements.
    */
-  StridedArray(const dims_type& dims)
+  explicit StridedArray(const dims_type& dims)
     : Parent(dims)
     , m_strides(default_strides(dims))
     , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })

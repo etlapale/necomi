@@ -23,12 +23,12 @@ public:
 
   template <typename ...Dims,
 	    std::enable_if_t<all_convertible<Dims..., dim_type>::value>* = nullptr>
-  VarArray(Dims... dims)
+  explicit VarArray(Dims... dims)
     : VarArray(dims_type{static_cast<dim_type>(dims)...})
   {
   }
 
-  VarArray(const dims_type& dims)
+  explicit VarArray(const dims_type& dims)
     : m_dims(dims)
     , m_strides(default_strides(dims))
     , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
@@ -46,7 +46,7 @@ public:
   template <typename Array,
 	    std::enable_if_t<is_indexable<Array>::value
 			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
-  VarArray(const Array& a)
+  explicit VarArray(const Array& a)
     : VarArray(to_vector<dim_type>(a.dims()))
   {
     for_each(*this, [&a](const auto& coords, auto& value){

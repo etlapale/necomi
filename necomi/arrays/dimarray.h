@@ -15,7 +15,7 @@ public:
   using dim_type = DimType;
   using dims_type = std::array<dim_type, N>;
   
-  DimArray(const dims_type& dims)
+  explicit DimArray(const dims_type& dims)
     : m_dims(dims)
   {}
 

@@ -27,7 +27,7 @@ struct RandomDevSeedSequence
     (void) ia; (void) ib;
   }
 
-  RandomDevSeedSequence(std::initializer_list<std::uint32_t> il)
+  explicit RandomDevSeedSequence(std::initializer_list<std::uint32_t> il)
   {
     (void) il;
   }

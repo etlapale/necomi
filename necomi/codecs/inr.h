@@ -279,7 +279,7 @@ inr_save(const char* path, const Array<T,N>& a)
        * \param append \c true if you want to append to an already file.
        * \param auto_flush \c true to write the header for every added frame.
        */
-      INRWriter(const char* path, bool append=false, bool auto_flush=true);
+      explicit INRWriter(const char* path, bool append=false, bool auto_flush=true);
     
       /**
        * Close the INRWriter writing necessary remaining data.

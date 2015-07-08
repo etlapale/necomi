@@ -31,7 +31,7 @@ public:
     : m_start{{start}} , m_size{{size}} , m_strides{{strides}}
   {}
 
-  Slice(const std::array<std::array<dim_type,3>,N>& args)
+  explicit Slice(const std::array<std::array<dim_type,3>,N>& args)
   {
     for (dim_type i = 0; i < N; i++) {
       m_start[i] = args[i][0];

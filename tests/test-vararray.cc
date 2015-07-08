@@ -80,7 +80,7 @@ TEST_CASE( "dynamic arrays", "[core]" ) {
     REQUIRE( s0() == 456 );
     
     auto a = reshape(range(20), 4, 5);
-    VarArray<int> b = a;
+    auto b = VarArray<int>(a);
     REQUIRE( b(1,2) == 7 );
     REQUIRE( b(3,1) == 16 );
     auto c = var_array(a);

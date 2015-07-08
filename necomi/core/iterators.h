@@ -23,7 +23,7 @@ public:
   using dtype = typename Array::dtype;
   enum { ndim = Array::ndim };
   
-  ArrayIterator(Array& array)
+  explicit ArrayIterator(Array& array)
     : m_array(array)
   {
     m_coords.fill(0);
