@@ -7,6 +7,7 @@
 
 #include "../arrays/delayed.h"
 #include "../arrays/stridedarray.h"
+#include "../numerics/arithmetics.h"
 
 namespace necomi {
 
