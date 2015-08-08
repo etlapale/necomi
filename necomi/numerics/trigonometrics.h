@@ -33,8 +33,7 @@ template <typename Array,
 auto sin(const Array& a)
 {
   using std::sin;
-  using C = decltype(sin(std::declval<typename Array::dtype>()));
-  return make_delayed<C,Array::ndim>(a.dims(), [a] (const auto& x) {
+  return make_delayed(a.dims(), [a] (const auto& x) {
       return sin(a(x));
     });
 }
