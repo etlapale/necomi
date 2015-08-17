@@ -1,4 +1,4 @@
-// necomi/base/deriche.h – Canny-Deriche recursive filter
+// necomi/filters/deriche.h – Canny-Deriche recursive filter
 //
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
