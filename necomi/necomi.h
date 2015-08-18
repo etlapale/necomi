@@ -48,7 +48,6 @@
 
 // Filters
 #include "filters/deriche.h"
-#include "filters/exponential.h"
 
 // Codecs
 #include "codecs/streams.h"
