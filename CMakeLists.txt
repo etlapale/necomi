@@ -22,6 +22,14 @@ if (PNG_FOUND)
   add_definitions ("-DHAVE_LIBPNG ${PNG_DEFINITIONS}")
   include_directories ("${PNG_INCLUDE_DIRS}")
 endif ()
+# - Boost
+find_package (Boost)
+if (Boost_FOUND)
+  add_definitions ("-DHAVE_BOOST")
+  include_directories ("${Boost_INCLUDE_DIR}")
+else ()
+  message (WARNING "disabling checks for the missing Boost library")
+endif ()
 
 # Downloaded external dependencies
 set (ext_deps
@@ -40,7 +48,7 @@ endforeach ()
 # Unit tests
 file (GLOB CATCH_SRC tests/test-*.cc)
 add_executable (necomi-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
-target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES})
+target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES} ${BOOST_MATH_LIBRARY})
 add_custom_target (check)
 add_dependencies (check necomi-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)

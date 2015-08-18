@@ -7,7 +7,12 @@
 
 #include <cstdlib>
 #include <numeric>
+#include <type_traits>
 #include <vector>
+
+#ifdef HAVE_BOOST
+#include <boost/math/special_functions/binomial.hpp>
+#endif
 
 namespace necomi
 {
@@ -33,23 +38,29 @@ private:
   std::vector<T> m_b;
 };
 
+#ifdef HAVE_BOOST
+
 /**
  *
  */
 template <typename T>
 auto exp_cascade(std::size_t order, T tau)
 {
+  static_assert(std::is_floating_point<T>::value,
+		"exp_cascade requires a floating point argument");
+  
   std::vector<T> a;
   for (auto i = 0UL; i < order + 2; i++)
     a.push_back((i%2 ? -1 : 1)
-		* std::exp(- i * order / tau)
-		//* binom(order+1, i));
-		);
+		* std::exp(- static_cast<T>(i) * order / tau)
+		* boost::math::binomial_coefficient<T>(order+1, i));
 
   std::vector<T> b { std::accumulate(a.cbegin(), a.cend(), 0.0) };
 
   return RecursiveFilter<T>(a,b);
 }
+
+#endif // HAVE_BOOST
 
 } // namespace necomi
 

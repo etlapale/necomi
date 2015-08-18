@@ -41,10 +41,8 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
 	REQUIRE( coefs.size() == filter.a().size() );
 	
 	double err = 0;
-	for (auto i = 0UL; i < coefs.size(); i++) {
-	  std::cout << coefs[i] << ' ' << filter.a()[i] << std::endl;
+	for (auto i = 0UL; i < coefs.size(); i++)
 	  err += std::abs(coefs[i] - filter.a()[i]);
-	}
 
 	REQUIRE( err < 1e-5 );
       }
