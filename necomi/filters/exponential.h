@@ -11,8 +11,8 @@
 #include <vector>
 
 #ifdef HAVE_BOOST
+#include <boost/circular_buffer.hpp>
 #include <boost/math/special_functions/binomial.hpp>
-#endif
 
 namespace necomi
 {
@@ -25,6 +25,7 @@ public:
   RecursiveFilter(const std::vector<T>& a,
 		  const std::vector<T>& b)
     : m_a(a), m_b(b)
+    , m_last_inputs(a.size(), 0), m_last_outputs(b.size(), 0)
   {};
 
   const std::vector<T> a() const
@@ -32,13 +33,29 @@ public:
   
   const std::vector<T> b() const
   { return m_b; }
+
+  const boost::circular_buffer<T> last_inputs() const
+  { return m_last_inputs; }
+
+  const boost::circular_buffer<T> last_outputs() const
+  { return m_last_outputs; }
+
+  void feed(const T& input)
+  {
+    // Save the input
+    //m_last_inputs.
+    
+    // Compute A·Y
+    
+  }
   
 private:
   std::vector<T> m_a;
   std::vector<T> m_b;
+  boost::circular_buffer<T> m_last_inputs;
+  boost::circular_buffer<T> m_last_outputs;
 };
 
-#ifdef HAVE_BOOST
 
 /**
  *
