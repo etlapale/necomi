@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -57,28 +58,44 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
 	REQUIRE( std::abs(sum - filter.b()[0]) < epsilon );
       }
 
-      THEN( "it should save the last 10 input values" ) {
-	REQUIRE( filter.last_inputs().size() == 10 );
+      THEN( "it should save the last input value" ) {
+	REQUIRE( filter.last_inputs().size() == 1 );
       }
       
-      THEN( "it should save the last output value" ) {
-	REQUIRE( filter.last_outputs().size() == 1 );
+      THEN( "it should save the last 9 output values" ) {
+	REQUIRE( filter.last_outputs().size() == 9 );
       }
 
       THEN( "the initial state should be zeros" ) {
-	REQUIRE( filter.last_inputs()[0] == 0 );
-	REQUIRE( filter.last_inputs()[3] == 0 );
-	REQUIRE( filter.last_inputs()[7] == 0 );
 	REQUIRE( filter.last_outputs()[0] == 0 );
+	REQUIRE( filter.last_outputs()[3] == 0 );
+	REQUIRE( filter.last_outputs()[7] == 0 );
+	REQUIRE( filter.last_inputs()[0] == 0 );
       }
     }
 
     WHEN( "an exponential filter is fed" ) {
       filter.feed(1.0);
-      THEN( "its current value should change" ) {
+
+      THEN( "its state should not grow" ) {
+	REQUIRE( filter.last_inputs().size() == 1 );
+	REQUIRE( filter.last_outputs().size() == 9 );
       }
     }
   }
+}
+
+
+static constexpr uint64_t factorial(uint64_t n)
+{ 
+  return n == 0 ? 1 : n * factorial(n-1); 
+}
+
+double gamma(double t, std::size_t n, double tau)
+{ 
+  return std::pow(n*t, n)
+    * std::exp(-static_cast<double>(n)*t/tau)
+    / (factorial(n-1)*std::pow(tau, (n+1)));
 }
 
 SCENARIO( "exponential filter impulse response", "[filters]" ) {
@@ -90,9 +107,12 @@ SCENARIO( "exponential filter impulse response", "[filters]" ) {
     WHEN( "an impulse response is computed" ) {
       
       THEN( "its response should be approximated by a Gamma function" ) {
+	auto err = 0.0;
 	for (auto t = 0; t < 300; t++) {
-	  filter.feed(t == 0 ? 1 : 0);
+	  auto res = filter.feed(t == 0 ? 1 : 0);
+	  err += std::abs(res - gamma(t, n, tau));
 	}
+	REQUIRE( err < 0.15 );
       }
     }
   }

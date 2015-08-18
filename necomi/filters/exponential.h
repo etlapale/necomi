@@ -20,12 +20,13 @@ namespace necomi
 template <typename T>
 class RecursiveFilter
 {
+  static_assert(std::is_floating_point<T>::value,
+		"recursive filtering requires floating point values");
 public:
-  
   RecursiveFilter(const std::vector<T>& a,
 		  const std::vector<T>& b)
     : m_a(a), m_b(b)
-    , m_last_inputs(a.size(), 0), m_last_outputs(b.size(), 0)
+    , m_last_inputs(b.size(), 0), m_last_outputs(a.size()-1, 0)
   {};
 
   const std::vector<T> a() const
@@ -40,13 +41,26 @@ public:
   const boost::circular_buffer<T> last_outputs() const
   { return m_last_outputs; }
 
-  void feed(const T& input)
+  T feed(const T& input)
   {
     // Save the input
-    //m_last_inputs.
+    m_last_inputs.push_front(input);
     
     // Compute A·Y
+    T a_y = 0;
+    for (auto i = 0UL; i < m_last_outputs.size(); i++)
+      a_y += m_a[i+1] * m_last_outputs[i];
+    // Compute B·X
+    T b_x = 0;
+    for (auto i = 0UL; i < m_b.size(); i++)
+      b_x += m_b[i] * m_last_inputs[i];
+
+    T output = (b_x - a_y) / m_a[0];
     
+    // Save the output
+    m_last_outputs.push_front(output);
+
+    return output;
   }
   
 private:
