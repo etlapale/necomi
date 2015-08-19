@@ -57,30 +57,6 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
 	REQUIRE( std::abs(sum - 3.8066805263525794e-10) < epsilon );
 	REQUIRE( std::abs(sum - filter.b()[0]) < epsilon );
       }
-
-      THEN( "it should save the last input value" ) {
-	REQUIRE( filter.last_inputs().size() == 1 );
-      }
-      
-      THEN( "it should save the last 9 output values" ) {
-	REQUIRE( filter.last_outputs().size() == 9 );
-      }
-
-      THEN( "the initial state should be zeros" ) {
-	REQUIRE( filter.last_outputs()[0] == 0 );
-	REQUIRE( filter.last_outputs()[3] == 0 );
-	REQUIRE( filter.last_outputs()[7] == 0 );
-	REQUIRE( filter.last_inputs()[0] == 0 );
-      }
-    }
-
-    WHEN( "an exponential filter is fed" ) {
-      filter.feed(1.0);
-
-      THEN( "its state should not grow" ) {
-	REQUIRE( filter.last_inputs().size() == 1 );
-	REQUIRE( filter.last_outputs().size() == 9 );
-      }
     }
   }
 }
@@ -111,6 +87,7 @@ SCENARIO( "exponential filter impulse response", "[filters]" ) {
 	for (auto t = 0; t < 300; t++) {
 	  auto res = filter.feed(t == 0 ? 1 : 0);
 	  err += std::abs(res - gamma(t, n, tau));
+	  std::cout << res << std::endl;
 	}
 	REQUIRE( err < 0.15 );
       }

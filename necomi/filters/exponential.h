@@ -5,29 +5,37 @@
 
 #pragma once
 
+#include <array>
 #include <cstdlib>
 #include <numeric>
 #include <type_traits>
 #include <vector>
 
 #ifdef HAVE_BOOST
-#include <boost/circular_buffer.hpp>
 #include <boost/math/special_functions/binomial.hpp>
+#endif
 
 namespace necomi
 {
 
-template <typename T>
+template <typename T, std::size_t N>
 class RecursiveFilter
 {
   static_assert(std::is_floating_point<T>::value,
 		"recursive filtering requires floating point values");
+  
 public:
   RecursiveFilter(const std::vector<T>& a,
-		  const std::vector<T>& b)
+		  const std::vector<T>& b,
+		  const std::array<std::size_t,N>& dims)
     : m_a(a), m_b(b)
-    , m_last_inputs(b.size(), 0), m_last_outputs(a.size()-1, 0)
-  {};
+    , m_last_inputs(prepend_coordinate(dims, b.size()))
+    , m_last_outputs(prepend_coordinate(dims, a.size()-1))
+    , m_in_pos(0), m_out_pos(0)
+  {
+    m_last_inputs = 0;
+    m_last_outputs = 0;
+  };
 
   const std::vector<T> a() const
   { return m_a; }
@@ -35,47 +43,76 @@ public:
   const std::vector<T> b() const
   { return m_b; }
 
-  const boost::circular_buffer<T> last_inputs() const
-  { return m_last_inputs; }
-
-  const boost::circular_buffer<T> last_outputs() const
-  { return m_last_outputs; }
-
-  T feed(const T& input)
+  template <typename Input,
+	    std::enable_if_t<is_indexable<Input>::value>* = nullptr>
+  const necomi::StridedArray<T,N> feed(const Input& input)
   {
+    static_assert(Input::ndim == N, "invalid input array dimensionality");
+    
+#ifndef NECOMI_NO_BOUND_CHECKS
+    if (input.dims() != remove_coordinate(m_last_inputs.dims(), 0))
+      throw std::length_error("input array dimensions incompatible with declared ones");
+#endif
+  
     // Save the input
-    m_last_inputs.push_front(input);
+    m_in_pos = (m_in_pos + m_last_inputs.dim(0) - 1) % m_last_inputs.dim(0);
+    m_last_inputs[m_in_pos] = input;
     
     // Compute A·Y
-    T a_y = 0;
-    for (auto i = 0UL; i < m_last_outputs.size(); i++)
-      a_y += m_a[i+1] * m_last_outputs[i];
+    StridedArray<T,N> a_y = zeros_like(input);
+    for (auto i = 0UL; i < m_last_outputs.dim(0); i++)
+      a_y += m_a[i+1]
+	* m_last_outputs[(i + m_out_pos) % m_last_outputs.dim(0)];
     // Compute B·X
-    T b_x = 0;
+    StridedArray<T,N> b_x = zeros_like(input);
     for (auto i = 0UL; i < m_b.size(); i++)
-      b_x += m_b[i] * m_last_inputs[i];
+      b_x += m_b[i]
+	* m_last_inputs[(i + m_in_pos) % m_last_inputs.dim(0)];
 
-    T output = (b_x - a_y) / m_a[0];
-    
-    // Save the output
-    m_last_outputs.push_front(output);
+    // Compute and save the output
+    m_out_pos = (m_out_pos + m_last_outputs.dim(0) - 1) % m_last_outputs.dim(0);
+    m_last_outputs[m_out_pos] = (b_x - a_y) / m_a[0];
 
-    return output;
+    return m_last_outputs[m_out_pos];
+  }
+
+  /**
+   * Convenience overload for scalar values.
+   */
+  template <typename U,
+	    std::enable_if_t<std::is_convertible<U,T>::value
+			     && N == 0>* = nullptr>
+  T feed(const U& input)
+  {
+    necomi::StridedArray<T,0> in;
+    in = input;
+    return feed(in)();
   }
   
 private:
+  /// Coefficient applied to the last outputs.
   std::vector<T> m_a;
+  /// Coefficient applied to the last inputs.
   std::vector<T> m_b;
-  boost::circular_buffer<T> m_last_inputs;
-  boost::circular_buffer<T> m_last_outputs;
+  /// Copy of the last inputs.
+  necomi::StridedArray<T,N+1> m_last_inputs;
+  /// Last outputs.
+  necomi::StridedArray<T,N+1> m_last_outputs;;
+  /// Position in the circular array of last inputs.
+  std::size_t m_in_pos;
+  /// Position in the circular array of last outputs.
+  std::size_t m_out_pos;
 };
 
+
+#ifdef HAVE_BOOST
 
 /**
  *
  */
-template <typename T>
-auto exp_cascade(std::size_t order, T tau)
+template <typename T, std::size_t N>
+auto exp_cascade(std::size_t order, T tau,
+		 const std::array<std::size_t,N>& dims)
 {
   static_assert(std::is_floating_point<T>::value,
 		"exp_cascade requires a floating point argument");
@@ -88,7 +125,14 @@ auto exp_cascade(std::size_t order, T tau)
 
   std::vector<T> b { std::accumulate(a.cbegin(), a.cend(), 0.0) };
 
-  return RecursiveFilter<T>(a,b);
+  return RecursiveFilter<T,N>(a, b, dims);
+}
+
+/// Convenience wrapper for scalars.
+template <typename T>
+auto exp_cascade(std::size_t order, T tau)
+{
+  return exp_cascade<T,0>(order, tau, {});
 }
 
 #endif // HAVE_BOOST
