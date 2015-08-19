@@ -62,6 +62,7 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
     WHEN( "the filter is fed a scalar input" ) {
       THEN( "it just works" ) {
 	(void) filter.feed(3);
+	REQUIRE( true );
       }
     }
     
@@ -69,11 +70,26 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
       THEN( "it just works" ) {
 	auto input = zeros();
 	(void) filter.feed(input);
+	REQUIRE( true );
       }
     }
-    /* TODO: add that to a test with a 1D input
-    WHEN( "the filter is fed an input with mismatching dimensions" ) {
-      THEN( "a std::length_error exception is thrown" ) {
+  }
+}
+
+SCENARIO( "recursive filters input should be well dimensioned", "[filters]" ) {
+  GIVEN( "a 1D exponential cascade filter" ) {
+    auto n = 8UL;
+    auto tau = 85.0;
+    auto filter = exp_cascade<double,1>(n, tau, {1});
+
+    WHEN( "the filter is fed a valid 1D input" ) {
+      auto input = zeros(12);
+      THEN( "it just works" ) {
+	REQUIRE( true );
+      }
+    }
+    
+    WHEN( "the filter is fed a mismatched 1D input") {
 	auto input = zeros(23);
 	bool exception_thrown = false;
 	try {
@@ -81,11 +97,13 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
 	} catch (std::length_error&) {
 	  exception_thrown = true;
 	}
-	REQUIRE( exception_thrown );
+	THEN( "a std::length_error exception is thrown" ) {
+	  REQUIRE( exception_thrown );
+	}
       }
-      }*/
-  }
+    }
 }
+
 
 
 static constexpr uint64_t factorial(uint64_t n)
@@ -113,7 +131,6 @@ SCENARIO( "exponential filter impulse response", "[filters]" ) {
 	for (auto t = 0; t < 300; t++) {
 	  auto res = filter.feed(t == 0 ? 1 : 0);
 	  err += std::abs(res - gamma(t, n, tau));
-	  std::cout << res << std::endl;
 	}
 	REQUIRE( err < 0.15 );
       }
