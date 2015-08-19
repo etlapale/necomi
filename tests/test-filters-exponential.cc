@@ -58,6 +58,32 @@ SCENARIO( "exponential filters are recursive filters", "[filters]" ) {
 	REQUIRE( std::abs(sum - filter.b()[0]) < epsilon );
       }
     }
+
+    WHEN( "the filter is fed a scalar input" ) {
+      THEN( "it just works" ) {
+	(void) filter.feed(3);
+      }
+    }
+    
+    WHEN( "the filter is fed a valid (0D) array" ) {
+      THEN( "it just works" ) {
+	auto input = zeros();
+	(void) filter.feed(input);
+      }
+    }
+    /* TODO: add that to a test with a 1D input
+    WHEN( "the filter is fed an input with mismatching dimensions" ) {
+      THEN( "a std::length_error exception is thrown" ) {
+	auto input = zeros(23);
+	bool exception_thrown = false;
+	try {
+	  (void) filter.feed(input);
+	} catch (std::length_error&) {
+	  exception_thrown = true;
+	}
+	REQUIRE( exception_thrown );
+      }
+      }*/
   }
 }
 

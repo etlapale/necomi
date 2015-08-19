@@ -59,12 +59,14 @@ public:
     m_last_inputs[m_in_pos] = input;
     
     // Compute A·Y
-    StridedArray<T,N> a_y = zeros_like(input);
+    //StridedArray<T,N> a_y = zeros_like(input);
+    auto a_y = strided_array(zeros_like(input));
     for (auto i = 0UL; i < m_last_outputs.dim(0); i++)
       a_y += m_a[i+1]
 	* m_last_outputs[(i + m_out_pos) % m_last_outputs.dim(0)];
     // Compute B·X
-    StridedArray<T,N> b_x = zeros_like(input);
+    //StridedArray<T,N> b_x = zeros_like(input);
+    auto b_x = strided_array(zeros_like(input));
     for (auto i = 0UL; i < m_b.size(); i++)
       b_x += m_b[i]
 	* m_last_inputs[(i + m_in_pos) % m_last_inputs.dim(0)];
