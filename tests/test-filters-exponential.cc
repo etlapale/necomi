@@ -6,6 +6,7 @@ using namespace std;
 #include "Catch/include/catch.hpp"
 
 #include <necomi/necomi.h>
+#include <necomi/codecs/streams.h>
 #include <necomi/filters.h>
 using namespace necomi;
 
@@ -83,8 +84,9 @@ SCENARIO( "recursive filters input should be well dimensioned", "[filters]" ) {
     auto filter = exp_cascade<double,1>(n, tau, {1});
 
     WHEN( "the filter is fed a valid 1D input" ) {
-      auto input = zeros(12);
+      auto input = zeros(1);
       THEN( "it just works" ) {
+	(void) filter.feed(input);
 	REQUIRE( true );
       }
     }
@@ -118,7 +120,7 @@ double gamma(double t, std::size_t n, double tau)
     / (factorial(n-1)*std::pow(tau, (n+1)));
 }
 
-SCENARIO( "exponential filter impulse response", "[filters]" ) {
+SCENARIO( "exponential filter impulse response is an approximation of a Gamma function", "[filters]" ) {
   GIVEN( "an exponential cascade filter" ) {
     auto n = 8UL;
     auto tau = 85.0;
@@ -133,6 +135,29 @@ SCENARIO( "exponential filter impulse response", "[filters]" ) {
 	  err += std::abs(res - gamma(t, n, tau));
 	}
 	REQUIRE( err < 0.15 );
+      }
+    }
+  }
+}
+
+
+SCENARIO( "exponential filter response is predetermined", "[filters]" ) {
+  GIVEN( "a 1D exponential cascade filter" ) {
+    auto n = 8UL;
+    auto tau = 85.0;
+    auto filter = exp_cascade<double,1>(n, tau, {3});
+
+    WHEN( "the filter is fed a series of fixed 1D input" ) {
+      filter.feed(litarray(3.737023 ,  2.035292 ,  4.4884669));
+      filter.feed(litarray(2.8989778,  7.6498662,  5.6221151));
+      filter.feed(litarray(5.6696888,  5.4746131,  3.9854514));
+      for (auto i = 0; i < 50; i++)
+	filter.feed(zeros(3));
+      THEN( "the filter output shoud be predetermined" ) {
+	auto out = filter.feed(zeros(3));
+	auto expected = litarray(0.0890974, 0.109397, 0.103007);
+	auto err = sum(power<2>(out - expected));
+	REQUIRE( err < 1e-12 );
       }
     }
   }
