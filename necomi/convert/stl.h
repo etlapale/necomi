@@ -19,6 +19,15 @@ StridedArray<T,1> from_vector(const std::vector<T>& vec)
   std::copy(vec.cbegin(), vec.cend(), arr.begin());
   return arr;
 }
+
+template <typename T>
+std::vector<T> to_vector(const StridedArray<T,1>& a)
+{
+  std::vector<T> vec;
+  for (auto i = 0UL; i < a.dim(0); i++)
+    vec.push_back(a(i));
+  return vec;
+}
   
 } // namespace necomi
 

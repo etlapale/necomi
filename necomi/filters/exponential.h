@@ -15,6 +15,8 @@
 #include <boost/math/special_functions/binomial.hpp>
 #endif
 
+#include "../convert/stl.h"
+
 namespace necomi
 {
 
@@ -28,7 +30,7 @@ public:
   RecursiveFilter(const std::vector<T>& a,
 		  const std::vector<T>& b,
 		  const std::array<std::size_t,N>& dims)
-    : m_a(a), m_b(b)
+    : m_a(a), m_b(from_vector(b))
     , m_last_inputs(prepend_coordinate(dims, b.size()))
     , m_last_outputs(prepend_coordinate(dims, a.size()-1))
     , m_in_pos(0), m_out_pos(0)
@@ -41,7 +43,7 @@ public:
   { return m_a; }
   
   const std::vector<T> b() const
-  { return m_b; }
+  { return to_vector(m_b); }
 
   template <typename Input,
 	    std::enable_if_t<is_indexable<Input>::value>* = nullptr>
@@ -59,17 +61,13 @@ public:
     m_last_inputs[m_in_pos] = input;
     
     // Compute A·Y
-    //StridedArray<T,N> a_y = zeros_like(input);
     auto a_y = strided_array(zeros_like(input));
     for (auto i = 0UL; i < m_last_outputs.dim(0); i++)
       a_y += m_a[i+1]
 	* m_last_outputs[(i + m_out_pos) % m_last_outputs.dim(0)];
     // Compute B·X
-    //StridedArray<T,N> b_x = zeros_like(input);
-    auto b_x = strided_array(zeros_like(input));
-    for (auto i = 0UL; i < m_b.size(); i++)
-      b_x += m_b[i]
-	* m_last_inputs[(i + m_in_pos) % m_last_inputs.dim(0)];
+    auto b_x = sum(widen_right(m_last_inputs.dims(), m_b)
+		   * roll(m_last_inputs, m_in_pos, 0UL), 0);
 
     // Compute and save the output
     m_out_pos = (m_out_pos + m_last_outputs.dim(0) - 1) % m_last_outputs.dim(0);
@@ -95,7 +93,8 @@ private:
   /// Coefficient applied to the last outputs.
   std::vector<T> m_a;
   /// Coefficient applied to the last inputs.
-  std::vector<T> m_b;
+  //std::vector<T> m_b;
+  StridedArray<T,1> m_b;
   /// Copy of the last inputs.
   necomi::StridedArray<T,N+1> m_last_inputs;
   /// Last outputs.

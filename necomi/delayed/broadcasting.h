@@ -35,7 +35,8 @@ auto widen(const std::array<std::size_t,M>& dims, const Array& a)
 /**
  * Append extra dimensions to an array.
  */
-template <std::size_t M, typename Array>
+template <std::size_t M, typename Array,
+	  std::enable_if_t<M != Array::ndim>* = nullptr>
 auto widen_right(const std::array<std::size_t,M>& dims, const Array& a)
 {
   static_assert(M > Array::ndim, "array dimensions cannot be shrinked");
@@ -50,6 +51,19 @@ auto widen_right(const std::array<std::size_t,M>& dims, const Array& a)
       std::copy_n(coords.cbegin(), Array::ndim, coords_a.begin());
       return a(coords_a);
     });
+}
+
+template <std::size_t M, typename Array,
+	  std::enable_if_t<M == Array::ndim>* = nullptr>
+auto widen_right(const std::array<std::size_t,M>& dims, const Array& a)
+{
+#ifndef NECOMI_NO_BOUND_CHECKS
+  // Make sure the dimensions are matching
+  for (std::size_t i = 0; i < Array::ndim; i++)
+    if (a.dims()[i] != dims[i])
+      throw std::length_error("cannot right-broadcast arrays to different dimensions");
+#endif
+  return a;
 }
 
 namespace broadcasting {
