@@ -18,6 +18,9 @@ provides multiple :doc:`numerical functions <numerics>`.
 
 Necomi is released under the :doc:`Simplified BSD License <license>`.
 
+.. image:: https://ci.atelo.org/projects/2/status.png?ref=develop
+   :target: https://ci.atelo.org/projects/2?ref=develop
+
 Documentation
 -------------
 
@@ -46,6 +49,7 @@ reshaping and numerical functions.
 |
 `archives <http://necomi.atelo.org/data/>`_
 
-`Project website <https://git.atelo.org/etlapale/necomi>`_
+`Project website <https://necomi.atelo.org>`_
+| `Gitlab repository <https://git.atelo.org/etlapale/necomi>`_
 
 .. _Sphinx: http://sphinx-doc.org
