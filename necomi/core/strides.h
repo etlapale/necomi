@@ -9,6 +9,8 @@
 #include <numeric>
 #include <type_traits>
 
+#include "../traits/arrays.h"
+
 namespace necomi
 {
 
