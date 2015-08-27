@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../arrays/delayed.h"
+#include "../traits/shape.h"
 
 namespace necomi {
 
