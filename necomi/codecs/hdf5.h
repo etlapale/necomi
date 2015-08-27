@@ -129,7 +129,7 @@ struct pred_type<unsigned long long>
  * Read a full dataset into a new contiguous Array.
  * \ingroup Codecs
  */
-template <typename T>
+template <typename T=double>
 VarArray<T> hdf5_load(const char* filename, const char* dset_name)
 {
   // Open the file and its dataset

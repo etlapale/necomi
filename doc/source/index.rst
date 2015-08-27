@@ -9,12 +9,12 @@ provides multiple :doc:`numerical functions <numerics>`.
 
 ::
 	  
-    // Load a 3D double dataset from a HDF5 file
-    auto a = hdf5_load<double,3>("myfile.h5", "dataset");
-    // Get a shared 2D slice of the dataset
-    auto b = a[1];
-    // Blur the 2D slice
-    deriche(b, 2.0);
+    // Load a dataset from a HDF5 file
+    auto a = hdf5_load("myfile.h5", "dataset");
+    // Perform computations on N-dimensional arrays
+    auto f = sum(cos(array1) + 3 * sqrt(array2));
+    // Blur a single frame inside a 3D video
+    deriche(video[t], 2.0);
 
 Necomi is released under the :doc:`Simplified BSD License <license>`.
 
