@@ -127,11 +127,10 @@ struct pred_type<unsigned long long>
 
 /**
  * Read a full dataset into a new contiguous Array.
- * The dataset dimensionality must be `N`.
  * \ingroup Codecs
  */
-template <typename T, std::size_t N>
-StridedArray<T,N> hdf5_load(const char* filename, const char* dset_name)
+template <typename T>
+VarArray<T> hdf5_load(const char* filename, const char* dset_name)
 {
   // Open the file and its dataset
   H5File file(filename, H5F_ACC_RDONLY);
@@ -140,19 +139,16 @@ StridedArray<T,N> hdf5_load(const char* filename, const char* dset_name)
 
   // Make sure we have the same rank
   int rank = dspace.getSimpleExtentNdims();
-  if (rank != N) {
-    throw std::runtime_error("Invalid HDF5 dimensionality");
-  }
 
   // Get the dimensions and copy them to an std::array
-  hsize_t hdims[N];
+  hsize_t hdims[rank];
   dspace.getSimpleExtentDims(hdims);
-  std::array<std::size_t,N> dims;
-  for (std::size_t i = 0; i < N; i++)
-    dims[i] = hdims[i];
+  std::vector<std::size_t> dims;
+  for (auto i = 0; i < rank; i++)
+    dims.push_back(hdims[i]);
 
   // Create the array (allocates the data)
-  StridedArray<T,N> a(dims);
+  VarArray<T> a(dims);
 
   // Read the data from the dataset in the array
   PredType hptype = pred_type<T>::type();
