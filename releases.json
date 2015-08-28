@@ -1,0 +1,49 @@
+{
+    "name": "necomi",
+    "title": "Necomi",
+    "description": "Necomi is a C++ template library to manipulate multidimensional arrays.",
+    "license": "BSDL",
+    "tags": "c++, numerics, science",
+    "releases": [
+	{
+	    "version": "0.4",
+	    "state": "development",
+	    "scope": "major feature",
+	    "changes": "Renamed, documented with Sphinx, removed CRTP, added reshaping and numerical functions.",
+	    "download": "http://necomi.atelo.org/data/necomi-0.4.tar.xz",
+	    "published": "2015-04-24T23:51:00+07:00"
+	},
+	{
+	    "version": "0.3.1",
+	    "state": "development",
+	    "scope": "minor feature",
+	    "changes": "",
+	    "download": "http://necomi.atelo.org/data/cuiloa-0.3.1.tar.xz",
+	    "published": "2014-11-19T23:59:00+07:00"
+	},
+	{
+	    "version": "0.3",
+	    "state": "development",
+	    "scope": "major feature",
+	    "changes": "",
+	    "download": "http://necomi.atelo.org/data/cuiloa-0.3.tar.xz",
+	    "published": "2014-10-14T21:07:00+07:00"
+	},
+	{
+	    "version": "0.2.2",
+	    "state": "development",
+	    "scope": "minor feature",
+	    "changes": "Added Array::any and random number generation. HDF5 and clang 3.5 support fixed.",
+	    "download": "http://necomi.atelo.org/data/cuiloa-0.2.2.tar.xz",
+	    "published": "2014-10-01T17:26:00+07:00"
+	},
+	{
+	    "version": "0.2.1",
+	    "state": "development",
+	    "scope": "minor feature",
+	    "changes": "",
+	    "download": "http://necomi.atelo.org/data/cuiloa-0.2.1.tar.xz",
+	    "published": "2014-08-27T00:10:00+07:00"
+	}
+    ]
+}
