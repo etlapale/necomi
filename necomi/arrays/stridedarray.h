@@ -18,6 +18,10 @@
 
 #include "../traits/arrays.h"
 
+#ifdef HAVE_FFTW
+#include <fftw3.h>
+#endif
+
 #include "dimarray.h"
 
 namespace necomi {
@@ -58,7 +62,13 @@ public:
   explicit StridedArray(const dims_type& dims)
     : Parent(dims)
     , m_strides(default_strides(dims))
+#ifdef HAVE_FFTW
+      // Use SIMD-compatible aligned memory when FFTW is present
+    , m_shared_data(static_cast<T*>(fftw_malloc(sizeof(T) * size(*this))),
+		    fftw_free)
+#else
     , m_shared_data(new T[size(*this)], [](T* p){ delete [] p; })
+#endif
     , m_data(m_shared_data.get())
   {}
 
