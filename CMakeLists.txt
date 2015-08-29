@@ -8,6 +8,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g")
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # Optional libraries:
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
@@ -30,6 +32,13 @@ if (Boost_FOUND)
 else ()
   message (WARNING "disabling checks for the missing Boost library")
 endif ()
+# - FFTW
+find_package (FFTW3)
+if (FFTW3_FOUND)
+  include_directories ("${FFTW3_INCLUDE_DIRS}")
+else ()
+  message (WARNING "disabling check for the missing FFTW library")
+endif ()
 
 # Downloaded external dependencies
 set (ext_deps
@@ -48,7 +57,7 @@ endforeach ()
 # Unit tests
 file (GLOB CATCH_SRC tests/test-*.cc)
 add_executable (necomi-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
-target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES} ${BOOST_MATH_LIBRARY})
+target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES} ${PNG_LIBRARIES} ${BOOST_MATH_LIBRARY} ${FFTW3_LIBRARIES})
 add_custom_target (check)
 add_dependencies (check necomi-catch-test)
 add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)

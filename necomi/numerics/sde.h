@@ -89,7 +89,7 @@ auto euler_maruyama(const std::array<std::size_t,N>& dims, std::size_t num_noise
                                                  drift, diffusion, prng);
 }
 
-}
+} // namespace necomi
 
 // Local Variables:
 // mode: c++
