@@ -51,6 +51,19 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
       }
     }
   }
+  GIVEN( "a contiguous 2D array of real numbers" ) {
+    auto a = strided_array(reshape<2>(litarray(0.95, 0.99, 0.16, 0.55, 0.16, 0.21, 0.72, 0.66, 0.24, 0.24, 0.80, 0.82, 0.23, 0.09, 0.20, 0.02, 0.25, 0.80, 0.65, 0.40, 0.33, 0.86, 0.77, 0.88, 0.20, 0.56, 0.98, 0.69, 0.74, 0.58, 0.06, 0.21, 0.54, 0.06, 0.23), {7,5}));
+    WHEN( "its (real) Fourier transform is computed" ) {
+      auto b = rfft(a);
+      THEN( "its result is predetermined" ) {
+	REQUIRE( b.ndim == 2 );
+	REQUIRE( b.dim(0) == 7 );
+	REQUIRE( b.dim(1) == 3 );
+	auto truth = reshape<2>(litarray(16.83+0.00i, -0.67-3.06i, -0.42-1.05i, -1.13+1.02i, 1.33-1.36i, 0.19-0.31i, 0.20-2.28i, -1.61+0.40i, -0.48-0.40i, 2.35-0.63i, 2.68+0.78i, 1.01-1.27i, 2.35+0.63i, 1.35-1.21i, -0.01-2.03i, 0.20+2.28i, -0.07+0.12i, 1.38-0.98i, -1.13-1.02i, 2.10+0.40i, 0.01+0.03i), {7,3});
+	REQUIRE( std::abs(sum(power<2>(truth-b))) < 1e-4 );
+      }
+    }
+  }
 }
 
 #endif // HAVE_FFTW
