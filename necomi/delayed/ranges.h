@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <array>
+#include <cstdlib>
+
 #include "../arrays/delayed.h"
 
 namespace necomi {
@@ -19,15 +22,15 @@ auto constants(const std::array<std::size_t,N>& dims, T value)
 }
   
 template <typename T=double, std::size_t N,
-	  typename dims_type = std::array<std::size_t,N>>
+          typename dims_type = std::array<std::size_t,N>>
 auto zeros(const dims_type& dims)
 {
   return constants<T,N>(dims,0);
 }
 
 template <typename T=double,
-	  typename ...Dims,
-	  typename std::enable_if<all_convertible<Dims...,std::size_t>::value>* = nullptr>
+          typename ...Dims,
+          typename std::enable_if<all_convertible<Dims...,std::size_t>::value>* = nullptr>
 auto zeros(Dims... dims)
 {
   std::array<std::size_t,sizeof...(Dims)> d{static_cast<std::size_t>(dims)...};
@@ -76,9 +79,9 @@ auto range(T start, T stop, T step=1)
 #endif
   auto size = static_cast<std::size_t>(std::ceil(static_cast<double>(stop-start)/step));
   return make_delayed(std::array<std::size_t,1>{size},
-		      [start,step](const auto& coords) {
-			return static_cast<T>(start+step*coords[0]);
-		      });
+                      [start,step](const auto& coords) {
+                        return static_cast<T>(start+step*coords[0]);
+                      });
 }
 
 
@@ -103,8 +106,8 @@ auto linspace(T start, T stop, std::size_t size, bool endpoint=true)
   using U = typename std::conditional<std::is_floating_point<T>::value, T, double>::type;
   auto step = static_cast<U>(stop - start)/(endpoint ? size - 1 : size);
   return make_delayed(std::array<size_t,1>{size},
-		      [start,step](const auto& coords)
-		      { return static_cast<U>(start+step*coords[0]); });
+                      [start,step](const auto& coords)
+                      { return static_cast<U>(start+step*coords[0]); });
 }
 
 /**
@@ -115,9 +118,53 @@ auto identity(std::size_t dim)
 {
   // TODO: generalize (prod(coords) = 1)
   return make_delayed(std::array<std::size_t,2>{dim,dim},
-		      [](const auto& coords) {
-			return coords[0] == coords[1];
-		      });
+                      [](const auto& coords) {
+                        return coords[0] == coords[1];
+                      });
+}
+
+template <typename T>
+struct Range
+{
+  Range(T end)
+    : Range(0, end)
+  {}
+  
+  Range(T start, T end)
+    : Range(start, end, 1)
+  {}
+  
+  Range(T s, T e, T p)
+    : start(s), end(e), step(p)
+  {}
+  
+  T start;
+  T end;
+  T step;
+};
+
+template <typename T=double, typename ...Ranges>
+auto meshgrid(Range<T> range, Ranges... ranges)
+{
+  constexpr std::size_t N = 1 + sizeof...(Ranges);
+
+  // Dimensions of each of the resulting arrays
+  auto size = [](Range<T> rg)
+    { return static_cast<std::size_t>((rg.end-rg.start) / rg.step); };
+  std::array<std::size_t,N> dims {size(range), size(ranges)...};
+
+  // Function to create each coordinate array individually
+  std::size_t i = 0;	// With a state (order guaranteed)
+  auto builder = [&dims,&i](const Range<T>& rg) {
+    auto a = make_delayed(dims, [i,&rg](const auto& coords) {
+	auto x = static_cast<T>(coords[i]);
+	return (x + rg.start) * rg.step;
+      });
+    i++;
+    return strided_array(a);
+  };
+
+  return std::make_tuple(builder(range), builder(ranges)...);
 }
 
 } // namespace necomi
