@@ -3,6 +3,10 @@
 #include <necomi/necomi.h>
 using namespace necomi;
 
+#include <necomi/codecs/streams.h>
+using namespace necomi::streams;
+
+
 TEST_CASE( "transformations", "[delayed]" ) {
 
   SECTION( "concatenate" ) {
@@ -70,5 +74,25 @@ TEST_CASE( "transformations", "[delayed]" ) {
     //for_each(c, [](const auto&, int& x) {std::cout << x << ' ';});
     //std::cout << std::endl;
     //std::cout << sum(b) << std::endl;
+  }
+}
+
+SCENARIO( "arrays can be zero padded" ) {
+  GIVEN( "a small 2D array" ) {
+    auto a = constants<2>({2,3}, 1);
+    WHEN( "we zero pad it into a larger size" ) {
+      auto b = pad(a, {6, 5});
+      THEN(" its output should be predetermined" ) {
+	auto truth = reshape<2>(litarray(0, 0, 0, 0, 0,
+					 0, 0, 0, 0, 0,
+					 0, 1, 1, 1, 0,
+					 0, 1, 1, 1, 0,
+					 0, 0, 0, 0, 0,
+					 0, 0, 0, 0, 0),
+	  {6, 5});
+	REQUIRE( truth.dims() == b.dims() );
+	REQUIRE( sum(power<2>(truth-b)) < 1e-20 );
+      }
+    }
   }
 }

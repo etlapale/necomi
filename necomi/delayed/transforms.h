@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../arrays/delayed.h"
+#include "../delayed/ranges.h"
 #include "../traits/shape.h"
 
 namespace necomi {
@@ -176,6 +177,32 @@ template <typename Array, typename ...Arrays,
 auto concat(const Array& a, const Arrays&... as)
 {
   return concat(0, a, as...);
+}
+
+template <typename Array>
+auto pad(const Array& a, const std::array<std::size_t,Array::ndim>& dims,
+	 typename Array::dtype value = 0)
+{
+#ifndef NECOMI_NO_BOUND_CHECKS
+  for (auto i = 0UL; i < Array::ndim; i++)
+    if (a.dim(i) >= dims[i])
+      throw std::length_error("array can only be padded in larger ones");
+#endif
+
+  typename Array::dims_type pad;
+  for (auto i = 0UL; i < Array::ndim; i++)
+    pad[i] = (dims[i] - a.dim(i)) / 2;
+
+  return make_delayed(dims, [value,a,pad](const auto& coords){
+      typename Array::dims_type pos;
+      // Check if out of bounds
+      for (auto i = 0UL; i < Array::ndim; i++) {
+	if (coords[i] < pad[i] || coords[i] - pad[i] >= a.dim(i))
+	  return value;
+	pos[i] = coords[i] - pad[i];
+      }
+      return a(pos);
+    });
 }
 
 // TODO: remove, special case of fix_dimension
