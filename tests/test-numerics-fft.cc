@@ -31,7 +31,7 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
 			      -44.6825+10.4388i);
 	REQUIRE( std::abs(sum(power<2>(b-truth))) < 1e-6 );
       }
-      THEN( "its inverse is the original array scaled by the array size" ) {
+      THEN( "its inverse is the original array" ) {
 	auto c = ifft(b);
 	REQUIRE( std::abs(sum(power<2>(c-a))) < 1e-12 );
       }
@@ -45,7 +45,7 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
 	auto truth = strided_array(reshape<2>(litarray(3896.00+4165.00i, 92.35+-173.74i, -26.87+171.71i, -68.45+-280.62i, 50.04+212.49i, -120.11+-81.78i, 13.04+11.95i, 367.38+-201.72i, -55.44+-364.31i, 179.25+37.99i, -162.68+-99.32i, -92.32+-234.41i, 336.33+-32.95i, 278.79+207.11i, -20.86+176.52i, 130.01+-353.18i, -136.65+80.51i, 361.38+416.66i, 111.36+139.92i, 4.39+78.94i, -283.51+308.47i, -224.27+443.02i, -41.33+320.60i, 205.27+-341.72i, -437.75+-412.10i, -124.52+-110.46i, 214.26+360.64i, -102.24+-356.66i, -220.19+-25.78i, -585.79+117.41i, 9.77+299.46i, 77.10+-546.38i, 92.69+-124.90i, 11.14+-351.25i, -383.25+320.75i, 322.28+-130.80i, 297.27+116.65i, 221.62+146.27i, -205.86+518.53i, -351.75+211.49i, 223.53+286.12i, 71.00+372.16i, -332.50+-180.48i, -165.76+32.47i, 45.63+160.70i, -58.87+410.30i, -174.18+234.57i, 497.49+-83.99i, 226.32+132.44i, -81.50+-266.73i, 72.45+468.36i, -101.47+140.49i, -514.06+-204.91i, 521.66+22.32i, 195.59+-32.08i, -83.95+277.51i, 268.30+8.88i, 174.25+312.54i, -0.94+-214.28i, -517.80+148.23i, -225.91+36.40i, -272.24+-5.92i, -278.06+203.88i, 377.23+217.52i, 226.08+170.22i, -161.78+-590.68i, -14.02+-44.71i, 33.55+-76.32i, -56.04+-189.94i, 171.57+-59.23i, 235.12+-69.42i, 247.50+118.90i, -282.06+105.51i, -585.34+-485.86i, -68.60+-124.35i, -191.19+376.25i, -122.85+-9.88i), {11, 7}));
 	REQUIRE( std::abs(sum(power<2>(b-truth))) < 1e-3 );
       }
-      THEN( "its inverse is a scaled version of the original array" ) {
+      THEN( "its inverse is the original array" ) {
 	auto c = ifft(b);
 	REQUIRE( std::abs(sum(power<2>(c-a))) < 1e-12 );
       }
@@ -61,6 +61,12 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
 	REQUIRE( b.dim(1) == 3 );
 	auto truth = reshape<2>(litarray(16.83+0.00i, -0.67-3.06i, -0.42-1.05i, -1.13+1.02i, 1.33-1.36i, 0.19-0.31i, 0.20-2.28i, -1.61+0.40i, -0.48-0.40i, 2.35-0.63i, 2.68+0.78i, 1.01-1.27i, 2.35+0.63i, 1.35-1.21i, -0.01-2.03i, 0.20+2.28i, -0.07+0.12i, 1.38-0.98i, -1.13-1.02i, 2.10+0.40i, 0.01+0.03i), {7,3});
 	REQUIRE( std::abs(sum(power<2>(truth-b))) < 1e-4 );
+      }
+      THEN( "its inverse is the original array" ) {
+	auto c = irfft(b, a.dim(1));
+	REQUIRE( a.ndim == c.ndim );
+	REQUIRE( a.dims() == c.dims() );
+	REQUIRE( std::abs(sum(power<2>(c-a))) < 1e-12 );
       }
     }
   }
