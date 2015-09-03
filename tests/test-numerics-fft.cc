@@ -72,5 +72,31 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
   }
 }
 
+SCENARIO( "convolutions can be implemented in Fourier domain" ) {
+  GIVEN( "an approximated 2D impulse signal" ) {
+    auto a = strided_array(zeros(41,41));
+    a(20,20) = 1;
+    WHEN( "its Fourier transform is multiplicated by a Gaussian one" ) {
+      auto sg = 3.0;
+      auto krnl_width = static_cast<int>(sg * 4);
+      auto grid = meshgrid(Range<double>(-krnl_width, krnl_width+1),
+			   Range<double>(-krnl_width, krnl_width+1));
+      auto x = std::get<0>(grid);
+      auto y = std::get<1>(grid);
+
+      // Generate a Gaussian array
+      auto coef = 2*M_PI*power<2>(sg);
+      auto gauss = strided_array(exp(-(power<2>(x) + power<2>(y))/(2*power<2>(sg))) / coef);
+
+      // Compute the convolution
+      auto res = fftconvolve(a, gauss);
+      
+      REQUIRE( res.dims() == a.dims() );
+      
+      //std::cout << res << std::endl;
+    }
+  }
+}
+
 #endif // HAVE_FFTW
 

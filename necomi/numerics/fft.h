@@ -186,6 +186,49 @@ StridedArray<double,N> irfft(StridedArray<std::complex<double>,N>& a,
   return res;
 }
 
+template <std::size_t N>
+StridedArray<double,N> fftconvolve(const StridedArray<double,N>& input,
+				   const StridedArray<double,N>& kernel)
+{
+  // Compute the padded dimensions
+  auto pdims = input.dims();
+  for (auto i = 0UL; i < N; i++)
+    pdims[i] = 2*((input.dim(i) + kernel.dim(i))/2);
+
+  // Pad the input and kernel arrays
+  auto pinput = strided(pad(input, pdims));
+  auto pkernel = strided(pad(kernel, pdims));
+
+  // Compute the real Fourier tranforms of the input and kernel
+  // TODO: reuse at least the plan here
+  auto finput = rfft(pinput);
+  auto fkernel = rfft(pkernel);
+
+  // Center the FFT
+  finput.map([](const auto& coords, auto& val) {
+      auto s = std::accumulate(coords.cbegin(), coords.cend(), 0);
+      auto sign = s % 2 == 0 ? 1 : -1;
+      val *= sign;
+    });
+
+  // Multiply the transformed signals
+  auto fres = strided(finput * fkernel);
+
+  // Convert back the transformed signal into the real domain
+  auto res = irfft(fres, pinput.dim(N-1));
+
+  // Remove the padding
+  std::array<std::array<std::size_t,3>,N> scs;
+  for (auto i = 0UL; i < N; i++) {
+    scs[i][0] = (res.dim(i) - input.dim(i)) / 2;
+    scs[i][1] = input.dim(i);
+    scs[i][2] = 1;
+  }
+  
+  return strided(res.slice(Slice<std::size_t,N>(scs)));
+}
+				   
+
 } // namespace necomi
 
 #endif // HAVE_FFTW
