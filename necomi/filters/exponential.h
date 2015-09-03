@@ -15,6 +15,7 @@
 #include <boost/math/special_functions/binomial.hpp>
 #endif
 
+#include "../core/coordinates.h"
 #include "../convert/stl.h"
 
 namespace necomi
