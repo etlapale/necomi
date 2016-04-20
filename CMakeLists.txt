@@ -24,13 +24,6 @@ foreach (dep IN LISTS ext_deps)
   endif ()
 endforeach ()
 
-# Unit tests
-file (GLOB CATCH_SRC tests/test-*.cc)
-add_executable (necomi-catch-test EXCLUDE_FROM_ALL tests/catch-tests.cc ${CATCH_SRC})
-add_custom_target (check)
-add_dependencies (check necomi-catch-test)
-add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)
-
 # Optional libraries:
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
@@ -38,21 +31,25 @@ if (HDF5_FOUND)
   add_definitions ("-DHAVE_HDF5")
   add_definitions (${HDF5_DEFINITIONS})
   include_directories ("${HDF5_INCLUDE_DIRS}")
-  target_link_libraries (necomi-catch-test ${HDF5_LIBRARIES})
+  list (APPEND necomi_libraries ${HDF5_LIBRARIES})
+else ()
+  message (WARNING "disabling checks for the missing HDF5 library")
 endif ()
 # - libpng
 find_package (PNG)
 if (PNG_FOUND)
   add_definitions ("-DHAVE_LIBPNG ${PNG_DEFINITIONS}")
   include_directories ("${PNG_INCLUDE_DIRS}")
-  target_link_libraries (necomi-catch-test ${PNG_LIBRARIES})
+  list (APPEND necomi_libraries ${PNG_LIBRARIES})
+else ()
+  message (WARNING "disabling checks for the missing libpng library")
 endif ()
 # - Boost
 find_package (Boost)
 if (Boost_FOUND)
   add_definitions ("-DHAVE_BOOST")
   include_directories ("${Boost_INCLUDE_DIR}")
-  target_link_libraries (necomi-catch-test ${BOOST_MATH_LIBRARY})
+  list (APPEND necomi_libraries ${BOOST_MATH_LIBRARY})
 else ()
   message (WARNING "disabling checks for the missing Boost library")
 endif ()
@@ -61,10 +58,46 @@ find_package (FFTW3)
 if (FFTW3_FOUND)
   add_definitions ("-DHAVE_FFTW")
   include_directories ("${FFTW3_INCLUDE_DIRS}")
-  target_link_libraries (necomi-catch-test ${FFTW3_LIBRARIES})
+  list (APPEND necomi_libraries ${FFTW3_LIBRARIES})
 else ()
   message (WARNING "disabling check for the missing FFTW library")
 endif ()
+
+# Unit tests
+set (tests_src
+  tests/catch-tests.cc
+  tests/test-algos-modif.cc
+  tests/test-algos-sort.cc
+  tests/test-arrays.cc
+  tests/test-broadcasting.cc
+  tests/test-concepts.cc
+  tests/test-convert-stl.cc
+  tests/test-core-iterators.cc
+  tests/test-delayed-arithmetic.cc
+  tests/test-delayed.cc
+  tests/test-delayed-maps.cc
+  tests/test-delayed-transforms.cc
+  tests/test-filters-exponential.cc
+  tests/test-numerics.cc
+  tests/test-random.cc
+  tests/test-slices.cc
+  tests/test-traits-shape.cc
+  tests/test-vararray.cc)
+if (HDF5_FOUND)
+  set (tests_src ${tests_src} tests/test-hdf5.cc)
+endif ()
+if (PNG_FOUND)
+  set (tests_src ${tests_src} tests/test-png.cc)
+endif ()
+if (FFTW3_FOUND)
+  set (tests_src ${tests_src} tests/test-numerics-fft.cc)
+endif ()
+add_executable (necomi-catch-test EXCLUDE_FROM_ALL ${tests_src})
+target_link_libraries (necomi-catch-test ${necomi_libraries})
+
+add_custom_target (check)
+add_dependencies (check necomi-catch-test)
+add_custom_command (TARGET check POST_BUILD COMMAND necomi-catch-test)
 
 # pkg-config support
 configure_file (necomi.pc.in necomi.pc @ONLY)
