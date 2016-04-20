@@ -34,7 +34,7 @@ successive values between 0 and 9. The ``range`` function can accept
 additional arguments to further define the numerical range, and
 several other construction function are defined. For instance, to
 create an array of random values taken from a normal distribution (see
-:doc:`random`)::
+:doc:`numerics/random`)::
 
    // Create a 2D array of 5×4 normally distributed numbers
    auto c = normal<double,2>({5,4}, prng);

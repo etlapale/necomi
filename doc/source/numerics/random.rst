@@ -47,8 +47,8 @@ functions.
 
 .. cpp:function:: Array<T,N> normal(Dims dims, PRNG& prng)
 
-   Generate an array of floating point values following a normal_
-   (Gaussian) distribution.
+   Generate an array of floating point values following a `normal
+   distribution`_ (Gaussian).
 
    By default an array of `double` values is generated, but you can
    set `T` to another element type. The dimensionality `N` is inferred,
@@ -74,4 +74,4 @@ functions.
    Idem but for a uniform distribution of floating point values
    in [min,max);
 
-.. _normal: https://en.wikipedia.org/wiki/Normal_distribution
+.. _normal distribution: https://en.wikipedia.org/wiki/Normal_distribution
