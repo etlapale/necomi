@@ -8,6 +8,10 @@ addons:
       - clang-3.7
       - g++-5
       - gcc-5
+      - libhdf5-dev
+      - libpng-dev
+      - libboost-all-dev
+      - libfftw3-dev
 install:
   - git submodule init
   - git submodule update
