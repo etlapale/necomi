@@ -1,5 +1,6 @@
 // necomi/numerics/trigonometrics.h – Scalar and delayed trigonometrics
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -42,7 +43,7 @@ auto sin(const Array& a)
 template <typename Array1, typename Array2,
 	  std::enable_if_t<is_indexable<Array1>::value
 			   && is_indexable<Array2>::value
-			   && Array1::ndim == Array2::ndim>* = nullptr>
+			   && Array1::ndim() == Array2::ndim()>* = nullptr>
 auto atan2(const Array1& ys, const Array2& xs)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -90,7 +91,7 @@ template <typename Array,
 	  std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto degrees(const Array& a)
 {
-  return make_delayed<typename Array::dtype,Array::ndim>(a.dimensions(), [a] (const auto& x) {
+  return make_delayed<typename Array::dtype,Array::ndim()>(a.dimensions(), [a] (const auto& x) {
       return degrees(a(x));
     });
 }

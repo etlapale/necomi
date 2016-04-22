@@ -1,5 +1,6 @@
 // necomi/arrays/vararray.h – Dynamically-sized strided arrays
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -50,7 +51,7 @@ public:
     : VarArray(to_vector<dim_type>(a.dims()))
   {
     for_each(*this, [&a](const auto& coords, auto& value){
-	value = a(to_array<typename Array::dim_type, Array::ndim>(coords));
+	value = a(to_array<typename Array::dim_type, Array::ndim()>(coords));
       });
   }
 

@@ -28,9 +28,9 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     struct IdxArray
     {
       using dtype = double;
-      enum { ndim = 1 };
       using dim_type = std::size_t;
-      using dims_type = std::array<dim_type,ndim>;
+      constexpr static std::size_t ndim() { return 1; }
+      using dims_type = std::array<dim_type,ndim()>;
       
       dims_type dims() const { return dims_type(); }
       dtype operator()(const dims_type&) const { return 42; };
@@ -203,7 +203,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "delayed one-liner" ) {
     auto a = make_delayed<2>({{11,21}}, [](const auto&) { return 42; });
-    REQUIRE( a.ndim == 2 );
+    REQUIRE( a.ndim() == 2 );
     REQUIRE( a.dim(0) == 11 );
     REQUIRE( a(3,7) == 42 );
   }
@@ -232,7 +232,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "constant creation" ) {
     auto a = zeros(5,4);
-    REQUIRE( a.ndim == 2 );
+    REQUIRE( a.ndim() == 2 );
     REQUIRE( a.dim(0) == 5 );
     REQUIRE( a.dim(1) == 4 );
   }
@@ -467,7 +467,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   SECTION( "delayed constant arrays" ) {
     auto a = constants({5}, 13);
-    REQUIRE( decltype(a)::ndim == 1 );
+    REQUIRE( decltype(a)::ndim() == 1 );
     REQUIRE( a.dim(0) == 5 );
     REQUIRE( a(0) == 13 );
     REQUIRE( a(2) == 13 );
@@ -518,7 +518,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto b = 3 * range<int>(7);
     
     auto c = zip(a,b);
-    REQUIRE( c.ndim == 2);
+    REQUIRE( c.ndim() == 2);
     REQUIRE( c.dim(0) == 7 );
     REQUIRE( c.dim(1) == 2 );
 
@@ -601,7 +601,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(3,1) == 23 );
     
     auto d = fix_dimension(b, 0, 2);
-    REQUIRE( d.ndim == 1 );
+    REQUIRE( d.ndim() == 1 );
     REQUIRE( d.dim(0) == 3 );
     REQUIRE( d(0) == 15 );
     REQUIRE( d(2) == 17 );
@@ -645,14 +645,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto c = range<int>(3, 27);
 
     auto d = stack(a,b);
-    REQUIRE( d.ndim == 2 );
+    REQUIRE( d.ndim() == 2 );
     REQUIRE( d.dim(0) == 2 );
     REQUIRE( d(0,3) == 3 );
     REQUIRE( d(1,3) == 3 );
     REQUIRE( d(0,12) == d(1,12) );
 
     auto e = stack(a,b,a);
-    REQUIRE( e.ndim == 2 );
+    REQUIRE( e.ndim() == 2 );
     REQUIRE( e.dim(0) == 3 );
     REQUIRE( e(0,3) == 3 );
     REQUIRE( e(1,3) == 3 );
@@ -660,7 +660,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( e(0,12) == e(1,12) );
 
     auto f = stack(a,b,c);
-    REQUIRE( f.ndim == 2 );
+    REQUIRE( f.ndim() == 2 );
     REQUIRE( f.dim(0) == 3 );
     REQUIRE( f(0,4) == 4 );
     REQUIRE( f(1,4) == 4 );
@@ -669,7 +669,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto g = reshape(range<int>(12), 4, 3);
     auto h = reshape(range<int>(4,16), 4, 3);
     auto i = stack(g,h);
-    REQUIRE( i.ndim == 3 );
+    REQUIRE( i.ndim() == 3 );
     REQUIRE( i.dim(0) == 2 );
     REQUIRE( i(0,2,1) == 7 );
     REQUIRE( i(1,2,1) == 11 );
@@ -690,14 +690,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = reshape(range<int>(24), 2, 4, 3);
     
     auto a0 = slice(a, 0);
-    REQUIRE( a0.ndim == 2 );
+    REQUIRE( a0.ndim() == 2 );
     REQUIRE( a0.dim(0) == 4 );
     REQUIRE( a0.dim(1) == 3 );
     REQUIRE( a0(2,1) == 7 );
     REQUIRE( a0(1,2) == 5 );
     
     auto a1 = slice(a, 1);
-    REQUIRE( a1.ndim == 2 );
+    REQUIRE( a1.ndim() == 2 );
     REQUIRE( a1.dim(0) == 4 );
     REQUIRE( a1.dim(1) == 3 );
     REQUIRE( a1(2,1) == 19 );

@@ -1,5 +1,6 @@
 // necomi/delayed/comparisons.h – Array comparisons
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -19,7 +20,7 @@ namespace necomi {
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<is_indexable<Array1>::value &&
 				    is_indexable<Array2>::value>* = nullptr,
-	  typename std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<Array1::ndim() == Array2::ndim()>* = nullptr>
 auto operator==(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -35,7 +36,7 @@ auto operator==(const Array1& a, const Array2& b)
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<is_indexable<Array1>::value &&
 				    is_indexable<Array2>::value &&
-				    Array1::ndim==Array2::ndim>* = nullptr>
+				    Array1::ndim()==Array2::ndim()>* = nullptr>
 auto operator!=(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -61,7 +62,7 @@ auto operator>(const Array& a, const T& val)
 template <typename Array1, typename Array2,
 	  typename std::enable_if_t<is_array<Array1>::value
 				    && is_array<Array2>::value>* = nullptr,
-	  typename std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
+	  typename std::enable_if_t<Array1::ndim() == Array2::ndim()>* = nullptr>
 auto operator>(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS

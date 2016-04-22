@@ -1,5 +1,6 @@
 // necomi/numerics/exponents.h – Exponents and logarithms
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -69,7 +70,7 @@ template <unsigned beta, typename Array1, typename Array2,
 				    && std::is_floating_point<typename Array2::dtype>::value>* = nullptr>
 auto ggd(const Array1& a, const Array2& alpha, typename Array1::dtype mu=0)
 {
-  /*return make_delayed<typename Array::dtype, Array::ndim>(a.dims(),
+  /*return make_delayed<typename Array::dtype, Array::ndim()>(a.dims(),
 			   [a,alpha,mu]
 			   (const auto& coords) {
 			     return std::exp(-power<beta>(std::fabs(a(coords)-mu)/alpha));

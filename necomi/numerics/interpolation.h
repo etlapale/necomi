@@ -1,5 +1,6 @@
 // necomi/numerics/interpolation.h – Discretizations and interpolations
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -65,7 +66,7 @@ template <InterpolationMethod method, typename U=double,
 	    method==InterpolationMethod::NearestNeighbor>* = nullptr>
 U interpolation(const Array& a, U x)
 {
-  static_assert(Array::ndim == 1,
+  static_assert(Array::ndim() == 1,
 		"nearest-neighbor interpolation only available for one-dimensional arrays");
   auto x0 = static_cast<std::size_t>(0.5 + x);
   return a(x0);
@@ -81,7 +82,7 @@ template <InterpolationMethod method, typename U=double,
 	    method==InterpolationMethod::NearestNeighbor>* = nullptr>
   auto interpolation(const Array& a)
 {
-  static_assert(Array::ndim == 1,
+  static_assert(Array::ndim() == 1,
 		"nearest-neighbor interpolation only available for one-dimensional arrays");
   return [a](U x) {
     auto x0 = static_cast<std::size_t>(0.5 + x);
@@ -97,9 +98,9 @@ template <InterpolationMethod method,
 	  typename std::enable_if_t<method==InterpolationMethod::Linear>* = nullptr>
 auto interpolation(const Array1& a, const Array2& xvals)
 {
-  static_assert(Array2::ndim == 1,
+  static_assert(Array2::ndim() == 1,
 		"linear interpolation only available for one-dimensional arrays");
-  return make_delayed<Array1::dtype,Array2::ndim>(xvals.dimensions(),
+  return make_delayed<Array1::dtype,Array2::ndim()>(xvals.dimensions(),
 						  [a,xvals](const auto& coords) {
 						    typename Array2::dtype x = xvals(coords);
 						    auto x0 = static_cast<std::size_t>(x);
@@ -120,7 +121,7 @@ template <InterpolationMethod method, typename U=double,
 	    method==InterpolationMethod::Linear>* = nullptr>
   U interpolation(const Array& a, U x)
 {
-  static_assert(Array::ndim == 1,
+  static_assert(Array::ndim() == 1,
 		"linear interpolation only available for one-dimensional arrays");
   auto x0 = static_cast<std::size_t>(x);
   auto y0 = a(x0);
@@ -139,7 +140,7 @@ template <InterpolationMethod method, typename U=double,
 	    method==InterpolationMethod::Linear>* = nullptr>
   auto interpolation(const Array& a)
 {
-  static_assert(Array::ndim == 1,
+  static_assert(Array::ndim() == 1,
 		"linear interpolation only available for one-dimensional arrays");
   return [a](U x) {
     auto x0 = static_cast<std::size_t>(x);
@@ -162,7 +163,7 @@ auto rescale(typename Array::dtype imin, typename Array::dtype imax,
 	     const Array& a)
 {
   using T = typename Array::dtype;
-  return make_delayed<T, Array::ndim>(a.dimensions(),
+  return make_delayed<T, Array::ndim()>(a.dimensions(),
 				      [imin,imax,omin,omax,a](const auto& coords) {
 					return rescale<T>(imin, imax, omin, omax, a(coords));
 				      });
@@ -178,7 +179,7 @@ auto scaled_interpolation(const Array1& a,
 			  typename Array2::dtype xmin,
 			  typename Array2::dtype xmax, const Array2& xvals)
 {
-  static_assert(Array1::ndim == 1,
+  static_assert(Array1::ndim() == 1,
 		"linear interpolation only available for one-dimensional arrays");
   return make_delayed<>(xvals.dims(),
 			[xmin,xmax,a,xvals]
