@@ -12,6 +12,8 @@ addons:
       - libpng-dev
       - libboost-all-dev
       - libfftw3-dev
+before_install:
+  - pip install codecov
 install:
   - git submodule init
   - git submodule update
@@ -24,3 +26,5 @@ before_script:
   - cmake .
 script:
   - make check
+after_success:
+  - codecov
