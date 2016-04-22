@@ -1,6 +1,5 @@
 // necomi/traits/arrays.h – Compile-time array type checks
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -20,7 +19,7 @@ template <std::size_t N>
 struct enable_if_dimension {};
     
 template <typename T>
-struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim()>>::type>
+struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim>>::type>
   : std::true_type {};
   
 template <typename T, typename = void>
@@ -64,7 +63,7 @@ struct is_same_ndim_dtype
   : std::integral_constant<bool,
 			   std::is_same<typename Array1::dtype,
 					typename Array2::dtype>::value
-			   && Array1::ndim() == Array2::ndim()>
+			   && Array1::ndim == Array2::ndim>
 {};
 
 template <typename T, typename = void>

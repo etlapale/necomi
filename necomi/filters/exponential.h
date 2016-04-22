@@ -1,6 +1,5 @@
 // necomi/filters/exponential.h – Recursive exponential filters
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -51,7 +50,7 @@ public:
 	    std::enable_if_t<is_indexable<Input>::value>* = nullptr>
   const necomi::StridedArray<T,N> feed(const Input& input)
   {
-    static_assert(Input::ndim() == N, "invalid input array dimensionality");
+    static_assert(Input::ndim == N, "invalid input array dimensionality");
     
 #ifndef NECOMI_NO_BOUND_CHECKS
     if (input.dims() != remove_coordinate(m_last_inputs.dims(), 0))

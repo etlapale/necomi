@@ -15,7 +15,7 @@ TEST_CASE( "transformations", "[delayed]" ) {
     auto b = constants({5}, 38);
     auto c = concat(a, b);
     
-    REQUIRE( c.ndim() == 1 );
+    REQUIRE( c.ndim == 1 );
     REQUIRE( c.dim(0) == 8 );
     REQUIRE( c(0) == 67 );
     REQUIRE( c(2) == 67 );
@@ -23,7 +23,7 @@ TEST_CASE( "transformations", "[delayed]" ) {
     REQUIRE( c(7) == 38 );
 
     auto d = concat(a, b, a);
-    REQUIRE( d.ndim() == 1 );
+    REQUIRE( d.ndim == 1 );
     REQUIRE( d.dim(0) == 11 );
     REQUIRE( d(0) == 67 );
     REQUIRE( d(2) == 67 );
@@ -35,7 +35,7 @@ TEST_CASE( "transformations", "[delayed]" ) {
     auto e = reshape(range(15), 3, 5);
     auto f = reshape(range(35), 7, 5);
     auto g = concat(e, f);
-    REQUIRE( g.ndim() == 2 );
+    REQUIRE( g.ndim == 2 );
     REQUIRE( g.dim(0) == 10 );
     REQUIRE( g.dim(1) == 5 );
     REQUIRE( g(2,1) == 11 );
@@ -45,7 +45,7 @@ TEST_CASE( "transformations", "[delayed]" ) {
     auto m = reshape(range(15), 5, 3);
     auto n = reshape(range(35), 5, 7);
     auto p = concat(1, m, n);
-    REQUIRE( p.ndim() == 2 );
+    REQUIRE( p.ndim == 2 );
     REQUIRE( p.dim(0) == 5 );
     REQUIRE( p.dim(1) == 10 );
     REQUIRE( p(0,7) == 4 );

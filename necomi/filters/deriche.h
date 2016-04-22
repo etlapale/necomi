@@ -1,6 +1,5 @@
 // necomi/filters/deriche.h – Canny-Deriche recursive filter
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -203,8 +202,8 @@ deriche(StridedArray<T,N>&& a, std::size_t dim, T sigma,
   }
     
     template <typename A,
-	      std::enable_if_t<0<A::ndim() && std::is_floating_point<typename A::dtype>::value>* = nullptr>
-      StridedArray<typename A::dtype,A::ndim()> deriche(const A& a, double sigma,
+	      std::enable_if_t<0<A::ndim && std::is_floating_point<typename A::dtype>::value>* = nullptr>
+	      StridedArray<typename A::dtype,A::ndim> deriche(const A& a, double sigma,
 		     DericheOrder order=DericheOrder::BLUR)
   {
     auto x = strided_array(a);

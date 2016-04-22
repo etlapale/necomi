@@ -56,7 +56,7 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
     WHEN( "its (real) Fourier transform is computed" ) {
       auto b = rfft(a);
       THEN( "its result is predetermined" ) {
-	REQUIRE( b.ndim() == 2 );
+	REQUIRE( b.ndim == 2 );
 	REQUIRE( b.dim(0) == 7 );
 	REQUIRE( b.dim(1) == 3 );
 	auto truth = reshape<2>(litarray(16.83+0.00i, -0.67-3.06i, -0.42-1.05i, -1.13+1.02i, 1.33-1.36i, 0.19-0.31i, 0.20-2.28i, -1.61+0.40i, -0.48-0.40i, 2.35-0.63i, 2.68+0.78i, 1.01-1.27i, 2.35+0.63i, 1.35-1.21i, -0.01-2.03i, 0.20+2.28i, -0.07+0.12i, 1.38-0.98i, -1.13-1.02i, 2.10+0.40i, 0.01+0.03i), {7,3});
@@ -64,7 +64,7 @@ SCENARIO( "contiguous arrays of complex numbers are Fourier transformable",
       }
       THEN( "its inverse is the original array" ) {
 	auto c = irfft(b, a.dim(1));
-	REQUIRE( a.ndim() == c.ndim() );
+	REQUIRE( a.ndim == c.ndim );
 	REQUIRE( a.dims() == c.dims() );
 	REQUIRE( std::abs(sum(power<2>(c-a))) < 1e-12 );
       }

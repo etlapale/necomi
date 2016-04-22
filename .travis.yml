@@ -13,7 +13,7 @@ addons:
       - libboost-all-dev
       - libfftw3-dev
 before_install:
-  - sudo pip install codecov
+  - pip install codecov
 install:
   - git submodule init
   - git submodule update

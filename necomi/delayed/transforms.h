@@ -1,6 +1,5 @@
 // necomi/delayed/transforms.h – Array reshaping and reordering
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -52,7 +51,7 @@ template <typename Array, typename dim_type = typename Array::dim_type>
 auto roll(const Array& a, dim_type shift, dim_type dim)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
-  if (dim >= Array::ndim())
+  if (dim >= Array::ndim)
     throw std::out_of_range("invalid rolling dimension");
 #endif
   auto sz = a.dims()[dim];
@@ -63,7 +62,7 @@ auto roll(const Array& a, dim_type shift, dim_type dim)
 }
 
 template <typename Array, typename dim_type = typename Array::dim_type,
-	  std::enable_if_t<Array::ndim()==1>* = nullptr>
+	  std::enable_if_t<Array::ndim==1>* = nullptr>
 auto roll(const Array& a, dim_type shift)
 {
   return roll<Array>(a, shift, 0);
@@ -71,7 +70,7 @@ auto roll(const Array& a, dim_type shift)
 
 // TODO: remove (stack() special case)
 template <typename Array1, typename Array2,
-	  std::enable_if_t<Array1::ndim() == Array2::ndim()>* = nullptr>
+	  std::enable_if_t<Array1::ndim == Array2::ndim>* = nullptr>
 auto zip(const Array1& a, const Array2& b)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
@@ -81,14 +80,14 @@ auto zip(const Array1& a, const Array2& b)
 #endif
   return make_delayed(append_coordinate(a.dims(), 2),
 		      [a,b](const auto& coords) {
-			auto c = remove_coordinate(coords, Array1::ndim());
-			return coords[Array1::ndim()] == 0 ? a(c) : b(c);
+			auto c = remove_coordinate(coords, Array1::ndim);
+			return coords[Array1::ndim] == 0 ? a(c) : b(c);
 		      });
 }
   
 template <typename Array, typename T=typename Array::dtype,
 	  typename dims_type = typename Array::dims_type>
-auto shifted(const Array& a, std::array<ssize_t,Array::ndim()> offset, T default_value = 0)
+auto shifted(const Array& a, std::array<ssize_t,Array::ndim> offset, T default_value = 0)
 {
   using dim_type = typename Array::dim_type;
   
@@ -97,7 +96,7 @@ auto shifted(const Array& a, std::array<ssize_t,Array::ndim()> offset, T default
          default_value=std::move(default_value)]
 	(const auto& coords) {
 	  dims_type cx;
-	  for (dim_type i = 0; i < Array::ndim(); i++) {
+	  for (dim_type i = 0; i < Array::ndim; i++) {
 	    // Check for negative resulting coordinates
 	    if (offset[i] < 0
 		&& static_cast<dim_type>(-offset[i]) > coords[i])
@@ -181,23 +180,23 @@ auto concat(const Array& a, const Arrays&... as)
 }
 
 template <typename Array>
-auto pad(const Array& a, const std::array<std::size_t,Array::ndim()>& dims,
+auto pad(const Array& a, const std::array<std::size_t,Array::ndim>& dims,
 	 typename Array::dtype value = 0)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
-  for (auto i = 0UL; i < Array::ndim(); i++)
+  for (auto i = 0UL; i < Array::ndim; i++)
     if (a.dim(i) >= dims[i])
       throw std::length_error("array can only be padded in larger ones");
 #endif
 
   typename Array::dims_type pad;
-  for (auto i = 0UL; i < Array::ndim(); i++)
+  for (auto i = 0UL; i < Array::ndim; i++)
     pad[i] = (dims[i] - a.dim(i)) / 2;
 
   return make_delayed(dims, [value,a,pad](const auto& coords){
       typename Array::dims_type pos;
       // Check if out of bounds
-      for (auto i = 0UL; i < Array::ndim(); i++) {
+      for (auto i = 0UL; i < Array::ndim; i++) {
 	if (coords[i] < pad[i] || coords[i] - pad[i] >= a.dim(i))
 	  return value;
 	pos[i] = coords[i] - pad[i];
@@ -212,7 +211,7 @@ template <typename Array,
 	  typename std::enable_if_t<is_array<Array>::value>* = nullptr>
 auto slice(Array a, std::size_t i)
 {
-  static_assert(Array::ndim() >= 1,
+  static_assert(Array::ndim >= 1,
 		"only arrays with more than one dimension are sliceable");
 #ifndef NECOMI_NO_BOUND_CHECKS
   // Make sure the dimensions of a and b are the same

@@ -1,6 +1,5 @@
 // necomi/algorithms/modif.h – Apply functions to all elements
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -22,7 +21,7 @@ Array& transform(Array& a, Function f)
 
 
 template <typename Array1, typename Array2, typename Function,
-	  std::enable_if_t<Array1::ndim() == Array2::ndim()
+	  std::enable_if_t<Array1::ndim == Array2::ndim
 			   && is_modifiable<Array1>::value
 			   && is_indexable<Array2>::value>* = nullptr>
 Array1& transform(Array1& a, const Array2& b, Function f)

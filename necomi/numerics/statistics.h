@@ -1,6 +1,5 @@
 // necomi/numerics/statistics.h – Basic statistical functions
 //
-// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -88,7 +87,7 @@ T min(const Array& a)
  * Sum an array across a given dimension.
  */
 template <typename Array, typename dim_type = typename Array::dim_type,
-	  typename std::enable_if<Array::ndim()!=0>::type* = nullptr>
+	  typename std::enable_if<Array::ndim!=0>::type* = nullptr>
 auto sum(const Array&a, dim_type dim)
 {
   return make_delayed(remove_coordinate(a.dims(), dim),
@@ -109,7 +108,7 @@ auto sum(const Array&a, dim_type dim)
  * Average an array across a given dimension.
  */
 template <typename Array, typename dim_type = typename Array::dim_type,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto average(const Array& a, dim_type dim)
 {
   return sum(a,dim) / static_cast<typename Array::dtype>(a.dims()[dim]);
@@ -119,7 +118,7 @@ auto average(const Array& a, dim_type dim)
  * Average across all dimensions.
  */
 template <typename Array,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto average(const Array& a)
 {
   return sum(a) / static_cast<typename Array::dtype>(size(a));
@@ -138,7 +137,7 @@ auto average(const Array& a)
  * in NumPy).
  */
 template <typename Array, typename dim_type = typename Array::dim_type,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto variance(const Array& a, dim_type dim, bool bessel_correction)
 {
   auto avg = strided_array(average(a, dim));
@@ -159,7 +158,7 @@ auto variance(const Array& a, dim_type dim, bool bessel_correction)
 }
 
 template <typename Array,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto variance(const Array& a, bool bessel_correction)
 {
   static_assert(std::is_floating_point<typename Array::dtype>::value,
@@ -173,14 +172,14 @@ auto variance(const Array& a, bool bessel_correction)
 }
 
 template <typename Array, typename dim_type = typename Array::dim_type,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto deviation(const Array& a, dim_type dim, bool bessel_correction)
 {
   return sqrt(variance(a, dim, bessel_correction));
 }
 
 template <typename Array,
-	  typename std::enable_if_t<Array::ndim()!=0>* = nullptr>
+	  typename std::enable_if_t<Array::ndim!=0>* = nullptr>
 auto deviation(const Array& a, bool bessel_correction)
 {
   return std::sqrt(variance(a, bessel_correction));
@@ -204,9 +203,9 @@ auto max(const Array& a, U value)
  * Cumulative sum.
  */
 template <typename Indexable, typename T=typename Indexable::dtype>
-StridedArray<T,Indexable::ndim()> cumsum(const Indexable& a, std::size_t dim = 0)
+StridedArray<T,Indexable::ndim> cumsum(const Indexable& a, std::size_t dim = 0)
 {
-  StridedArray<T,Indexable::ndim()> res(a.dims());
+  StridedArray<T,Indexable::ndim> res(a.dims());
   res.map([&res,dim,&a](auto& path, auto& valx) {
       if (path[dim] == 0) {
 	valx = a(path);
