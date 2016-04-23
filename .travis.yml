@@ -8,6 +8,7 @@ addons:
       - clang-3.7
       - g++-5
       - gcc-5
+      - lcov
       - libhdf5-serial-dev
       - libpng-dev
       - libboost-all-dev
