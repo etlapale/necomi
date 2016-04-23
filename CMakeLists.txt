@@ -10,7 +10,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 include_directories ("${PROJECT_SOURCE_DIR}")
-include(CodeCoverage)
 
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
