@@ -22,8 +22,8 @@ compiler:
   - clang
   - gcc
 before_script:
-  - cmake .
+  - cmake -DCMAKE_BUILD_TYPE=Debug .
 script:
-  - make check VERBOSE=1
+  - make coverage VERBOSE=1
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -12,6 +12,7 @@ endif()
 include_directories ("${PROJECT_SOURCE_DIR}")
 
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(CodeCoverage)
 
 # Downloaded external dependencies
 set (ext_deps
@@ -100,6 +101,7 @@ target_link_libraries (necomi-catch-test ${necomi_libraries})
 
 # Code coverage (gcc)
 if (CMAKE_COMPILER_IS_GNUCXX)
+  setup_target_for_coverage(coverage necomi-catch-test coverage)
   target_link_libraries (necomi-catch-test ${necomi_libraries} "gcov")
 endif()
 
