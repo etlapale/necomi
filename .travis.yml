@@ -24,6 +24,6 @@ compiler:
 before_script:
   - cmake .
 script:
-  - make check
+  - make check VERBOSE=1
 after_success:
   - bash <(curl -s https://codecov.io/bash)
