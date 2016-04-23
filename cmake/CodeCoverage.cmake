@@ -76,7 +76,7 @@ FIND_PROGRAM( GCOVR_PATH gcovr PATHS ${CMAKE_SOURCE_DIR}/tests)
 IF(NOT GCOV_PATH)
   MESSAGE(FATAL_ERROR "gcov not found! Aborting...")
 ELSE()
-  MESSAGE("gcov found: ${GCOV_PATH}")
+  MESSAGE("-- gcov found: ${GCOV_PATH}")
 ENDIF() # NOT GCOV_PATH
 
 IF(NOT CMAKE_COMPILER_IS_GNUCXX)
@@ -137,14 +137,14 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 	ADD_CUSTOM_TARGET(${_targetname}
 
 		# Cleanup lcov
-		${LCOV_PATH} --directory . --zerocounters
+		${LCOV_PATH} --gcov-tool ${GCOV_PATH} --directory . --zerocounters
 
 		# Run tests
 		COMMAND ${_testrunner} ${ARGV3}
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'tests/*' '/usr/*' --output-file ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --directory . --capture --output-file ${_outputname}.info
+		COMMAND ${LCOV_PATH} --gcov-tool ${GCOV_PATH} --remove ${_outputname}.info 'tests/*' '/usr/*' --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
 		# COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
