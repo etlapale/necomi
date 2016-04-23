@@ -31,5 +31,14 @@ TEST_CASE( "sort", "[algorithms]" ) {
     auto c = permute(a, idx);
     for (auto j = 1UL; j < b.dim(0); j++)
       REQUIRE( c(j-1) >= c(j) );
+
+    auto x = idx.slice(slice(0UL, size(a)-1UL, 1UL));
+    bool length_error_thrown = false;
+    try {
+      permute(a, x);
+    } catch (std::length_error&) {
+      length_error_thrown = true;
+    }
+    REQUIRE( length_error_thrown );
   }
 }

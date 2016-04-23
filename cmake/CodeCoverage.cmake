@@ -74,7 +74,9 @@ FIND_PROGRAM( GENHTML_PATH genhtml )
 FIND_PROGRAM( GCOVR_PATH gcovr PATHS ${CMAKE_SOURCE_DIR}/tests)
 
 IF(NOT GCOV_PATH)
-	MESSAGE(FATAL_ERROR "gcov not found! Aborting...")
+  MESSAGE(FATAL_ERROR "gcov not found! Aborting...")
+ELSE()
+  MESSAGE("gcov found: ${GCOV_PATH}")
 ENDIF() # NOT GCOV_PATH
 
 IF(NOT CMAKE_COMPILER_IS_GNUCXX)
