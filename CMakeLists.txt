@@ -5,8 +5,12 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-braces -Wno-unused-value")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+if (CMAKE_COMPILER_IS_GNUCXX)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+endif()
 
 include_directories ("${PROJECT_SOURCE_DIR}")
+include(CodeCoverage)
 
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -97,8 +101,6 @@ target_link_libraries (necomi-catch-test ${necomi_libraries})
 
 # Code coverage (gcc)
 if (CMAKE_COMPILER_IS_GNUCXX)
-  message("compiling with g++")
-  target_compile_options(necomi-catch-test PUBLIC "--coverage")
   target_link_libraries (necomi-catch-test ${necomi_libraries} "gcov")
 endif()
 
