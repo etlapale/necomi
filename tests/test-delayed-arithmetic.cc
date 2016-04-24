@@ -16,4 +16,41 @@ TEST_CASE( "delayed arrays from arithmetic operations", "[delayed]" ) {
     auto c = -b;
     REQUIRE( all(c == a) );
   }
+  
+  SECTION( "arithmetic operators on mismatching sizes" ) {
+    auto a = range<int>(10);
+    auto b = range<int>(8);
+
+    bool length_error_thrown = false;
+    try {
+      a * b;
+    } catch (std::length_error&) {
+      length_error_thrown = true;
+    }
+    REQUIRE( length_error_thrown );
+    
+    length_error_thrown = false;
+    try {
+      a / b;
+    } catch (std::length_error&) {
+      length_error_thrown = true;
+    }
+    REQUIRE( length_error_thrown );
+    
+    length_error_thrown = false;
+    try {
+      a - b;
+    } catch (std::length_error&) {
+      length_error_thrown = true;
+    }
+    REQUIRE( length_error_thrown );
+    
+    length_error_thrown = false;
+    try {
+      a + b;
+    } catch (std::length_error&) {
+      length_error_thrown = true;
+    }
+    REQUIRE( length_error_thrown );
+  }
 }
