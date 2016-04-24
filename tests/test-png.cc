@@ -30,6 +30,22 @@ TEST_CASE( "PNG storage", "[codecs]" ) {
     REQUIRE( img(354,300,2) == 0x26 );
   }
 
+  SECTION( "load an invalid image" ) {
+    // Create an invalid image
+    std::ofstream fp("invalid.png", std::ios::binary);
+    fp.write("abcdefgh", 8);
+    fp.close();
+    
+    bool png_exception_thrown = false;
+    try {
+      png_load("invalid.png");
+    } catch (necomi::png_exception&) {
+      png_exception_thrown = true;
+    }
+
+    REQUIRE( png_exception_thrown );
+  }
+
   SECTION( "save PNG image" ) {
     // Open the image
     auto img = png_load(baboon_path);
