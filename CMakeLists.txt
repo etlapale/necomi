@@ -29,6 +29,15 @@ foreach (dep IN LISTS ext_deps)
 endforeach ()
 
 # Optional libraries:
+# - OpenCL
+find_package (OpenCL)
+if (OpenCL_FOUND)
+  add_definitions ("-DHAVE_OPENCL")
+  include_directories ("${OpenCL_INCLUDE_DIRS}")
+  list (APPEND necomi_libraries ${OpenCL_LIBRARIES})
+else ()
+  message (WARNING "disabling checks for missing OpenCL")
+endif ()
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
 if (HDF5_FOUND)
@@ -86,6 +95,7 @@ set (tests_src
   tests/test-filters-deriche.cc
   tests/test-filters-exponential.cc
   tests/test-numerics.cc
+  tests/test-opencl.cc
   tests/test-random.cc
   tests/test-slices.cc
   tests/test-traits-shape.cc
