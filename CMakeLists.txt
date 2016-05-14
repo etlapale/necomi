@@ -79,6 +79,7 @@ set (tests_src
   tests/test-convert-stl.cc
   tests/test-core-iterators.cc
   tests/test-delayed-arithmetic.cc
+  tests/test-delayed-comparisons.cc
   tests/test-delayed.cc
   tests/test-delayed-maps.cc
   tests/test-delayed-transforms.cc
