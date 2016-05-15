@@ -386,10 +386,10 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( a(1,0) == 0 );
 
     auto b = identity(3);
-    REQUIRE( a(0,0) == 1 );
-    REQUIRE( a(3,3) == 1 );
-    REQUIRE( a(1,2) == 0 );
-    REQUIRE( a(2,0) == 0 );
+    REQUIRE( b(0,0) == 1 );
+    REQUIRE( b(2,2) == 1 );
+    REQUIRE( b(1,2) == 0 );
+    REQUIRE( b(2,0) == 0 );
   }
   
   SECTION( "1D delayed array function" ) {
