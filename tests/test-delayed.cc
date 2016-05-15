@@ -447,7 +447,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     bool exception_thrown = false;
     try {
-      auto c = range<double>(10, 3, 1);
+      range<double>(10, 3, 1);
     } catch (std::out_of_range& e) {
       exception_thrown = true;
     }
@@ -455,7 +455,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     exception_thrown = false;
     try {
-      auto c = range<double>(3, 10, 0);
+      range<double>(3, 10, 0);
     } catch (std::out_of_range& e) {
       exception_thrown = true;
     }
@@ -680,7 +680,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     bool exception_thrown = false;
     try {
       auto j = range<int>(12);
-      auto k = stack(a, j);
+      stack(a, j);
     } catch (std::length_error& e) {
       exception_thrown = true;
     }
@@ -745,7 +745,6 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
     auto a = zeros(1,3,4);
     auto b = zeros(1,3);
-    auto c = zeros(1,3,4);
     StridedArray<double,3> d(1,3,4);
     StridedArray<int,2> e(1,3);
     StridedArray<float,3> f(1,3,4);
@@ -803,10 +802,10 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( is_modifiable<B>::value );
     REQUIRE( ! is_modifiable<C>::value ); // TODO
 
-    const int k = 93;
-    auto d = make_delayed(a.dims(), [&k] (const auto&) -> const int& {
-	return k;
-      });
+    //const int k = 93;
+    /*auto d = make_delayed(a.dims(), [&k] (const auto&) -> const int& {
+      return k;
+      });*/
 
     //DebugType<typename decltype(d)::elem_type> dde;
     //DebugType<typename decltype(d)::const_elem_type> dce;
