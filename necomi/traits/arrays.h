@@ -65,7 +65,7 @@ struct is_same_ndim_dtype
   : std::integral_constant<bool,
 			   std::is_same<typename Array1::dtype,
 					typename Array2::dtype>::value
-			   && Array1::ndim == Array2::ndim>
+			   && Array1::ndim() == Array2::ndim()>
 {};
 
 template <typename T, typename = void>

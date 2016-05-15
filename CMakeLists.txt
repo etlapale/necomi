@@ -72,7 +72,7 @@ set (tests_src
   tests/catch-tests.cc
   #tests/test-algos-modif.cc
   #tests/test-algos-sort.cc
-  #tests/test-arrays.cc
+  tests/test-arrays.cc
   #tests/test-broadcasting.cc
   #tests/test-codecs-streams.cc
   tests/test-concepts.cc
