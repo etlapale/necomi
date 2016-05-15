@@ -71,20 +71,20 @@ TEST_CASE( "basic array operations", "[base]" ) {
 
   SECTION( "array dimensions" ) {
     StridedArray<double,0> a0;
-    REQUIRE( a0.ndim == 0 );
+    REQUIRE( a0.ndim() == 0 );
     REQUIRE( size(a0) == 1 );
 
     StridedArray<double,1> a1(127);
-    REQUIRE( a1.ndim == 1 );
+    REQUIRE( a1.ndim() == 1 );
     REQUIRE( a1.dim(0) == 127 );
 
     StridedArray<double,2> a2(3,4);
-    REQUIRE( a2.ndim == 2 );
+    REQUIRE( a2.ndim() == 2 );
     REQUIRE( a2.dim(0) == 3 );
     REQUIRE( a2.dim(1) == 4 );
 
     StridedArray<double,5> a5(8,1,7,2,9);
-    REQUIRE( a5.ndim == 5 );
+    REQUIRE( a5.ndim() == 5 );
     REQUIRE( a5.dim(1) == 1 );
     REQUIRE( a5.dim(4) == 9 );
   }
@@ -169,7 +169,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     for (unsigned int i = 0; i < size(a1); i++)
       a1(i) = i;
     auto a1s = a1[45];
-    REQUIRE( a1s.ndim == 0 );
+    REQUIRE( a1s.ndim() == 0 );
     REQUIRE( size(a1s) == 1);
     REQUIRE( a1s() == 45 );
 
@@ -177,7 +177,7 @@ TEST_CASE( "basic array operations", "[base]" ) {
     for (unsigned int i = 0; i < size(a2); i++)
       a2.data()[i] = i;
     auto a2s = a2[2];
-    REQUIRE( a2s.ndim == 1 );
+    REQUIRE( a2s.ndim() == 1 );
     REQUIRE( size(a2s) == 4 );
     REQUIRE( a2s.dim(0) == 4 );
     REQUIRE( a2s.strides().size() == 1 );

@@ -18,26 +18,30 @@ struct NotArray2
 // Missing element type
 struct NotArray3
 {
-  static constexpr std::size_t ndim = 0;
+  static constexpr std::size_t ndim()
+  { return 2; }
 };
 
 // Missing dimensions
 struct NotArray4
 {
   typedef char value_type;
-  static constexpr std::size_t ndim = 1;
+  static constexpr std::size_t ndim()
+  { return 1; }
 };
 
 // Minimal array definition
 struct Array1
 {
   using dtype = double;
-  enum { ndim = 1 };
   using dim_type = std::size_t;
-  using dims_type = std::array<dim_type,ndim>;
+  using dims_type = std::array<dim_type,1>;
+
+  static constexpr std::size_t ndim()
+  { return 1; }
   
   dims_type dims() const
-  { return std::array<std::size_t,ndim>(); };
+  { return std::array<std::size_t,1>(); };
 };
 
 // Minimal indexable array definition

@@ -203,7 +203,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "delayed one-liner" ) {
     auto a = make_delayed<2>({{11,21}}, [](const auto&) { return 42; });
-    REQUIRE( a.ndim == 2 );
+    REQUIRE( a.ndim() == 2 );
     REQUIRE( a.dim(0) == 11 );
     REQUIRE( a(3,7) == 42 );
   }
@@ -232,7 +232,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
 
   SECTION( "constant creation" ) {
     auto a = zeros(5,4);
-    REQUIRE( a.ndim == 2 );
+    REQUIRE( a.ndim() == 2 );
     REQUIRE( a.dim(0) == 5 );
     REQUIRE( a.dim(1) == 4 );
   }
@@ -477,7 +477,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = constants({5}, 7);
     StridedArray<double,a(2)> b;
     //REQUIRE( sizeof(b) == sizeof(int)*13 );
-    REQUIRE( b.ndim() == 7 );
+    REQUIRE( b.ndim()() == 7 );
 
     //auto func = [](){ return static_cast<int>(time(0)); };
     //int c[func()];
@@ -518,7 +518,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto b = 3 * range<int>(7);
     
     auto c = zip(a,b);
-    REQUIRE( c.ndim == 2);
+    REQUIRE( c.ndim() == 2);
     REQUIRE( c.dim(0) == 7 );
     REQUIRE( c.dim(1) == 2 );
 
@@ -601,7 +601,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( c(3,1) == 23 );
     
     auto d = fix_dimension(b, 0, 2);
-    REQUIRE( d.ndim == 1 );
+    REQUIRE( d.ndim() == 1 );
     REQUIRE( d.dim(0) == 3 );
     REQUIRE( d(0) == 15 );
     REQUIRE( d(2) == 17 );
@@ -645,14 +645,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto c = range<int>(3, 27);
 
     auto d = stack(a,b);
-    REQUIRE( d.ndim == 2 );
+    REQUIRE( d.ndim() == 2 );
     REQUIRE( d.dim(0) == 2 );
     REQUIRE( d(0,3) == 3 );
     REQUIRE( d(1,3) == 3 );
     REQUIRE( d(0,12) == d(1,12) );
 
     auto e = stack(a,b,a);
-    REQUIRE( e.ndim == 2 );
+    REQUIRE( e.ndim() == 2 );
     REQUIRE( e.dim(0) == 3 );
     REQUIRE( e(0,3) == 3 );
     REQUIRE( e(1,3) == 3 );
@@ -660,7 +660,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     REQUIRE( e(0,12) == e(1,12) );
 
     auto f = stack(a,b,c);
-    REQUIRE( f.ndim == 2 );
+    REQUIRE( f.ndim() == 2 );
     REQUIRE( f.dim(0) == 3 );
     REQUIRE( f(0,4) == 4 );
     REQUIRE( f(1,4) == 4 );
@@ -669,7 +669,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto g = reshape(range<int>(12), 4, 3);
     auto h = reshape(range<int>(4,16), 4, 3);
     auto i = stack(g,h);
-    REQUIRE( i.ndim == 3 );
+    REQUIRE( i.ndim() == 3 );
     REQUIRE( i.dim(0) == 2 );
     REQUIRE( i(0,2,1) == 7 );
     REQUIRE( i(1,2,1) == 11 );
@@ -690,14 +690,14 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     auto a = reshape(range<int>(24), 2, 4, 3);
     
     auto a0 = slice(a, 0);
-    REQUIRE( a0.ndim == 2 );
+    REQUIRE( a0.ndim() == 2 );
     REQUIRE( a0.dim(0) == 4 );
     REQUIRE( a0.dim(1) == 3 );
     REQUIRE( a0(2,1) == 7 );
     REQUIRE( a0(1,2) == 5 );
     
     auto a1 = slice(a, 1);
-    REQUIRE( a1.ndim == 2 );
+    REQUIRE( a1.ndim() == 2 );
     REQUIRE( a1.dim(0) == 4 );
     REQUIRE( a1.dim(1) == 3 );
     REQUIRE( a1(2,1) == 19 );

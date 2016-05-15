@@ -37,7 +37,7 @@ template <typename Array,
 			   && std::is_same<dims_type, typename Array::dims_type>::value>* = nullptr>
 std::size_t strided_index(const Array& a, const dims_type& coords)
 {
-  // TODO static/dynamic check on a.ndim
+  // TODO static/dynamic check on a.ndim()
   return std::inner_product(coords.cbegin(), coords.cend(),
 			    a.strides().cbegin(), 0);
 }
@@ -57,7 +57,7 @@ template <typename Array, typename ...Coords,
 	  std::enable_if_t<all_convertible<Coords..., dim_type>::value>* = nullptr>
 std::size_t strided_index(const Array& a, Coords... coords)
 {
-  // TODO static/dynamic check on a.ndim
+  // TODO static/dynamic check on a.ndim()
   using dims_type = typename Array::dims_type;
   return strided_index(a, dims_type{static_cast<dim_type>(coords)...});
 }

@@ -1,5 +1,6 @@
 // necomi/traits/arrays.h – Compile-time array type checks
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -15,11 +16,12 @@ NECOMI_MAKE_HAS_TYPE_FIELD(dtype)
 template <typename T, typename = void>
 struct has_ndim : std::false_type {};
 
-template <std::size_t N>
-struct enable_if_dimension {};
+//template <std::size_t N>
+//struct enable_if_dimension {};
     
 template <typename T>
-struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim>>::type>
+//struct has_ndim<T, typename enable_if_type<enable_if_dimension<T::ndim>>::type>
+struct has_ndim<T, decltype(&T::ndim, void())>
   : std::true_type {};
   
 template <typename T, typename = void>

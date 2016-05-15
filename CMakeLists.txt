@@ -70,34 +70,35 @@ endif ()
 # Unit tests
 set (tests_src
   tests/catch-tests.cc
-  tests/test-algos-modif.cc
-  tests/test-algos-sort.cc
-  tests/test-arrays.cc
-  tests/test-broadcasting.cc
-  tests/test-codecs-streams.cc
+  #tests/test-algos-modif.cc
+  #tests/test-algos-sort.cc
+  #tests/test-arrays.cc
+  #tests/test-broadcasting.cc
+  #tests/test-codecs-streams.cc
   tests/test-concepts.cc
-  tests/test-convert-stl.cc
-  tests/test-core-iterators.cc
-  tests/test-delayed-arithmetic.cc
-  tests/test-delayed-comparisons.cc
-  tests/test-delayed.cc
-  tests/test-delayed-maps.cc
-  tests/test-delayed-transforms.cc
-  tests/test-filters-deriche.cc
-  tests/test-filters-exponential.cc
-  tests/test-numerics.cc
-  tests/test-random.cc
-  tests/test-slices.cc
+  #tests/test-convert-stl.cc
+  #tests/test-core-iterators.cc
+  #tests/test-delayed-arithmetic.cc
+  #tests/test-delayed-comparisons.cc
+  #tests/test-delayed.cc
+  #tests/test-delayed-maps.cc
+  #tests/test-delayed-transforms.cc
+  #tests/test-filters-deriche.cc
+  #tests/test-filters-exponential.cc
+  #tests/test-numerics.cc
+  #tests/test-random.cc
+  #tests/test-slices.cc
   tests/test-traits-shape.cc
-  tests/test-vararray.cc)
+  #tests/test-vararray.cc
+  )
 if (HDF5_FOUND)
-  set (tests_src ${tests_src} tests/test-hdf5.cc)
+  #set (tests_src ${tests_src} tests/test-hdf5.cc)
 endif ()
 if (PNG_FOUND)
-  set (tests_src ${tests_src} tests/test-png.cc)
+  #set (tests_src ${tests_src} tests/test-png.cc)
 endif ()
 if (FFTW3_FOUND)
-  set (tests_src ${tests_src} tests/test-numerics-fft.cc)
+  #set (tests_src ${tests_src} tests/test-numerics-fft.cc)
 endif ()
 add_executable (necomi-catch-test EXCLUDE_FROM_ALL ${tests_src})
 target_link_libraries (necomi-catch-test ${necomi_libraries})

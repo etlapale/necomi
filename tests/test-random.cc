@@ -45,7 +45,7 @@ TEST_CASE( "random number generation", "[random]" ) {
     auto c = normal(d, prng);
     ok = std::is_same<decltype(c)::dtype, double>::value;
     REQUIRE( ok );
-    REQUIRE( c.ndim == 3 );
+    REQUIRE( c.ndim() == 3 );
   }
 }
  
