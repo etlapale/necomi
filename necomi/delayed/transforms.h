@@ -49,7 +49,7 @@ auto reshape(const Array& a, Dimensions... dims)
  * Shift elements on a given axis.
  */
 template <typename Array, typename dim_type = typename Array::dim_type>
-auto roll(const Array& a, dim_type shift, dim_type dim)
+auto roll(const Array& a, dim_type shift, std::size_t dim)
 {
 #ifndef NECOMI_NO_BOUND_CHECKS
   if (dim >= Array::ndim())

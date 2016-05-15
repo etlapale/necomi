@@ -290,7 +290,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     
     bool exception_thrown = false;
     try {
-      auto c = reshape(a, 4, 3);
+      reshape(a, 4, 3);
     } catch (std::length_error& e) {
       exception_thrown = true;
     }
