@@ -1,5 +1,6 @@
 // necomi/arrays/stridedarray.h – In memory shared strided array
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -38,7 +39,9 @@ public:
   using dim_type = std::size_t;
   using dims_type = std::array<dim_type, N>;
   using dtype = T;
-  enum { ndim = N };
+
+  static constexpr std::size_t ndim()
+  { return N; }
 
   // Facilitate access to classes from the same template.
   template <typename U, dim_type M> friend class Array;
@@ -117,7 +120,7 @@ public:
 
   template <typename Array,
 	    std::enable_if_t<is_indexable<Array>::value
-			     && Array::ndim == N
+			     && Array::ndim() == N
 			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
   StridedArray(const Array& a)
     : StridedArray(a.dims())
@@ -125,16 +128,18 @@ public:
     this->operator=(a);
   }
 
+  /*
   template <typename Array,
 	    std::enable_if_t<has_dtype<Array>::value
 			     && ! has_ndim<Array>::value
 			     && has_dims<Array>::value
 			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
   StridedArray(const Array& a)
-    : StridedArray(to_array<dim_type, ndim>(a.dims()))
+    : StridedArray(to_array<dim_type, ndim()>(a.dims()))
   {
     this->operator=(a);
   }
+  */
 
   const dims_type& strides() const
   { return m_strides; }
@@ -304,7 +309,7 @@ public:
    */
   template <typename Array,
 	    std::enable_if_t<is_indexable<Array>::value
-			     && Array::ndim == N
+			     && Array::ndim() == N
 			     && is_promotable<typename Array::dtype,T>::value>* = nullptr>
   void operator=(const Array& a)
   {
@@ -332,7 +337,7 @@ public:
   {
 #ifndef NECOMI_NO_BOUND_CHECKS
     // Make sure the dimensions of a and b are the same
-    if (ndim != a.ndim())
+    if (ndim() != Array::ndim())
       throw std::length_error("cannot copy from variadic array of different dimensionality");
     if (! std::equal(this->dims().cbegin(), this->dims().cend(),
 		     a.dims().cbegin()))
@@ -388,7 +393,7 @@ public:
   ArrayIterator<StridedArray<T,N>> end()
   {
     dims_type coords = this->dims();
-    for (auto i = 0UL; i < ndim - 1; i++)
+    for (auto i = 0UL; i < ndim() - 1; i++)
       coords[i]--;
     return ArrayIterator<StridedArray<T,N>>(*this, coords);
   }
@@ -408,9 +413,9 @@ protected:
  */
 template <typename U, typename From, typename T=typename From::dtype,
 	  typename std::enable_if_t<std::is_convertible<T,U>::value>* = nullptr>
-StridedArray<U, From::ndim> strided_array(const From& a)
+StridedArray<U, From::ndim()> strided_array(const From& a)
 {
-  StridedArray<U, From::ndim> res(a.dims());
+  StridedArray<U, From::ndim()> res(a.dims());
   res.map([&a](auto& coords, auto& val) {
       val = static_cast<U>(a(coords));
     });
@@ -423,13 +428,13 @@ StridedArray<U, From::ndim> strided_array(const From& a)
  * A new array with copied or casted elements is always returned.
  */
 template <typename From, typename T=typename From::dtype>
-StridedArray<T, From::ndim> strided_array(const From& a)
+StridedArray<T, From::ndim()> strided_array(const From& a)
 {
   return strided_array<T,From>(a);
 }
 
 template <typename From, typename T=typename From::dtype>
-StridedArray<T, From::ndim> strided(const From& a)
+StridedArray<T, From::ndim()> strided(const From& a)
 {
   return strided_array<T,From>(a);
 }

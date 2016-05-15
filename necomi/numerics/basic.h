@@ -56,6 +56,7 @@ auto norm(const IndexableArray& a, Norm norm)
 {
   switch (norm) {
   case Norm::Infinity:
+  default:
     return max(abs(a));
   }
 }
