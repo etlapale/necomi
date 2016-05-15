@@ -1,5 +1,6 @@
 // necomi/core/iterators.h – STL compatible iterators
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -21,7 +22,9 @@ public:
   using dim_type = typename Array::dim_type;
   using dims_type = typename Array::dims_type;
   using dtype = typename Array::dtype;
-  enum { ndim = Array::ndim };
+
+  static constexpr std::size_t ndim()
+  { return ndim; }
   
   explicit ArrayIterator(Array& array)
     : m_array(array)
@@ -54,7 +57,7 @@ public:
 
   ArrayIterator<Array>& operator++()
   {
-    for (long i = ndim-1; i >= 0; i--) {
+    for (long i = ndim()-1; i >= 0; i--) {
       if (i == 0 || m_coords[i] < m_array.dim(i) - 1) {
         m_coords[i]++;
         break;
@@ -68,7 +71,7 @@ public:
 
   ArrayIterator<Array>& operator--()
   {
-    for (long i = ndim-1; i >= 0; i--) {
+    for (long i = ndim()-1; i >= 0; i--) {
       if (m_coords[i] > 0) {
         m_coords[i]--;
         break;

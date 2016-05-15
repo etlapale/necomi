@@ -74,7 +74,7 @@ set (tests_src
   #tests/test-algos-sort.cc
   tests/test-arrays.cc
   #tests/test-broadcasting.cc
-  #tests/test-codecs-streams.cc
+  tests/test-codecs-streams.cc
   tests/test-concepts.cc
   #tests/test-convert-stl.cc
   #tests/test-core-iterators.cc
