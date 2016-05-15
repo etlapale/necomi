@@ -83,8 +83,8 @@ set (tests_src
   #tests/test-delayed.cc
   #tests/test-delayed-maps.cc
   #tests/test-delayed-transforms.cc
-  #tests/test-filters-deriche.cc
-  #tests/test-filters-exponential.cc
+  tests/test-filters-deriche.cc
+  tests/test-filters-exponential.cc
   #tests/test-numerics.cc
   #tests/test-random.cc
   #tests/test-slices.cc

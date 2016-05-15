@@ -24,7 +24,7 @@ public:
   using dtype = typename Array::dtype;
 
   static constexpr std::size_t ndim()
-  { return ndim; }
+  { return Array::ndim(); }
   
   explicit ArrayIterator(Array& array)
     : m_array(array)
