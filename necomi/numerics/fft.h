@@ -1,5 +1,6 @@
 // necomi/numerics/fft.h – Wrapper around FFTW
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -44,7 +45,7 @@ StridedArray<std::complex<double>,N> fft(StridedArray<std::complex<double>,N>& a
 			 FFTW_FORWARD, FFTW_ESTIMATE);
   else {
     int dims[N];
-    for (int i = 0UL; i < a.ndim; i++)
+    for (std::size_t i = 0UL; i < a.ndim(); i++)
       dims[i] = a.dim(i);
     p = fftw_plan_dft(N, dims,
 		      reinterpret_cast<fftw_complex*>(a.data()),
@@ -85,7 +86,7 @@ StridedArray<std::complex<double>,N> ifft(StridedArray<std::complex<double>,N>& 
 			 FFTW_BACKWARD, FFTW_ESTIMATE);
   else {
     int dims[N];
-    for (int i = 0UL; i < a.ndim; i++)
+    for (std::size_t i = 0UL; i < a.ndim(); i++)
       dims[i] = a.dim(i);
     p = fftw_plan_dft(N, dims,
 		      reinterpret_cast<fftw_complex*>(a.data()),
@@ -130,7 +131,7 @@ StridedArray<std::complex<double>,N> rfft(StridedArray<double,N>& a)
 			     FFTW_ESTIMATE);
   else {
     int dims[N];
-    for (int i = 0UL; i < a.ndim; i++)
+    for (std::size_t i = 0UL; i < a.ndim(); i++)
       dims[i] = a.dim(i);
     p = fftw_plan_dft_r2c(N, dims, a.data(),
 			  reinterpret_cast<fftw_complex*>(res.data()),
@@ -170,7 +171,7 @@ StridedArray<double,N> irfft(StridedArray<std::complex<double>,N>& a,
 			     res.data(), FFTW_ESTIMATE);
   else {
     int dims[N];
-    for (int i = 0UL; i < a.ndim; i++)
+    for (std::size_t i = 0UL; i < a.ndim(); i++)
       dims[i] = res.dim(i);
     p = fftw_plan_dft_c2r(N, dims,
 			  reinterpret_cast<fftw_complex*>(a.data()),
