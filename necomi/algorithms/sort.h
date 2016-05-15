@@ -1,5 +1,6 @@
 // necomi/algorithms/sort.h – Sorting algorithms
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -30,7 +31,7 @@ template <typename Array1, typename Array2,
 			   && is_indexable<Array2>::value>* = nullptr>
 auto permute(const Array1& a, const Array2& idx)
 {
-  static_assert(Array1::ndim == Array2::ndim,
+  static_assert(Array1::ndim() == Array2::ndim(),
 		"array to be permuted and its indices must have same dimensionality");
   static_assert(std::is_same<typename Array1::dims_type,
 		             typename Array2::dtype>::value,

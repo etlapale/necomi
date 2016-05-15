@@ -1,5 +1,6 @@
 // necomi/arrays/delayed.h – Delayed arrays
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -18,8 +19,10 @@ public:
   using dim_type = std::size_t;
   using dims_type = std::array<dim_type, N>;
   using dtype = T;
-  enum { ndim = N };
   using Self = DelayedArray<T,N,Expr,modifiable>;
+
+  static constexpr std::size_t ndim()
+  { return N; }
 
   DelayedArray(const dims_type& dims, Expr e)
     : DimArray<dim_type,N>(dims)
@@ -97,7 +100,7 @@ auto make_delayed(Array& a, Expr fun)
 {
   constexpr bool modifiable = is_modifiable<Array>::value;
   using T = std::remove_reference_t<decltype(fun(a.dims()))>;
-  return DelayedArray<T,Array::ndim,Expr,modifiable>(a.dims(), fun);
+  return DelayedArray<T,Array::ndim(),Expr,modifiable>(a.dims(), fun);
 }
 
 template <std::size_t N, typename Expr>

@@ -89,15 +89,16 @@ set (tests_src
   tests/test-random.cc
   tests/test-slices.cc
   tests/test-traits-shape.cc
-  tests/test-vararray.cc)
+  tests/test-vararray.cc
+  )
 if (HDF5_FOUND)
-  set (tests_src ${tests_src} tests/test-hdf5.cc)
+  #set (tests_src ${tests_src} tests/test-hdf5.cc)
 endif ()
 if (PNG_FOUND)
-  set (tests_src ${tests_src} tests/test-png.cc)
+  #set (tests_src ${tests_src} tests/test-png.cc)
 endif ()
 if (FFTW3_FOUND)
-  set (tests_src ${tests_src} tests/test-numerics-fft.cc)
+  #set (tests_src ${tests_src} tests/test-numerics-fft.cc)
 endif ()
 add_executable (necomi-catch-test EXCLUDE_FROM_ALL ${tests_src})
 target_link_libraries (necomi-catch-test ${necomi_libraries})
