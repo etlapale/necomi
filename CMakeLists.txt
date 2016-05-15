@@ -79,17 +79,17 @@ set (tests_src
   tests/test-convert-stl.cc
   tests/test-core-iterators.cc
   tests/test-delayed-arithmetic.cc
-  #tests/test-delayed-comparisons.cc
+  tests/test-delayed-comparisons.cc
   tests/test-delayed.cc
-  #tests/test-delayed-maps.cc
-  #tests/test-delayed-transforms.cc
+  tests/test-delayed-maps.cc
+  tests/test-delayed-transforms.cc
   tests/test-filters-deriche.cc
   tests/test-filters-exponential.cc
   tests/test-numerics.cc
   tests/test-random.cc
   tests/test-slices.cc
   tests/test-traits-shape.cc
-  #tests/test-vararray.cc
+  tests/test-vararray.cc
   )
 if (HDF5_FOUND)
   #set (tests_src ${tests_src} tests/test-hdf5.cc)

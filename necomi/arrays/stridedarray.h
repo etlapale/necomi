@@ -128,6 +128,7 @@ public:
     this->operator=(a);
   }
 
+  /*
   template <typename Array,
 	    std::enable_if_t<has_dtype<Array>::value
 			     && ! has_ndim<Array>::value
@@ -138,6 +139,7 @@ public:
   {
     this->operator=(a);
   }
+  */
 
   const dims_type& strides() const
   { return m_strides; }
