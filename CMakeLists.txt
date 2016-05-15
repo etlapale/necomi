@@ -70,24 +70,24 @@ endif ()
 # Unit tests
 set (tests_src
   tests/catch-tests.cc
-  #tests/test-algos-modif.cc
-  #tests/test-algos-sort.cc
+  tests/test-algos-modif.cc
+  tests/test-algos-sort.cc
   tests/test-arrays.cc
-  #tests/test-broadcasting.cc
+  tests/test-broadcasting.cc
   tests/test-codecs-streams.cc
   tests/test-concepts.cc
-  #tests/test-convert-stl.cc
-  #tests/test-core-iterators.cc
-  #tests/test-delayed-arithmetic.cc
+  tests/test-convert-stl.cc
+  tests/test-core-iterators.cc
+  tests/test-delayed-arithmetic.cc
   #tests/test-delayed-comparisons.cc
-  #tests/test-delayed.cc
+  tests/test-delayed.cc
   #tests/test-delayed-maps.cc
   #tests/test-delayed-transforms.cc
   tests/test-filters-deriche.cc
   tests/test-filters-exponential.cc
-  #tests/test-numerics.cc
-  #tests/test-random.cc
-  #tests/test-slices.cc
+  tests/test-numerics.cc
+  tests/test-random.cc
+  tests/test-slices.cc
   tests/test-traits-shape.cc
   #tests/test-vararray.cc
   )

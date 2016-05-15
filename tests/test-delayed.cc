@@ -28,9 +28,11 @@ TEST_CASE( "delayed arrays", "[core]" ) {
     struct IdxArray
     {
       using dtype = double;
-      enum { ndim = 1 };
       using dim_type = std::size_t;
-      using dims_type = std::array<dim_type,ndim>;
+      using dims_type = std::array<dim_type,1>;
+
+      static constexpr std::size_t ndim()
+      { return 1; }
       
       dims_type dims() const { return dims_type(); }
       dtype operator()(const dims_type&) const { return 42; };
@@ -467,7 +469,7 @@ TEST_CASE( "delayed arrays", "[core]" ) {
   
   SECTION( "delayed constant arrays" ) {
     auto a = constants({5}, 13);
-    REQUIRE( decltype(a)::ndim == 1 );
+    REQUIRE( decltype(a)::ndim() == 1 );
     REQUIRE( a.dim(0) == 5 );
     REQUIRE( a(0) == 13 );
     REQUIRE( a(2) == 13 );
