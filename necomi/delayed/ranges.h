@@ -1,11 +1,13 @@
 // necomi/delayed/ranges.h – Delayed arrays from constants and ranges
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstdlib>
 
 #include "../arrays/delayed.h"
