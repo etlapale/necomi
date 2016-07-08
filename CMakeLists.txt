@@ -1,18 +1,23 @@
 cmake_minimum_required (VERSION 2.8)
 project (Necomitl)
 
+option(PERFORM_COVERAGE "Perform code coverage analysis" ON)
+
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-braces -Wno-unused-value")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-if (CMAKE_COMPILER_IS_GNUCXX)
+
+if (CMAKE_COMPILER_IS_GNUCXX AND ${PERFORM_COVERAGE})
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-endif()
+endif ()
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(CodeCoverage)
+if (${PERFORM_COVERAGE})
+  include(CodeCoverage)
+endif ()
 
 # Downloaded external dependencies
 set (ext_deps
@@ -104,7 +109,7 @@ add_executable (necomi-catch-test EXCLUDE_FROM_ALL ${tests_src})
 target_link_libraries (necomi-catch-test ${necomi_libraries})
 
 # Code coverage (gcc)
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX AND ${PERFORM_COVERAGE})
   setup_target_for_coverage(coverage necomi-catch-test coverage)
   target_link_libraries (necomi-catch-test ${necomi_libraries} "gcov")
 endif()
