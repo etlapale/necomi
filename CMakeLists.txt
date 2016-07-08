@@ -125,4 +125,5 @@ configure_file (necomi.pc.in necomi.pc @ONLY)
 # Installlation
 install (DIRECTORY necomi DESTINATION include
          FILES_MATCHING PATTERN "*.h")
-install (FILES necomi.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+install (FILES "${CMAKE_BINARY_DIR}/necomi.pc"
+	 DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
