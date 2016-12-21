@@ -41,7 +41,14 @@ endforeach ()
 # Optional libraries:
 # - HDF5
 find_package (HDF5 COMPONENTS "C;CXX")
-if (HDF5_FOUND)
+# Make sure we got C++ support in HDF5
+set(all_hdf5_libs ${HDF5_FOUND})
+foreach (lib ${HDF5_CXX_LIBRARIES})
+  if (NOT lib)
+    set (all_hdf5_libs FALSE)
+  endif ()
+endforeach ()
+if (${all_hdf5_libs})
   add_definitions ("-DHAVE_HDF5")
   add_definitions (${HDF5_DEFINITIONS})
   include_directories ("${HDF5_INCLUDE_DIRS}")
