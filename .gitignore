@@ -16,7 +16,6 @@ necomi-*.*.tar.xz
 hdf5-test-*
 \#*\#
 necomi-catch-test
-*.png
 a.out
 bla.*
 *.dat
