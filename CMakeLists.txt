@@ -24,19 +24,14 @@ if (${PERFORM_COVERAGE})
   include(CodeCoverage)
 endif ()
 
-# Downloaded external dependencies
-set (ext_deps
-     "share/bitmaps/baboon.png http://necomi.atelo.org/data/share/bitmaps/baboon.png"
-     "share/bitmaps/baboon-rot90.png http://necomi.atelo.org/data/share/bitmaps/baboon-rot90.png")
-foreach (dep IN LISTS ext_deps)
-  separate_arguments (dep)
-  list (GET dep 0 filename)
-  list (GET dep 1 url)
-  if (NOT EXISTS ${filename})
-    message ("-- Downloading ${url}")
-    file (DOWNLOAD ${url} ${filename})
-  endif ()
-endforeach ()
+# Check if PNG images were downloaded through Git LFS
+file (SHA224 "${PROJECT_SOURCE_DIR}/share/bitmaps/baboon.png" baboon_hash)
+if (baboon_hash STREQUAL "449b2b3437f608d18eaee1b2e0115635ae26cf8ad7275ac82e6faced")
+  set (got_lfs_files TRUE)
+else ()
+  message (WARNING "Large files were not downloaded through git-lfs, some checks will be disabled")
+  set (got_lfs_files FALSE)
+endif ()
 
 # Optional libraries:
 # - HDF5
