@@ -128,7 +128,14 @@ namespace necomi {
 
   inline StridedArray<unsigned char,3> png_load(const std::string& filename)
   {
-    return png_load(std::ifstream(filename));
+    std::ifstream fp;
+    fp.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+      fp.open(filename);
+    } catch (...) {
+      throw std::runtime_error("could not open PNG file " + filename);
+    }
+    return png_load(std::move(fp));
   }
 
   inline void png_save(const StridedArray<unsigned char,3>& a,

@@ -7,7 +7,7 @@ using namespace std;
 #include <necomi/necomi.h>
 using namespace necomi;
 
-static const std::string baboon_path = "share/bitmaps/baboon.png";
+static const std::string baboon_path = NECOMI_SOURCE_DIR "/share/bitmaps/baboon.png";
 
 
 TEST_CASE( "PNG storage", "[codecs]" ) {
