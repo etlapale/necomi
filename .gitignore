@@ -27,3 +27,4 @@ doc/source/_static/fonts
 fonts/
 coverage
 coverage.info*
+build
