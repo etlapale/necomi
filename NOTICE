@@ -8,3 +8,5 @@ Laboratory at the University of California, Irvine, and supported by
 the National Eye Institute Grant #17491.
 
 Canny-Deriche recursive filtering was generalized from the CImg library.
+
+Licensed under the GNU Lesser General Public License version 3.
