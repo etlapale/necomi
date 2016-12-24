@@ -1,5 +1,6 @@
 // necomi/numerics/random.h – Pseudo random number generation
 //
+// Copyright © 2016 Émilien Tlapale
 // Copyright © 2014–2015 University of California, Irvine
 // Licensed under the Simplified BSD License.
 
@@ -180,7 +181,47 @@ StridedArray<T,1> betarnd(const T& alpha, const T& beta,
   return betarnd<T,1>(alpha, beta, {size}, prng);
 }
 
+template <typename Array>
+typename Array::dtype find_higher_index(Array& a, const typename Array::dtype& val)
+{
+  static_assert(Array::ndim() == 1);
 
+  // TODO: use a looper
+  // TODO: binary search
+  for (auto i = 0UL; i < a.dim(0); i++)
+    if (a(i) >= val)
+      return i;
+
+  return a.dim(0) - 1;
+}
+
+
+/**
+ * Generate random numbers with a given distribution through inverse transform
+ * sampling.
+ *
+ * @param low	Lower bound of the CDF domain.
+ * @param high	Higher bound of the CDF domain.
+ */
+template <typename T, typename CDF, typename PRNG>
+StridedArray<T,1> inverse_transform_sampling(CDF&& cdf, double low, double high,
+    std::size_t domain_size, std::size_t output_size, PRNG& prng)
+{
+  // Discretize the domain of the CDF
+  auto domain = linspace(low, high, domain_size);
+
+  // Compute the CDF values on the domain
+  auto cdf_vals = cdf(domain);
+
+  // Generate random numbers
+  auto u = uniform<T,1>(0, 1, {output_size}, prng);
+  u.map([&domain,&cdf_vals](const auto&, auto& val) {
+      auto idx = find_higher_index(cdf_vals, val);
+      val = domain(idx);
+    });
+
+  return u;
+}
 
 
 } // namespace necomi

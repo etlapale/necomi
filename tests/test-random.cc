@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <fstream>
 
 #include "Catch/include/catch.hpp"
 
@@ -47,5 +48,20 @@ TEST_CASE( "random number generation", "[random]" ) {
     REQUIRE( ok );
     REQUIRE( c.ndim() == 3 );
   }
+
+  SECTION( "inverse transform sampling" ) {
+
+    RandomDevSeedSequence rdss;
+    std::mt19937_64 prng(rdss);
+
+    double h = 0;
+    auto Ph = [h](auto& theta){ return ((1-2*M_PI*h)*sin(4*theta) + 4*theta)/(8*M_PI); };
+    auto vals = inverse_transform_sampling<double>(Ph, 0, 2*M_PI, 1024, 1e5, prng);
+
+    std::ofstream fp("foobar.dat");
+    for (auto i = 0UL; i < size(vals); i++) {
+     fp << vals(i) << ' ';
+    }
+    fp << std::endl;
+  }
 }
- 
