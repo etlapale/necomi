@@ -184,7 +184,8 @@ StridedArray<T,1> betarnd(const T& alpha, const T& beta,
 template <typename Array>
 typename Array::dtype find_higher_index(Array& a, const typename Array::dtype& val)
 {
-  static_assert(Array::ndim() == 1);
+  static_assert(Array::ndim() == 1,
+      "ordered indexing is only available for 1D arrays");
 
   // TODO: use a looper
   // TODO: binary search
